@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HabitWolf Pro - Sistema de Autodisciplina Gamificado</title>
     
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Aplicación gamificada de seguimiento de hábitos con sistema de evolución de lobo">
+    <meta name="theme-color" content="#4299e1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="HabitWolf Pro">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- PWA Apple Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMxYTIwMmMiLz4KPHBhdGggZD0iTTk2IDQ4QzEyMC4zIDQ4IDEzNiA2My43IDEzNiA4OEM1NiA5NiA5NiAxNDQgOTYgMTQ0UzEzNiA5NiA1NiA4OEM1NiA2My43IDcxLjcgNDggOTYgNDhaIiBmaWxsPSIjNDI5OWUxIi8+CjxjaXJjbGUgY3g9IjgwIiBjeT0iNzYiIHI9IjQiIGZpbGw9IiNmZmZmZmYiLz4KPGNpcmNsZSBjeD0iMTEyIiBjeT0iNzYiIHI9IjQiIGZpbGw9IiNmZmZmZmYiLz4KPGF0aCBkPSJNODggOTZTOTIgMTA0IDk2IDEwNFMxMDQgOTYgMTA0IDk2IiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo=">
+    
     <!-- CDN Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,8 +25,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
+        body {
+            font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
@@ -129,6 +142,10 @@
             background: linear-gradient(135deg, #ed8936, #dd6b20);
         }
         
+        .notification.neutral {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+        }
+        
         .chart-container {
             height: 300px !important;
         }
@@ -162,6 +179,17 @@
             height: 8px;
             border-radius: 4px;
             transition: width 0.5s ease;
+        }
+        
+        /* PWA Install Button Animation */
+        #install-pwa-btn {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(66, 153, 225, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(66, 153, 225, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(66, 153, 225, 0); }
         }
     </style>
 </head>
@@ -472,6 +500,10 @@
                                 <i class="fas fa-shield-alt mr-2"></i>
                                 <strong>Privacidad:</strong> Todos los datos se almacenan localmente en tu dispositivo. Nada se envía a servidores externos.
                             </p>
+                            <p>
+                                <i class="fas fa-download mr-2"></i>
+                                <strong>PWA:</strong> Instala la app en tu dispositivo para acceso offline y experiencia nativa.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -519,6 +551,83 @@
     <div id="notification-container"></div>
 
     <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(function(registration) {
+                        console.log('🐺 HabitWolf Pro SW registrado:', registration.scope);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showNotification('Nueva versión disponible. Recarga la página para actualizar.', 'neutral');
+                                }
+                            });
+                        });
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Error registrando SW:', error);
+                    });
+            });
+        }
+        
+        // PWA Install Prompt
+        let deferredPrompt;
+        let installButton;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('🐺 PWA install prompt disponible');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button
+            showInstallButton();
+        });
+        
+        function showInstallButton() {
+            if (!document.getElementById('install-pwa-btn')) {
+                const installBtn = document.createElement('button');
+                installBtn.id = 'install-pwa-btn';
+                installBtn.className = 'fixed bottom-4 right-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-full shadow-lg z-50 flex items-center gap-2 transition-all';
+                installBtn.innerHTML = '<i class="fas fa-download"></i> Instalar App';
+                installBtn.onclick = installPWA;
+                document.body.appendChild(installBtn);
+            }
+        }
+        
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('🐺 Usuario instaló la PWA');
+                        showNotification('¡HabitWolf Pro instalado exitosamente!', 'success');
+                    }
+                    deferredPrompt = null;
+                    const installBtn = document.getElementById('install-pwa-btn');
+                    if (installBtn) installBtn.remove();
+                });
+            }
+        }
+        
+        // Handle URL parameters for PWA shortcuts
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            const notification = urlParams.get('notification');
+            
+            if (tab) {
+                setTimeout(() => showTab(tab), 1000);
+            }
+            
+            if (notification) {
+                setTimeout(() => showNotification('¡Acceso directo desde notificación! 🐺', 'success'), 1500);
+            }
+        });
+        
         // Global Variables and Data Storage
         let gameData = {
             player: {
@@ -797,8 +906,8 @@
         }
 
         function updateWolfEvolution() {
-            const currentEvolution = gameData.wolfEvolution.find(evo => 
-                gameData.player.xp >= evo.minXp && 
+            const currentEvolution = gameData.wolfEvolution.find(evo =>
+                gameData.player.xp >= evo.minXp &&
                 (gameData.wolfEvolution[evo.level] ? gameData.player.xp < gameData.wolfEvolution[evo.level].minXp : true)
             );
             
@@ -1212,11 +1321,11 @@
 
         function formatDate(dateStr) {
             const date = new Date(dateStr);
-            return date.toLocaleDateString('es-ES', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+            return date.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
             });
         }
 
@@ -1766,10 +1875,10 @@
                 }
                 
                 // Check if all category habits completed today
-                const todayCompleted = todayLog && todayLog.habits ? 
+                const todayCompleted = todayLog && todayLog.habits ?
                     categoryHabits.every(habit => todayLog.habits.includes(habit.id)) : false;
                 
-                const yesterdayCompleted = yesterdayLog && yesterdayLog.habits ? 
+                const yesterdayCompleted = yesterdayLog && yesterdayLog.habits ?
                     categoryHabits.every(habit => yesterdayLog.habits.includes(habit.id)) : false;
                 
                 if (todayCompleted) {
@@ -1964,7 +2073,7 @@
                         <div class="text-4xl mb-2">${item.icon}</div>
                         <h3 class="font-semibold mb-2">${item.name}</h3>
                         <div class="text-lg font-bold text-yellow-600 mb-3">🪙 ${item.cost}</div>
-                        <button onclick="buyItem(${item.id})" ${!canAfford ? 'disabled' : ''} 
+                        <button onclick="buyItem(${item.id})" ${!canAfford ? 'disabled' : ''}
                                 class="${canAfford ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400'} text-white px-4 py-2 rounded-lg transition-colors">
                             ${canAfford ? 'Comprar' : 'Sin fondos'}
                         </button>
