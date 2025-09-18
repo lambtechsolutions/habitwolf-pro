@@ -37,13 +37,14 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
         
-        /* FIXED: Individual wolf evolution images with animation */
+        /* FIXED: Individual wolf evolution images with proper sizing */
         .wolf-evolution-image {
             width: 120px;
             height: 120px;
-            background-size: cover;
-            background-position: center;
+            background-size: 80%;
+            background-position: center bottom;
             background-repeat: no-repeat;
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
             border: 3px solid #4299e1;
             transition: all 0.3s ease;
@@ -131,36 +132,7 @@
             cursor: not-allowed;
         }
         
-        /* Chart container styling */
-        .chart-container {
-            position: relative;
-            height: 400px;
-            width: 100%;
-        }
-        
-        .chart-container canvas {
-            max-height: 400px;
-        }
-        
-        /* FIXED: Mobile-responsive tab styling */
-        .tab-button {
-            transition: all 0.3s ease;
-            border-radius: 8px 8px 0 0;
-            font-size: 14px;
-            padding: 12px 8px;
-            text-align: center;
-            min-width: 0;
-            flex: 1;
-        }
-        
-        .tab-button.active {
-            background: linear-gradient(135deg, #4299e1, #3182ce);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
-        }
-        
-        /* Mobile responsive tabs */
+        /* Mobile Responsive Styles */
         @media (max-width: 640px) {
             .tab-button {
                 font-size: 10px;
@@ -177,6 +149,72 @@
                 width: 80px;
                 height: 80px;
             }
+            
+            /* Fix wolf card stats overflow - stack vertically on mobile */
+            .wolf-stats-container {
+                flex-direction: column !important;
+                gap: 8px !important;
+                space-x: 0 !important;
+            }
+            
+            /* Adjust individual stat items */
+            .wolf-stat-item {
+                text-align: center !important;
+                min-width: auto !important;
+                font-size: 0.8rem;
+            }
+            
+            .wolf-stat-item .text-sm {
+                font-size: 0.7rem;
+            }
+            
+            /* Make wolf name smaller on mobile */
+            #wolf-name {
+                font-size: 1.25rem;
+            }
+            
+            /* Adjust spacing between avatar and info */
+            .wolf-card .flex.items-center.justify-between {
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+            }
+            
+            .wolf-card .flex.items-center.justify-between .text-right {
+                text-align: center !important;
+            }
+            
+            /* Make the avatar section take less space */
+            .wolf-card .flex.items-center.space-x-4 {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+                space-x: 0;
+            }
+        }
+        
+        /* Chart container styling */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        .chart-container canvas {
+            max-height: 400px;
+        }
+        
+        /* Tab styling */
+        .tab-button {
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
         }
         
         /* Notification styles */
@@ -235,16 +273,16 @@
                     </div>
                 </div>
                 <div class="text-white text-right">
-                    <div class="flex items-center space-x-4">
-                        <div>
+                    <div class="wolf-stats-container flex items-center space-x-4">
+                        <div class="wolf-stat-item">
                             <div class="text-sm text-blue-200">⭐ XP</div>
                             <div><span id="wolf-xp">0</span>/<span id="wolf-max-xp">100</span></div>
                         </div>
-                        <div>
-                            <div class="text-sm text-blue-200">🪙 Monedas</div>
+                        <div class="wolf-stat-item">
+                            <div class="text-sm text-blue-200">🪙 Lupus</div>
                             <div id="wolf-coins">0</div>
                         </div>
-                        <div>
+                        <div class="wolf-stat-item">
                             <div class="text-sm text-blue-200">❤️ Vidas</div>
                             <div id="wolf-lives">3</div>
                         </div>
@@ -258,22 +296,22 @@
             </div>
         </div>
         
-        <!-- FIXED: Mobile-responsive Navigation Tabs -->
-        <div class="flex mb-6 bg-white bg-opacity-10 rounded-lg p-1 overflow-hidden">
-            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-button active text-white font-semibold">
-                📊<br><span class="hidden sm:inline">Dashboard</span><span class="sm:hidden text-xs">Dash</span>
+        <!-- Navigation Tabs -->
+        <div class="flex space-x-1 mb-6 bg-white bg-opacity-10 rounded-lg p-1">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-button active flex-1 py-3 px-4 text-white font-semibold">
+                📊 Dashboard
             </button>
-            <button onclick="switchTab('habits')" id="tab-habits" class="tab-button text-white font-semibold">
-                🎯<br><span class="hidden sm:inline">Hábitos</span><span class="sm:hidden text-xs">Hábitos</span>
+            <button onclick="switchTab('habits')" id="tab-habits" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
+                🎯 Hábitos
             </button>
-            <button onclick="switchTab('daily')" id="tab-daily" class="tab-button text-white font-semibold">
-                📅<br><span class="hidden sm:inline">Registro Diario</span><span class="sm:hidden text-xs">Diario</span>
+            <button onclick="switchTab('daily')" id="tab-daily" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
+                📅 Registro Diario
             </button>
-            <button onclick="switchTab('profile')" id="tab-profile" class="tab-button text-white font-semibold">
-                🐺<br><span class="hidden sm:inline">Perfil</span><span class="sm:hidden text-xs">Perfil</span>
+            <button onclick="switchTab('profile')" id="tab-profile" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
+                🐺 Perfil
             </button>
-            <button onclick="switchTab('guardar')" id="tab-guardar" class="tab-button text-white font-semibold">
-                💾<br><span class="hidden sm:inline">Guardar</span><span class="sm:hidden text-xs">Datos</span>
+            <button onclick="switchTab('guardar')" id="tab-guardar" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
+                💾 Guardar
             </button>
         </div>
         
@@ -342,10 +380,10 @@
             <div class="glassmorphism rounded-xl p-6">
                 <h3 class="text-2xl font-bold text-white mb-6">Gestión de Hábitos</h3>
                 
-                <!-- FIXED: Add New Habit with meta and unidad - CORRECTED LAYOUT -->
+                <!-- Add New Habit with meta and unidad -->
                 <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-6">
                     <h4 class="text-white font-semibold mb-4">Agregar Nuevo Hábito</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <input type="text" id="new-habit-name" placeholder="Nombre del hábito" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
                         <select id="new-habit-category" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
                             <option value="">Seleccionar categoría</option>
@@ -358,8 +396,10 @@
                             <option value="nutrition">🥗 Nutrición</option>
                             <option value="finance">💰 Finanzas</option>
                         </select>
-                        <input type="number" id="new-habit-target" placeholder="Meta" min="1" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
-                        <input type="text" id="new-habit-unit" placeholder="Unidad (ej: veces, min)" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
+                        <div class="flex">
+                            <input type="number" id="new-habit-target" placeholder="Meta" min="1" class="p-3 border border-gray-300 bg-white bg-opacity-90 rounded-l-lg flex-grow">
+                            <input type="text" id="new-habit-unit" placeholder="Unidad" class="p-3 border border-gray-300 bg-white bg-opacity-90 rounded-r-lg w-20">
+                        </div>
                         <button onclick="addNewHabit()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
                             ➕ Agregar
                         </button>
@@ -383,7 +423,7 @@
                 
                 <!-- Day Status -->
                 <div id="day-status" class="bg-blue-100 border border-blue-300 rounded-lg p-4 mb-6 text-blue-800">
-                    ⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 monedas
+                    ⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🌙 Lupus
                 </div>
                 
                 <!-- Habits List -->
@@ -447,7 +487,7 @@
                     <h2 id="wolf-profile-name" class="text-3xl font-bold text-white mb-2">Cachorro Guerrero</h2>
                     <div class="text-blue-200">
                         <p>Nivel <span id="wolf-profile-level">1</span> • ⭐ <span id="wolf-profile-xp">0</span> XP</p>
-                        <p>🪙 <span id="wolf-profile-coins">0</span> monedas • ❤️ <span id="wolf-profile-lives">3</span> vidas</p>
+                        <p>🌙 <span id="wolf-profile-coins">0</span> Lupus • ❤️ <span id="wolf-profile-lives">3</span> vidas</p>
                     </div>
                 </div>
                 
@@ -469,7 +509,7 @@
             </div>
         </div>
 
-        <!-- UPDATED: Guardar Tab (renamed from Migration) -->
+        <!-- Guardar Tab -->
         <div id="guardar-tab" class="tab-content hidden">
             <div class="glassmorphism rounded-xl p-6">
                 <h3 class="text-2xl font-bold text-white mb-6">💾 Gestión de Datos</h3>
@@ -528,7 +568,7 @@
     </div>
 
     <script>
-        // FIXED: Initialize with proper date handling and form reset functionality
+        // Initialize with proper date handling and form reset functionality
         let gameData = {
             player: {
                 name: 'Cachorro Guerrero',
@@ -570,11 +610,11 @@
             updateDashboard();
             switchTab('dashboard'); // Start with dashboard tab
             
-            // FIXED: Auto-update date at midnight
+            // Auto-update date at midnight
             scheduleNextDayUpdate();
         }
 
-        // FIXED: Automatic date update system
+        // Automatic date update system
         function scheduleNextDayUpdate() {
             const now = new Date();
             const tomorrow = new Date(now);
@@ -585,10 +625,10 @@
             
             setTimeout(() => {
                 // Reset daily status and update interface
-                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 monedas';
+                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🌙 Lupus';
                 updateCurrentDate();
                 loadDailyHabits();
-                clearDailyForm(); // FIXED: Clear form at new day
+                clearDailyForm();
                 showNotification('🌅 ¡Nuevo día! Listos para nuevas conquistas', 'success');
                 
                 // Schedule next update
@@ -647,7 +687,7 @@
             }
         }
 
-        // FIXED: Habit Management with meta and unit
+        // Habit Management with meta and unit
         function addNewHabit() {
             const name = document.getElementById('new-habit-name').value.trim();
             const category = document.getElementById('new-habit-category').value;
@@ -694,7 +734,9 @@
                 
                 // Remove from daily logs
                 Object.values(gameData.dailyLogs).forEach(log => {
-                    log.habits = log.habits.filter(h => h !== habitId);
+                    if (log.habits) {
+                        log.habits = log.habits.filter(h => h !== habitId);
+                    }
                 });
                 
                 saveGameData();
@@ -770,7 +812,7 @@
                 gameData.dailyLogs[today] = { habits: [] };
             }
             
-            const habits = gameData.dailyLogs[today].habits;
+            const habits = gameData.dailyLogs[today].habits || [];
             const index = habits.indexOf(habitId);
             
             if (index > -1) {
@@ -781,6 +823,8 @@
                 gameData.player.xp += 10;
                 gameData.player.coins += 1;
             }
+            
+            gameData.dailyLogs[today].habits = habits;
             
             saveGameData();
             loadDailyHabits();
@@ -799,7 +843,7 @@
             document.querySelector(`[data-level="${level}"]`).classList.add('selected');
         }
 
-        // FIXED: Save daily log with proper form clearing
+        // Save daily log with proper form clearing
         function saveDailyLog() {
             const today = new Date().toISOString().split('T')[0];
             
@@ -834,7 +878,7 @@
             saveGameData();
             
             // SUCCESS MESSAGE
-            const completedHabits = gameData.dailyLogs[today].habits.length;
+            const completedHabits = gameData.dailyLogs[today].habits?.length || 0;
             const totalHabits = gameData.habits.length;
             
             if (completedHabits === totalHabits && totalHabits > 0) {
@@ -852,11 +896,11 @@
             // UPDATE STATUS MESSAGE
             document.getElementById('day-status').innerHTML = '✅ ¡Registro completado! Vuelve mañana para continuar tu evolución.';
             
-            // FIXED: Clear the daily form after successful submission
+            // Clear the daily form after successful submission
             clearDailyForm();
         }
 
-        // NEW: Function to clear the daily registration form
+        // Function to clear the daily registration form
         function clearDailyForm() {
             // Clear energy selection
             document.querySelectorAll('.energy-emoji').forEach(emoji => {
@@ -902,11 +946,11 @@
             document.getElementById('weekly-streak').textContent = maxStreak;
         }
 
-        // FIXED: Charts with proper error handling and radar chart
+        // Charts with proper error handling and radar chart
         function updateCharts() {
             updateHabitsChart();
             updateEnergyChart();
-            updateRadarChart(); // NEW: Radar chart
+            updateRadarChart();
         }
 
         function updateHabitsChart() {
@@ -1005,7 +1049,7 @@
             });
         }
 
-        // NEW: Radar Chart for category balance
+        // Radar Chart for category balance
         function updateRadarChart() {
             const ctx = document.getElementById('radarChart');
             if (!ctx) return;
@@ -1199,7 +1243,7 @@
                 { id: 'streak_master', name: 'Maestro de Rachas', icon: '🔥', description: '15 días de racha en una categoría' },
                 { id: 'chronicler', name: 'Cronista', icon: '📖', description: '10 reflexiones escritas' },
                 { id: 'evolution', name: 'Evolución', icon: '🌟', description: 'Alcanzar nivel 3' },
-                { id: 'coin_collector', name: 'Colector de Monedas', icon: '🪙', description: 'Acumular 500 monedas' }
+                { id: 'coin_collector', name: 'Colector de Lupus', icon: '🌙', description: 'Acumular 500 Lupus' }
             ];
             
             container.innerHTML = '';
@@ -1333,7 +1377,15 @@
             }
             
             // Streak master
-            const maxStreak = Math.max(...Object.values(gameData.streaks));
+            const streakValues = Object.values(gameData.streaks);
+            let maxStreak = 0;
+            if (streakValues.length > 0) {
+                const validStreaks = streakValues.filter(streak => typeof streak === 'number' && !isNaN(streak));
+                if (validStreaks.length > 0) {
+                    maxStreak = Math.max(...validStreaks);
+                }
+            }
+            
             if (maxStreak >= 15 && !gameData.badges.includes('streak_master')) {
                 newBadges.push('streak_master');
             }
@@ -1512,7 +1564,7 @@
                 loadDailyHabits();
                 saveGameData();
                 
-                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 monedas';
+                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🌙 Lupus';
                 showNotification('🔄 Datos de hoy reiniciados', 'success');
             }
         }
