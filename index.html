@@ -142,10 +142,15 @@
             max-height: 400px;
         }
         
-        /* Tab styling */
+        /* FIXED: Mobile-responsive tab styling */
         .tab-button {
             transition: all 0.3s ease;
             border-radius: 8px 8px 0 0;
+            font-size: 14px;
+            padding: 12px 8px;
+            text-align: center;
+            min-width: 0;
+            flex: 1;
         }
         
         .tab-button.active {
@@ -153,6 +158,25 @@
             color: white;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
+        }
+        
+        /* Mobile responsive tabs */
+        @media (max-width: 640px) {
+            .tab-button {
+                font-size: 10px;
+                padding: 8px 4px;
+                font-weight: 600;
+                line-height: 1.2;
+            }
+            
+            .wolf-card {
+                padding: 16px;
+            }
+            
+            .wolf-evolution-image {
+                width: 80px;
+                height: 80px;
+            }
         }
         
         /* Notification styles */
@@ -234,22 +258,22 @@
             </div>
         </div>
         
-        <!-- UPDATED: Navigation Tabs with new order -->
-        <div class="flex space-x-1 mb-6 bg-white bg-opacity-10 rounded-lg p-1">
-            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-button active flex-1 py-3 px-4 text-white font-semibold">
-                📊 Dashboard
+        <!-- FIXED: Mobile-responsive Navigation Tabs -->
+        <div class="flex mb-6 bg-white bg-opacity-10 rounded-lg p-1 overflow-hidden">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-button active text-white font-semibold">
+                📊<br><span class="hidden sm:inline">Dashboard</span><span class="sm:hidden text-xs">Dash</span>
             </button>
-            <button onclick="switchTab('habits')" id="tab-habits" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
-                🎯 Hábitos
+            <button onclick="switchTab('habits')" id="tab-habits" class="tab-button text-white font-semibold">
+                🎯<br><span class="hidden sm:inline">Hábitos</span><span class="sm:hidden text-xs">Hábitos</span>
             </button>
-            <button onclick="switchTab('daily')" id="tab-daily" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
-                📅 Registro Diario
+            <button onclick="switchTab('daily')" id="tab-daily" class="tab-button text-white font-semibold">
+                📅<br><span class="hidden sm:inline">Registro Diario</span><span class="sm:hidden text-xs">Diario</span>
             </button>
-            <button onclick="switchTab('profile')" id="tab-profile" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
-                🐺 Perfil
+            <button onclick="switchTab('profile')" id="tab-profile" class="tab-button text-white font-semibold">
+                🐺<br><span class="hidden sm:inline">Perfil</span><span class="sm:hidden text-xs">Perfil</span>
             </button>
-            <button onclick="switchTab('guardar')" id="tab-guardar" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
-                💾 Guardar
+            <button onclick="switchTab('guardar')" id="tab-guardar" class="tab-button text-white font-semibold">
+                💾<br><span class="hidden sm:inline">Guardar</span><span class="sm:hidden text-xs">Datos</span>
             </button>
         </div>
         
