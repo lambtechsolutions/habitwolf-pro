@@ -1,1536 +1,1536 @@
-1	<!DOCTYPE html>
-     2	<html lang="es">
-     3	<head>
-     4	    <meta charset="UTF-8">
-     5	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     6	    <title>HabitWolf Pro - Sistema de Autodisciplina Gamificado</title>
-     7	    
-     8	    <!-- PWA Meta Tags -->
-     9	    <meta name="description" content="Aplicación gamificada de seguimiento de hábitos con sistema de evolución de lobo">
-    10	    <meta name="theme-color" content="#4299e1">
-    11	    <meta name="apple-mobile-web-app-capable" content="yes">
-    12	    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    13	    <meta name="apple-mobile-web-app-title" content="HabitWolf Pro">
-    14	    
-    15	    <!-- PWA Manifest -->
-    16	    <link rel="manifest" href="./manifest.json">
-    17	    
-    18	    <!-- PWA Apple Icons -->
-    19	    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMxYTIwMmMiLz4KPHBhdGggZD0iTTk2IDQ4QzEyMC4zIDQ4IDEzNiA2My43IDEzNiA4OEM1NiA5NiA5NiAxNDQgOTYgMTQ0UzEzNiA5NiA1NiA4OEM1NiA2My43IDcxLjcgNDggOTYgNDhaIiBmaWxsPSIjNDI5OWUxIi8+CjxjaXJjbGUgY3g9IjgwIiBjeT0iNzYiIHI9IjQiIGZpbGw9IiNmZmZmZmYiLz4KPGNpcmNsZSBjeD0iMTEyIiBjeT0iNzYiIHI9IjQiIGZpbGw9IiNmZmZmZmYiLz4KPGF0aCBkPSJNODggOTZTOTIgMTA0IDk2IDEwNFMxMDQgOTYgMTA0IDk2IiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo=">
-    20	    
-    21	    <!-- CDN Libraries -->
-    22	    <script src="https://cdn.tailwindcss.com"></script>
-    23	    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    24	    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    25	    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    26	    
-    27	    <style>
-    28	        body { 
-    29	            font-family: 'Inter', sans-serif; 
-    30	            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    31	            min-height: 100vh;
-    32	        }
-    33	        
-    34	        .wolf-card {
-    35	            background: linear-gradient(145deg, #2d3748, #4a5568);
-    36	            border: 3px solid #4299e1;
-    37	            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    38	        }
-    39	        
-    40	        /* FIXED: Individual wolf evolution images with animation */
-    41	        .wolf-evolution-image {
-    42	            width: 120px;
-    43	            height: 120px;
-    44	            background-size: cover;
-    45	            background-position: center;
-    46	            background-repeat: no-repeat;
-    47	            border-radius: 15px;
-    48	            border: 3px solid #4299e1;
-    49	            transition: all 0.3s ease;
-    50	            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
-    51	            animation: wolfPulse 2s ease-in-out infinite;
-    52	        }
-    53	        
-    54	        @keyframes wolfPulse {
-    55	            0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3); }
-    56	            50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(66, 153, 225, 0.5); }
-    57	        }
-    58	        
-    59	        .wolf-evolution-image:hover {
-    60	            animation-play-state: paused;
-    61	            transform: scale(1.08);
-    62	            box-shadow: 0 8px 25px rgba(66, 153, 225, 0.6);
-    63	        }
-    64	        
-    65	        .wolf-evolution-image.level-1 { 
-    66	            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/1f1c3248-e5b5-4e91-9b03-aee49f3908ef'); 
-    67	        }
-    68	        .wolf-evolution-image.level-2 { 
-    69	            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/41296d25-6e4b-4df9-b3df-b7c85283537d'); 
-    70	        }
-    71	        .wolf-evolution-image.level-3 { 
-    72	            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/05926d3b-abe5-4cdb-9b75-60173b708b55'); 
-    73	        }
-    74	        .wolf-evolution-image.level-4 { 
-    75	            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/714749d4-10cb-465f-b59a-6dc3893fd4a9'); 
-    76	        }
-    77	        .wolf-evolution-image.level-5 { 
-    78	            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/05acbb65-7490-4da3-acef-1fe605a8cd78'); 
-    79	        }
-    80	        
-    81	        .energy-emoji {
-    82	            cursor: pointer;
-    83	            transition: all 0.2s ease;
-    84	            padding: 8px;
-    85	            border-radius: 50%;
-    86	        }
-    87	        
-    88	        .energy-emoji.selected {
-    89	            background-color: #3b82f6;
-    90	            transform: scale(1.2);
-    91	        }
-    92	        
-    93	        .habit-checkbox {
-    94	            transform: scale(1.5);
-    95	            cursor: pointer;
-    96	        }
-    97	
-    98	        .migration-section {
-    99	            background: linear-gradient(145deg, #374151, #4b5563);
-   100	            border: 2px solid #6366f1;
-   101	            border-radius: 12px;
-   102	            padding: 20px;
-   103	            margin: 20px 0;
-   104	        }
-   105	
-   106	        .date-picker-container {
-   107	            display: flex;
-   108	            gap: 10px;
-   109	            align-items: center;
-   110	            flex-wrap: wrap;
-   111	        }
-   112	
-   113	        .btn-migration {
-   114	            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-   115	            color: white;
-   116	            border: none;
-   117	            padding: 10px 20px;
-   118	            border-radius: 8px;
-   119	            cursor: pointer;
-   120	            font-weight: 600;
-   121	            transition: all 0.3s ease;
-   122	        }
-   123	
-   124	        .btn-migration:hover {
-   125	            transform: translateY(-2px);
-   126	            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-   127	        }
-   128	
-   129	        .btn-migration:disabled {
-   130	            opacity: 0.5;
-   131	            cursor: not-allowed;
-   132	        }
-   133	        
-   134	        /* Chart container styling */
-   135	        .chart-container {
-   136	            position: relative;
-   137	            height: 400px;
-   138	            width: 100%;
-   139	        }
-   140	        
-   141	        .chart-container canvas {
-   142	            max-height: 400px;
-   143	        }
-   144	        
-   145	        /* Tab styling */
-   146	        .tab-button {
-   147	            transition: all 0.3s ease;
-   148	            border-radius: 8px 8px 0 0;
-   149	        }
-   150	        
-   151	        .tab-button.active {
-   152	            background: linear-gradient(135deg, #4299e1, #3182ce);
-   153	            color: white;
-   154	            transform: translateY(-2px);
-   155	            box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
-   156	        }
-   157	        
-   158	        /* Notification styles */
-   159	        .notification {
-   160	            position: fixed;
-   161	            top: 20px;
-   162	            right: 20px;
-   163	            padding: 15px 20px;
-   164	            border-radius: 8px;
-   165	            color: white;
-   166	            font-weight: 600;
-   167	            z-index: 1000;
-   168	            animation: slideIn 0.3s ease;
-   169	        }
-   170	        
-   171	        .notification.success {
-   172	            background: linear-gradient(135deg, #10b981, #059669);
-   173	        }
-   174	        
-   175	        .notification.error {
-   176	            background: linear-gradient(135deg, #ef4444, #dc2626);
-   177	        }
-   178	        
-   179	        @keyframes slideIn {
-   180	            from { transform: translateX(100%); opacity: 0; }
-   181	            to { transform: translateX(0); opacity: 1; }
-   182	        }
-   183	        
-   184	        /* Enhanced styling */
-   185	        .glassmorphism {
-   186	            background: rgba(255, 255, 255, 0.1);
-   187	            backdrop-filter: blur(10px);
-   188	            border: 1px solid rgba(255, 255, 255, 0.2);
-   189	        }
-   190	    </style>
-   191	</head>
-   192	<body>
-   193	    <!-- Notification container -->
-   194	    <div id="notification-container"></div>
-   195	    
-   196	    <div class="container mx-auto px-4 py-8 max-w-6xl">
-   197	        <!-- Header with Wolf Character -->
-   198	        <div class="text-center mb-8">
-   199	            <h1 class="text-4xl font-bold text-white mb-4">🐺 HabitWolf Pro</h1>
-   200	            <p class="text-blue-200 text-lg">Sistema de Autodisciplina Gamificado</p>
-   201	        </div>
-   202	        
-   203	        <!-- Wolf Card -->
-   204	        <div class="wolf-card rounded-2xl p-6 mb-8">
-   205	            <div class="flex items-center justify-between mb-4">
-   206	                <div class="flex items-center space-x-4">
-   207	                    <div id="wolf-avatar" class="wolf-evolution-image level-1"></div>
-   208	                    <div class="text-white">
-   209	                        <h2 id="wolf-name" class="text-2xl font-bold">Cachorro Guerrero</h2>
-   210	                        <p class="text-blue-200">Nivel <span id="wolf-level">1</span></p>
-   211	                    </div>
-   212	                </div>
-   213	                <div class="text-white text-right">
-   214	                    <div class="flex items-center space-x-4">
-   215	                        <div>
-   216	                            <div class="text-sm text-blue-200">⭐ XP</div>
-   217	                            <div><span id="wolf-xp">0</span>/<span id="wolf-max-xp">100</span></div>
-   218	                        </div>
-   219	                        <div>
-   220	                            <div class="text-sm text-blue-200">🪙 Monedas</div>
-   221	                            <div id="wolf-coins">0</div>
-   222	                        </div>
-   223	                        <div>
-   224	                            <div class="text-sm text-blue-200">❤️ Vidas</div>
-   225	                            <div id="wolf-lives">3</div>
-   226	                        </div>
-   227	                    </div>
-   228	                </div>
-   229	            </div>
-   230	            
-   231	            <!-- XP Bar -->
-   232	            <div class="w-full bg-gray-600 rounded-full h-3 mb-4">
-   233	                <div id="wolf-xp-bar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
-   234	            </div>
-   235	        </div>
-   236	        
-   237	        <!-- UPDATED: Navigation Tabs with new order -->
-   238	        <div class="flex space-x-1 mb-6 bg-white bg-opacity-10 rounded-lg p-1">
-   239	            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-button active flex-1 py-3 px-4 text-white font-semibold">
-   240	                📊 Dashboard
-   241	            </button>
-   242	            <button onclick="switchTab('habits')" id="tab-habits" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
-   243	                🎯 Hábitos
-   244	            </button>
-   245	            <button onclick="switchTab('daily')" id="tab-daily" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
-   246	                📅 Registro Diario
-   247	            </button>
-   248	            <button onclick="switchTab('profile')" id="tab-profile" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
-   249	                🐺 Perfil
-   250	            </button>
-   251	            <button onclick="switchTab('guardar')" id="tab-guardar" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
-   252	                💾 Guardar
-   253	            </button>
-   254	        </div>
-   255	        
-   256	        <!-- Dashboard Tab (now first) -->
-   257	        <div id="dashboard-tab" class="tab-content">
-   258	            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-   259	                <!-- Weekly Summary -->
-   260	                <div class="glassmorphism rounded-xl p-6">
-   261	                    <h3 class="text-2xl font-bold text-white mb-4">Resumen Semanal</h3>
-   262	                    <div class="grid grid-cols-2 gap-4">
-   263	                        <div class="text-center">
-   264	                            <div class="text-3xl font-bold text-blue-300" id="weekly-habits">0</div>
-   265	                            <div class="text-blue-200 text-sm">Hábitos Completados</div>
-   266	                        </div>
-   267	                        <div class="text-center">
-   268	                            <div class="text-3xl font-bold text-green-300" id="weekly-energy">0</div>
-   269	                            <div class="text-blue-200 text-sm">Energía Promedio</div>
-   270	                        </div>
-   271	                        <div class="text-center">
-   272	                            <div class="text-3xl font-bold text-purple-300" id="weekly-streak">0</div>
-   273	                            <div class="text-blue-200 text-sm">Mejor Racha</div>
-   274	                        </div>
-   275	                        <div class="text-center">
-   276	                            <div class="text-3xl font-bold text-yellow-300" id="weekly-xp">0</div>
-   277	                            <div class="text-blue-200 text-sm">XP Ganado</div>
-   278	                        </div>
-   279	                    </div>
-   280	                </div>
-   281	                
-   282	                <!-- Charts -->
-   283	                <div class="glassmorphism rounded-xl p-6">
-   284	                    <h3 class="text-2xl font-bold text-white mb-4">Progreso de Hábitos</h3>
-   285	                    <div class="chart-container">
-   286	                        <canvas id="habitsChart"></canvas>
-   287	                    </div>
-   288	                </div>
-   289	                
-   290	                <!-- Energy Chart -->
-   291	                <div class="glassmorphism rounded-xl p-6">
-   292	                    <h3 class="text-2xl font-bold text-white mb-4">Niveles de Energía</h3>
-   293	                    <div class="chart-container">
-   294	                        <canvas id="energyChart"></canvas>
-   295	                    </div>
-   296	                </div>
-   297	                
-   298	                <!-- Radar Chart -->
-   299	                <div class="glassmorphism rounded-xl p-6">
-   300	                    <h3 class="text-2xl font-bold text-white mb-4">Balance de Categorías</h3>
-   301	                    <div class="chart-container">
-   302	                        <canvas id="radarChart"></canvas>
-   303	                    </div>
-   304	                </div>
-   305	                
-   306	                <!-- Category Progress -->
-   307	                <div class="glassmorphism rounded-xl p-6 lg:col-span-2">
-   308	                    <h3 class="text-2xl font-bold text-white mb-4">Progreso por Categorías</h3>
-   309	                    <div id="category-progress" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-   310	                        <!-- Dynamic category progress will be loaded here -->
-   311	                    </div>
-   312	                </div>
-   313	            </div>
-   314	        </div>
-   315	        
-   316	        <!-- Habits Tab -->
-   317	        <div id="habits-tab" class="tab-content hidden">
-   318	            <div class="glassmorphism rounded-xl p-6">
-   319	                <h3 class="text-2xl font-bold text-white mb-6">Gestión de Hábitos</h3>
-   320	                
-   321	                <!-- FIXED: Add New Habit with meta and unidad -->
-   322	                <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-6">
-   323	                    <h4 class="text-white font-semibold mb-4">Agregar Nuevo Hábito</h4>
-   324	                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-   325	                        <input type="text" id="new-habit-name" placeholder="Nombre del hábito" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
-   326	                        <select id="new-habit-category" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
-   327	                            <option value="">Seleccionar categoría</option>
-   328	                            <option value="fitness">💪 Fitness & Salud</option>
-   329	                            <option value="learning">📚 Aprendizaje</option>
-   330	                            <option value="productivity">⚡ Productividad</option>
-   331	                            <option value="mindfulness">🧘 Mindfulness</option>
-   332	                            <option value="creativity">🎨 Creatividad</option>
-   333	                            <option value="social">👥 Social</option>
-   334	                            <option value="nutrition">🥗 Nutrición</option>
-   335	                            <option value="finance">💰 Finanzas</option>
-   336	                        </select>
-   337	                        <div class="flex">
-   338	                            <input type="number" id="new-habit-target" placeholder="Meta" min="1" class="p-3 border border-gray-300 bg-white bg-opacity-90 rounded-l-lg flex-grow">
-   339	                            <input type="text" id="new-habit-unit" placeholder="Unidad" class="p-3 border border-gray-300 bg-white bg-opacity-90 rounded-r-lg w-20">
-   340	                        </div>
-   341	                        <button onclick="addNewHabit()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-   342	                            ➕ Agregar
-   343	                        </button>
-   344	                    </div>
-   345	                </div>
-   346	                
-   347	                <!-- Habits List -->
-   348	                <div id="habits-list" class="space-y-4">
-   349	                    <!-- Dynamic habits list will be loaded here -->
-   350	                </div>
-   351	            </div>
-   352	        </div>
-   353	        
-   354	        <!-- Daily Log Tab -->
-   355	        <div id="daily-tab" class="tab-content hidden">
-   356	            <div class="glassmorphism rounded-xl p-6 mb-6">
-   357	                <div class="flex items-center justify-between mb-6">
-   358	                    <h3 class="text-2xl font-bold text-white">Registro Diario</h3>
-   359	                    <div class="text-white font-semibold" id="current-date"></div>
-   360	                </div>
-   361	                
-   362	                <!-- Day Status -->
-   363	                <div id="day-status" class="bg-blue-100 border border-blue-300 rounded-lg p-4 mb-6 text-blue-800">
-   364	                    ⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 monedas
-   365	                </div>
-   366	                
-   367	                <!-- Habits List -->
-   368	                <div id="daily-habits-list" class="space-y-4 mb-6">
-   369	                    <!-- Dynamic habits will be loaded here -->
-   370	                </div>
-   371	                
-   372	                <!-- Energy Level -->
-   373	                <div class="mb-6">
-   374	                    <h4 class="text-white font-semibold mb-3">¿Cómo te sientes hoy? 💪</h4>
-   375	                    <div class="flex space-x-4">
-   376	                        <span class="energy-emoji text-3xl" data-level="1" onclick="selectEnergy(1)">😴</span>
-   377	                        <span class="energy-emoji text-3xl" data-level="2" onclick="selectEnergy(2)">😐</span>
-   378	                        <span class="energy-emoji text-3xl" data-level="3" onclick="selectEnergy(3)">🙂</span>
-   379	                        <span class="energy-emoji text-3xl" data-level="4" onclick="selectEnergy(4)">😊</span>
-   380	                        <span class="energy-emoji text-3xl" data-level="5" onclick="selectEnergy(5)">🔥</span>
-   381	                    </div>
-   382	                </div>
-   383	                
-   384	                <!-- Daily Reflection -->
-   385	                <div class="mb-4">
-   386	                    <label class="block text-white font-semibold mb-2">Reflexión del día 📝</label>
-   387	                    <textarea id="daily-reflection" placeholder="¿Qué aprendiste hoy? ¿Qué desafíos enfrentaste?" class="w-full p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90" rows="3"></textarea>
-   388	                </div>
-   389	                
-   390	                <!-- Tomorrow's Intention -->
-   391	                <div class="mb-4">
-   392	                    <label class="block text-white font-semibold mb-2">Intención para mañana 🌟</label>
-   393	                    <textarea id="tomorrow-intention" placeholder="¿En qué te quieres enfocar mañana?" class="w-full p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90" rows="2"></textarea>
-   394	                </div>
-   395	                
-   396	                <!-- Evidence Upload -->
-   397	                <div class="mb-4">
-   398	                    <label class="block text-white font-semibold mb-2">Evidencia del día (opcional) 📸</label>
-   399	                    <input type="file" id="evidence-upload" accept="image/*" class="w-full p-2 rounded-lg border border-gray-300 bg-white bg-opacity-90">
-   400	                </div>
-   401	                
-   402	                <!-- Request Advice -->
-   403	                <div class="mb-6">
-   404	                    <label class="flex items-center text-white">
-   405	                        <input type="checkbox" id="request-advice" class="mr-2">
-   406	                        <span class="font-semibold">💡 Quiero consejos para mejorar mañana</span>
-   407	                    </label>
-   408	                </div>
-   409	                
-   410	                <!-- Submit Button -->
-   411	                <button onclick="saveDailyLog()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-   412	                    🚀 Guardar Registro del Día
-   413	                </button>
-   414	            </div>
-   415	        </div>
-   416	        
-   417	        <!-- Profile Tab -->
-   418	        <div id="profile-tab" class="tab-content hidden">
-   419	            <div class="glassmorphism rounded-xl p-6">
-   420	                <h3 class="text-2xl font-bold text-white mb-6">Perfil del Lobo</h3>
-   421	                
-   422	                <!-- Wolf Profile Info -->
-   423	                <div class="text-center mb-8">
-   424	                    <div id="wolf-profile-avatar" class="wolf-evolution-image level-1 mx-auto mb-4"></div>
-   425	                    <h2 id="wolf-profile-name" class="text-3xl font-bold text-white mb-2">Cachorro Guerrero</h2>
-   426	                    <div class="text-blue-200">
-   427	                        <p>Nivel <span id="wolf-profile-level">1</span> • ⭐ <span id="wolf-profile-xp">0</span> XP</p>
-   428	                        <p>🪙 <span id="wolf-profile-coins">0</span> monedas • ❤️ <span id="wolf-profile-lives">3</span> vidas</p>
-   429	                    </div>
-   430	                </div>
-   431	                
-   432	                <!-- Evolution Path -->
-   433	                <div class="mb-8">
-   434	                    <h4 class="text-xl font-bold text-white mb-4">🌟 Camino de Evolución</h4>
-   435	                    <div id="evolution-path" class="space-y-4">
-   436	                        <!-- Dynamic evolution path will be loaded here -->
-   437	                    </div>
-   438	                </div>
-   439	                
-   440	                <!-- Badges Gallery -->
-   441	                <div>
-   442	                    <h4 class="text-xl font-bold text-white mb-4">🏆 Galería de Logros</h4>
-   443	                    <div id="badges-gallery" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-   444	                        <!-- Dynamic badges will be loaded here -->
-   445	                    </div>
-   446	                </div>
-   447	            </div>
-   448	        </div>
-   449	
-   450	        <!-- UPDATED: Guardar Tab (renamed from Migration) -->
-   451	        <div id="guardar-tab" class="tab-content hidden">
-   452	            <div class="glassmorphism rounded-xl p-6">
-   453	                <h3 class="text-2xl font-bold text-white mb-6">💾 Gestión de Datos</h3>
-   454	                <p class="text-blue-200 mb-6">Transfiere información de días anteriores o gestiona tus datos de respaldo.</p>
-   455	                
-   456	                <!-- Date Selection for Migration -->
-   457	                <div class="migration-section">
-   458	                    <h4 class="text-lg font-semibold text-white mb-4">🔄 Migrar Datos de Día Anterior</h4>
-   459	                    <p class="text-blue-200 mb-4">Selecciona una fecha anterior para copiar su información al día actual:</p>
-   460	                    
-   461	                    <div class="date-picker-container">
-   462	                        <label class="text-white font-medium">Fecha origen:</label>
-   463	                        <input type="date" id="migration-source-date" class="p-2 rounded-lg border border-gray-300 bg-white">
-   464	                        <button onclick="previewMigrationData()" class="btn-migration">👀 Previsualizar</button>
-   465	                        <button onclick="executeMigration()" id="migrate-btn" class="btn-migration" disabled>🚀 Migrar Datos</button>
-   466	                    </div>
-   467	                    
-   468	                    <!-- Migration Preview -->
-   469	                    <div id="migration-preview" class="mt-4 hidden">
-   470	                        <div class="bg-white bg-opacity-20 rounded-lg p-4">
-   471	                            <h5 class="text-white font-semibold mb-2">Vista previa de datos a migrar:</h5>
-   472	                            <div id="migration-content" class="text-blue-100 text-sm"></div>
-   473	                        </div>
-   474	                    </div>
-   475	                </div>
-   476	                
-   477	                <!-- Backup and Restore -->
-   478	                <div class="migration-section">
-   479	                    <h4 class="text-lg font-semibold text-white mb-4">💾 Respaldo y Restauración</h4>
-   480	                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-   481	                        <div>
-   482	                            <h5 class="text-white font-medium mb-2">Crear Respaldo</h5>
-   483	                            <p class="text-blue-200 text-sm mb-4">Exporta todos tus datos a un archivo JSON</p>
-   484	                            <button onclick="exportData()" class="btn-migration w-full">📥 Descargar Respaldo</button>
-   485	                        </div>
-   486	                        <div>
-   487	                            <h5 class="text-white font-medium mb-2">Restaurar desde Respaldo</h5>
-   488	                            <p class="text-blue-200 text-sm mb-4">Importa datos desde un archivo de respaldo</p>
-   489	                            <input type="file" id="import-file" accept=".json" class="w-full p-2 rounded-lg border border-gray-300 bg-white mb-2">
-   490	                            <button onclick="importData()" class="btn-migration w-full">📤 Restaurar Datos</button>
-   491	                        </div>
-   492	                    </div>
-   493	                </div>
-   494	                
-   495	                <!-- Reset Options -->
-   496	                <div class="migration-section">
-   497	                    <h4 class="text-lg font-semibold text-white mb-4">🔄 Opciones de Reinicio</h4>
-   498	                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-   499	                        <button onclick="resetTodayData()" class="btn-migration bg-yellow-600 hover:bg-yellow-700">🔄 Reiniciar Solo Hoy</button>
-   500	                        <button onclick="confirmFullReset()" class="btn-migration bg-red-600 hover:bg-red-700">⚠️ Reinicio Completo</button>
-   501	                    </div>
-   502	                    <p class="text-blue-200 text-xs mt-2">⚠️ Los reinicios son irreversibles. Crea un respaldo antes de continuar.</p>
-   503	                </div>
-   504	            </div>
-   505	        </div>
-   506	    </div>
-   507	
-   508	    <script>
-   509	        // FIXED: Initialize with proper date handling and form reset functionality
-   510	        let gameData = {
-   511	            player: {
-   512	                name: 'Cachorro Guerrero',
-   513	                level: 1,
-   514	                xp: 0,
-   515	                maxXp: 100,
-   516	                coins: 0,
-   517	                lives: 3,
-   518	                avatar: 'level-1'
-   519	            },
-   520	            habits: [],
-   521	            categories: {
-   522	                fitness: { name: 'Fitness & Salud', emoji: '💪', color: '#ef4444' },
-   523	                learning: { name: 'Aprendizaje', emoji: '📚', color: '#3b82f6' },
-   524	                productivity: { name: 'Productividad', emoji: '⚡', color: '#f59e0b' },
-   525	                mindfulness: { name: 'Mindfulness', emoji: '🧘', color: '#10b981' },
-   526	                creativity: { name: 'Creatividad', emoji: '🎨', color: '#8b5cf6' },
-   527	                social: { name: 'Social', emoji: '👥', color: '#ec4899' },
-   528	                nutrition: { name: 'Nutrición', emoji: '🥗', color: '#84cc16' },
-   529	                finance: { name: 'Finanzas', emoji: '💰', color: '#06b6d4' }
-   530	            },
-   531	            dailyLogs: {},
-   532	            streaks: {},
-   533	            badges: []
-   534	        };
-   535	
-   536	        // Initialize app
-   537	        document.addEventListener('DOMContentLoaded', function() {
-   538	            loadGameData();
-   539	            initializeApp();
-   540	        });
-   541	
-   542	        function initializeApp() {
-   543	            updateCurrentDate();
-   544	            updatePlayerStats();
-   545	            updateWolfProfile();
-   546	            loadDailyHabits();
-   547	            updateHabitsList();
-   548	            updateDashboard();
-   549	            switchTab('dashboard'); // Start with dashboard tab
-   550	            
-   551	            // FIXED: Auto-update date at midnight
-   552	            scheduleNextDayUpdate();
-   553	        }
-   554	
-   555	        // FIXED: Automatic date update system
-   556	        function scheduleNextDayUpdate() {
-   557	            const now = new Date();
-   558	            const tomorrow = new Date(now);
-   559	            tomorrow.setDate(tomorrow.getDate() + 1);
-   560	            tomorrow.setHours(0, 0, 0, 0);
-   561	            
-   562	            const msUntilMidnight = tomorrow.getTime() - now.getTime();
-   563	            
-   564	            setTimeout(() => {
-   565	                // Reset daily status and update interface
-   566	                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 monedas';
-   567	                updateCurrentDate();
-   568	                loadDailyHabits();
-   569	                clearDailyForm(); // FIXED: Clear form at new day
-   570	                showNotification('🌅 ¡Nuevo día! Listos para nuevas conquistas', 'success');
-   571	                
-   572	                // Schedule next update
-   573	                scheduleNextDayUpdate();
-   574	            }, msUntilMidnight);
-   575	        }
-   576	
-   577	        function updateCurrentDate() {
-   578	            const today = new Date();
-   579	            const options = { 
-   580	                weekday: 'long', 
-   581	                year: 'numeric', 
-   582	                month: 'long', 
-   583	                day: 'numeric' 
-   584	            };
-   585	            document.getElementById('current-date').textContent = today.toLocaleDateString('es-ES', options);
-   586	        }
-   587	
-   588	        // Load and Save Functions
-   589	        function loadGameData() {
-   590	            const saved = localStorage.getItem('habitwolf_gamedata');
-   591	            if (saved) {
-   592	                try {
-   593	                    gameData = { ...gameData, ...JSON.parse(saved) };
-   594	                } catch (e) {
-   595	                    console.warn('Error loading saved data:', e);
-   596	                }
-   597	            }
-   598	        }
-   599	
-   600	        function saveGameData() {
-   601	            localStorage.setItem('habitwolf_gamedata', JSON.stringify(gameData));
-   602	        }
-   603	
-   604	        // Tab Management
-   605	        function switchTab(tabName) {
-   606	            // Hide all tabs
-   607	            const tabs = document.querySelectorAll('.tab-content');
-   608	            tabs.forEach(tab => tab.classList.add('hidden'));
-   609	            
-   610	            // Remove active class from all buttons
-   611	            const buttons = document.querySelectorAll('.tab-button');
-   612	            buttons.forEach(button => button.classList.remove('active'));
-   613	            
-   614	            // Show selected tab and activate button
-   615	            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
-   616	            document.getElementById(`tab-${tabName}`).classList.add('active');
-   617	            
-   618	            // Update data for specific tabs
-   619	            if (tabName === 'dashboard') {
-   620	                updateDashboard();
-   621	            } else if (tabName === 'profile') {
-   622	                updateWolfProfile();
-   623	            } else if (tabName === 'daily') {
-   624	                loadDailyHabits();
-   625	            }
-   626	        }
-   627	
-   628	        // FIXED: Habit Management with meta and unit
-   629	        function addNewHabit() {
-   630	            const name = document.getElementById('new-habit-name').value.trim();
-   631	            const category = document.getElementById('new-habit-category').value;
-   632	            const target = parseInt(document.getElementById('new-habit-target').value) || 1;
-   633	            const unit = document.getElementById('new-habit-unit').value.trim() || 'vez';
-   634	            
-   635	            if (!name || !category) {
-   636	                showNotification('⚠️ Completa todos los campos requeridos', 'error');
-   637	                return;
-   638	            }
-   639	            
-   640	            const newHabit = {
-   641	                id: Date.now().toString(),
-   642	                name: name,
-   643	                category: category,
-   644	                target: target,
-   645	                unit: unit,
-   646	                createdAt: new Date().toISOString(),
-   647	                completed: {},
-   648	                streak: 0,
-   649	                totalCompleted: 0
-   650	            };
-   651	            
-   652	            gameData.habits.push(newHabit);
-   653	            gameData.streaks[newHabit.id] = 0;
-   654	            
-   655	            saveGameData();
-   656	            
-   657	            // Clear form
-   658	            document.getElementById('new-habit-name').value = '';
-   659	            document.getElementById('new-habit-category').value = '';
-   660	            document.getElementById('new-habit-target').value = '';
-   661	            document.getElementById('new-habit-unit').value = '';
-   662	            
-   663	            updateHabitsList();
-   664	            loadDailyHabits();
-   665	            showNotification('✅ Hábito agregado exitosamente', 'success');
-   666	        }
-   667	
-   668	        function deleteHabit(habitId) {
-   669	            if (confirm('¿Estás seguro de eliminar este hábito?')) {
-   670	                gameData.habits = gameData.habits.filter(h => h.id !== habitId);
-   671	                delete gameData.streaks[habitId];
-   672	                
-   673	                // Remove from daily logs
-   674	                Object.values(gameData.dailyLogs).forEach(log => {
-   675	                    log.habits = log.habits.filter(h => h !== habitId);
-   676	                });
-   677	                
-   678	                saveGameData();
-   679	                updateHabitsList();
-   680	                loadDailyHabits();
-   681	                showNotification('🗑️ Hábito eliminado', 'success');
-   682	            }
-   683	        }
-   684	
-   685	        function updateHabitsList() {
-   686	            const container = document.getElementById('habits-list');
-   687	            if (gameData.habits.length === 0) {
-   688	                container.innerHTML = '<p class="text-blue-200 text-center py-8">No hay hábitos creados. ¡Agrega tu primer hábito!</p>';
-   689	                return;
-   690	            }
-   691	            
-   692	            container.innerHTML = gameData.habits.map(habit => {
-   693	                const category = gameData.categories[habit.category];
-   694	                const streak = gameData.streaks[habit.id] || 0;
-   695	                
-   696	                return `
-   697	                    <div class="bg-white bg-opacity-10 rounded-lg p-4 flex items-center justify-between">
-   698	                        <div class="flex items-center space-x-4">
-   699	                            <span class="text-2xl">${category.emoji}</span>
-   700	                            <div>
-   701	                                <h4 class="text-white font-semibold">${habit.name}</h4>
-   702	                                <p class="text-blue-200 text-sm">${category.name} • Meta: ${habit.target} ${habit.unit} • Racha: ${streak} días</p>
-   703	                            </div>
-   704	                        </div>
-   705	                        <button onclick="deleteHabit('${habit.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition-colors">
-   706	                            🗑️
-   707	                        </button>
-   708	                    </div>
-   709	                `;
-   710	            }).join('');
-   711	        }
-   712	
-   713	        // Daily Log Functions
-   714	        function loadDailyHabits() {
-   715	            const today = new Date().toISOString().split('T')[0];
-   716	            const container = document.getElementById('daily-habits-list');
-   717	            
-   718	            if (gameData.habits.length === 0) {
-   719	                container.innerHTML = '<p class="text-blue-200 text-center py-8">No hay hábitos configurados. Ve a la pestaña "Hábitos" para agregar algunos.</p>';
-   720	                return;
-   721	            }
-   722	            
-   723	            container.innerHTML = gameData.habits.map(habit => {
-   724	                const category = gameData.categories[habit.category];
-   725	                const isCompleted = gameData.dailyLogs[today]?.habits?.includes(habit.id) || false;
-   726	                
-   727	                return `
-   728	                    <div class="bg-white bg-opacity-10 rounded-lg p-4 flex items-center space-x-4">
-   729	                        <input type="checkbox" 
-   730	                               class="habit-checkbox" 
-   731	                               ${isCompleted ? 'checked' : ''} 
-   732	                               onchange="toggleHabit('${habit.id}')">
-   733	                        <span class="text-2xl">${category.emoji}</span>
-   734	                        <div class="flex-grow">
-   735	                            <h4 class="text-white font-semibold ${isCompleted ? 'line-through opacity-75' : ''}">${habit.name}</h4>
-   736	                            <p class="text-blue-200 text-sm">${category.name} • Meta: ${habit.target} ${habit.unit}</p>
-   737	                        </div>
-   738	                        ${isCompleted ? '<span class="text-green-400 text-xl">✅</span>' : ''}
-   739	                    </div>
-   740	                `;
-   741	            }).join('');
-   742	        }
-   743	
-   744	        function toggleHabit(habitId) {
-   745	            const today = new Date().toISOString().split('T')[0];
-   746	            
-   747	            if (!gameData.dailyLogs[today]) {
-   748	                gameData.dailyLogs[today] = { habits: [] };
-   749	            }
-   750	            
-   751	            const habits = gameData.dailyLogs[today].habits;
-   752	            const index = habits.indexOf(habitId);
-   753	            
-   754	            if (index > -1) {
-   755	                habits.splice(index, 1);
-   756	            } else {
-   757	                habits.push(habitId);
-   758	                // Award XP and coins for completing habit
-   759	                gameData.player.xp += 10;
-   760	                gameData.player.coins += 1;
-   761	            }
-   762	            
-   763	            saveGameData();
-   764	            loadDailyHabits();
-   765	            updateWolfEvolution();
-   766	            updateStreaks();
-   767	            checkBadges();
-   768	        }
-   769	
-   770	        function selectEnergy(level) {
-   771	            // Remove previous selection
-   772	            document.querySelectorAll('.energy-emoji').forEach(emoji => {
-   773	                emoji.classList.remove('selected');
-   774	            });
-   775	            
-   776	            // Add selection to clicked emoji
-   777	            document.querySelector(`[data-level="${level}"]`).classList.add('selected');
-   778	        }
-   779	
-   780	        // FIXED: Save daily log with proper form clearing
-   781	        function saveDailyLog() {
-   782	            const today = new Date().toISOString().split('T')[0];
-   783	            
-   784	            if (!gameData.dailyLogs[today]) {
-   785	                gameData.dailyLogs[today] = { habits: [] };
-   786	            }
-   787	            
-   788	            // Get energy level
-   789	            const selectedEnergy = document.querySelector('.energy-emoji.selected');
-   790	            if (selectedEnergy) {
-   791	                gameData.dailyLogs[today].energyLevel = parseInt(selectedEnergy.dataset.level);
-   792	            }
-   793	            
-   794	            // Get reflection and intention
-   795	            gameData.dailyLogs[today].reflection = document.getElementById('daily-reflection').value;
-   796	            gameData.dailyLogs[today].intention = document.getElementById('tomorrow-intention').value;
-   797	            gameData.dailyLogs[today].requestAdvice = document.getElementById('request-advice').checked;
-   798	            
-   799	            // Handle evidence image
-   800	            const evidenceFile = document.getElementById('evidence-upload').files[0];
-   801	            if (evidenceFile) {
-   802	                const reader = new FileReader();
-   803	                reader.onload = function(e) {
-   804	                    gameData.dailyLogs[today].evidenceImage = e.target.result;
-   805	                    saveGameData();
-   806	                };
-   807	                reader.readAsDataURL(evidenceFile);
-   808	            }
-   809	            
-   810	            gameData.dailyLogs[today].timestamp = Date.now();
-   811	            
-   812	            saveGameData();
-   813	            
-   814	            // SUCCESS MESSAGE
-   815	            const completedHabits = gameData.dailyLogs[today].habits.length;
-   816	            const totalHabits = gameData.habits.length;
-   817	            
-   818	            if (completedHabits === totalHabits && totalHabits > 0) {
-   819	                showNotification('🎉 ¡Día perfecto completado! Vuelve mañana para seguir evolucionando tu lobo.', 'success');
-   820	            } else {
-   821	                showNotification('✅ ¡Registro guardado! Vuelve mañana para un nuevo día de conquistas.', 'success');
-   822	            }
-   823	            
-   824	            // Award completion bonus
-   825	            gameData.player.xp += 5;
-   826	            gameData.player.coins += 2;
-   827	            updateWolfEvolution();
-   828	            updatePlayerStats();
-   829	            
-   830	            // UPDATE STATUS MESSAGE
-   831	            document.getElementById('day-status').innerHTML = '✅ ¡Registro completado! Vuelve mañana para continuar tu evolución.';
-   832	            
-   833	            // FIXED: Clear the daily form after successful submission
-   834	            clearDailyForm();
-   835	        }
-   836	
-   837	        // NEW: Function to clear the daily registration form
-   838	        function clearDailyForm() {
-   839	            // Clear energy selection
-   840	            document.querySelectorAll('.energy-emoji').forEach(emoji => {
-   841	                emoji.classList.remove('selected');
-   842	            });
-   843	            
-   844	            // Clear text areas
-   845	            document.getElementById('daily-reflection').value = '';
-   846	            document.getElementById('tomorrow-intention').value = '';
-   847	            
-   848	            // Clear file input
-   849	            document.getElementById('evidence-upload').value = '';
-   850	            
-   851	            // Uncheck advice request
-   852	            document.getElementById('request-advice').checked = false;
-   853	        }
-   854	
-   855	        // Dashboard Functions
-   856	        function updateDashboard() {
-   857	            updateWeeklySummary();
-   858	            updateCharts();
-   859	            updateCategoryProgress();
-   860	            updateStreaksDisplay();
-   861	        }
-   862	
-   863	        function updateWeeklySummary() {
-   864	            const weekData = getWeekData();
-   865	            
-   866	            document.getElementById('weekly-habits').textContent = weekData.totalHabits;
-   867	            document.getElementById('weekly-energy').textContent = weekData.avgEnergy.toFixed(1);
-   868	            
-   869	            // FIXED: Handle -Infinity for weekly streak properly
-   870	            const streakValues = Object.values(gameData.streaks);
-   871	            let maxStreak = 0;
-   872	            
-   873	            if (streakValues.length > 0) {
-   874	                const validStreaks = streakValues.filter(streak => typeof streak === 'number' && !isNaN(streak));
-   875	                if (validStreaks.length > 0) {
-   876	                    maxStreak = Math.max(...validStreaks);
-   877	                }
-   878	            }
-   879	            
-   880	            document.getElementById('weekly-streak').textContent = maxStreak;
-   881	        }
-   882	
-   883	        // FIXED: Charts with proper error handling and radar chart
-   884	        function updateCharts() {
-   885	            updateHabitsChart();
-   886	            updateEnergyChart();
-   887	            updateRadarChart(); // NEW: Radar chart
-   888	        }
-   889	
-   890	        function updateHabitsChart() {
-   891	            const ctx = document.getElementById('habitsChart');
-   892	            if (!ctx) return;
-   893	            
-   894	            // Destroy existing chart if it exists
-   895	            if (window.habitsChart instanceof Chart) {
-   896	                window.habitsChart.destroy();
-   897	            }
-   898	            
-   899	            const weekData = getWeekData();
-   900	            
-   901	            window.habitsChart = new Chart(ctx, {
-   902	                type: 'line',
-   903	                data: {
-   904	                    labels: weekData.days,
-   905	                    datasets: [{
-   906	                        label: 'Hábitos Completados',
-   907	                        data: weekData.habitsPerDay,
-   908	                        borderColor: '#3b82f6',
-   909	                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-   910	                        fill: true,
-   911	                        tension: 0.4
-   912	                    }]
-   913	                },
-   914	                options: {
-   915	                    responsive: true,
-   916	                    maintainAspectRatio: false,
-   917	                    plugins: {
-   918	                        legend: {
-   919	                            labels: { color: '#ffffff' }
-   920	                        }
-   921	                    },
-   922	                    scales: {
-   923	                        y: {
-   924	                            beginAtZero: true,
-   925	                            ticks: { color: '#ffffff' },
-   926	                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-   927	                        },
-   928	                        x: {
-   929	                            ticks: { color: '#ffffff' },
-   930	                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-   931	                        }
-   932	                    }
-   933	                }
-   934	            });
-   935	        }
-   936	
-   937	        function updateEnergyChart() {
-   938	            const ctx = document.getElementById('energyChart');
-   939	            if (!ctx) return;
-   940	            
-   941	            // Destroy existing chart if it exists
-   942	            if (window.energyChart instanceof Chart) {
-   943	                window.energyChart.destroy();
-   944	            }
-   945	            
-   946	            const weekData = getWeekData();
-   947	            
-   948	            window.energyChart = new Chart(ctx, {
-   949	                type: 'bar',
-   950	                data: {
-   951	                    labels: weekData.days,
-   952	                    datasets: [{
-   953	                        label: 'Nivel de Energía',
-   954	                        data: weekData.energyPerDay,
-   955	                        backgroundColor: [
-   956	                            '#ef4444', '#f97316', '#f59e0b',
-   957	                            '#eab308', '#84cc16', '#22c55e',
-   958	                            '#10b981'
-   959	                        ]
-   960	                    }]
-   961	                },
-   962	                options: {
-   963	                    responsive: true,
-   964	                    maintainAspectRatio: false,
-   965	                    plugins: {
-   966	                        legend: {
-   967	                            labels: { color: '#ffffff' }
-   968	                        }
-   969	                    },
-   970	                    scales: {
-   971	                        y: {
-   972	                            beginAtZero: true,
-   973	                            max: 5,
-   974	                            ticks: { color: '#ffffff' },
-   975	                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-   976	                        },
-   977	                        x: {
-   978	                            ticks: { color: '#ffffff' },
-   979	                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-   980	                        }
-   981	                    }
-   982	                }
-   983	            });
-   984	        }
-   985	
-   986	        // NEW: Radar Chart for category balance
-   987	        function updateRadarChart() {
-   988	            const ctx = document.getElementById('radarChart');
-   989	            if (!ctx) return;
-   990	            
-   991	            // Destroy existing chart if it exists
-   992	            if (window.radarChart instanceof Chart) {
-   993	                window.radarChart.destroy();
-   994	            }
-   995	            
-   996	            const categoryData = getCategoryProgressData();
-   997	            
-   998	            window.radarChart = new Chart(ctx, {
-   999	                type: 'radar',
-  1000	                data: {
-  1001	                    labels: categoryData.labels,
-  1002	                    datasets: [{
-  1003	                        label: 'Progreso por Categoría',
-  1004	                        data: categoryData.values,
-  1005	                        borderColor: '#8b5cf6',
-  1006	                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
-  1007	                        pointBackgroundColor: '#8b5cf6',
-  1008	                        pointBorderColor: '#ffffff',
-  1009	                        pointBorderWidth: 2
-  1010	                    }]
-  1011	                },
-  1012	                options: {
-  1013	                    responsive: true,
-  1014	                    maintainAspectRatio: false,
-  1015	                    plugins: {
-  1016	                        legend: {
-  1017	                            labels: { color: '#ffffff' }
-  1018	                        }
-  1019	                    },
-  1020	                    scales: {
-  1021	                        r: {
-  1022	                            angleLines: { color: 'rgba(255, 255, 255, 0.2)' },
-  1023	                            grid: { color: 'rgba(255, 255, 255, 0.2)' },
-  1024	                            pointLabels: { color: '#ffffff' },
-  1025	                            ticks: { 
-  1026	                                color: '#ffffff',
-  1027	                                backdropColor: 'rgba(0, 0, 0, 0.5)'
-  1028	                            }
-  1029	                        }
-  1030	                    }
-  1031	                }
-  1032	            });
-  1033	        }
-  1034	
-  1035	        function getCategoryProgressData() {
-  1036	            const categories = Object.keys(gameData.categories);
-  1037	            const labels = categories.map(cat => gameData.categories[cat].name);
-  1038	            const values = categories.map(cat => {
-  1039	                const categoryHabits = gameData.habits.filter(h => h.category === cat);
-  1040	                if (categoryHabits.length === 0) return 0;
-  1041	                
-  1042	                const today = new Date().toISOString().split('T')[0];
-  1043	                const completedToday = gameData.dailyLogs[today]?.habits?.filter(hId => {
-  1044	                    const habit = gameData.habits.find(h => h.id === hId);
-  1045	                    return habit && habit.category === cat;
-  1046	                }).length || 0;
-  1047	                
-  1048	                return (completedToday / categoryHabits.length) * 100;
-  1049	            });
-  1050	            
-  1051	            return { labels, values };
-  1052	        }
-  1053	
-  1054	        function getWeekData() {
-  1055	            const days = [];
-  1056	            const habitsPerDay = [];
-  1057	            const energyPerDay = [];
-  1058	            let totalHabits = 0;
-  1059	            let totalEnergy = 0;
-  1060	            let energyDays = 0;
-  1061	            
-  1062	            for (let i = 6; i >= 0; i--) {
-  1063	                const date = new Date();
-  1064	                date.setDate(date.getDate() - i);
-  1065	                const dateStr = date.toISOString().split('T')[0];
-  1066	                const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
-  1067	                
-  1068	                days.push(dayName);
-  1069	                
-  1070	                const dayLog = gameData.dailyLogs[dateStr];
-  1071	                const habitsCount = dayLog?.habits?.length || 0;
-  1072	                const energyLevel = dayLog?.energyLevel || 0;
-  1073	                
-  1074	                habitsPerDay.push(habitsCount);
-  1075	                energyPerDay.push(energyLevel);
-  1076	                
-  1077	                totalHabits += habitsCount;
-  1078	                if (energyLevel > 0) {
-  1079	                    totalEnergy += energyLevel;
-  1080	                    energyDays++;
-  1081	                }
-  1082	            }
-  1083	            
-  1084	            return {
-  1085	                days,
-  1086	                habitsPerDay,
-  1087	                energyPerDay,
-  1088	                totalHabits,
-  1089	                avgEnergy: energyDays > 0 ? totalEnergy / energyDays : 0
-  1090	            };
-  1091	        }
-  1092	
-  1093	        function updateCategoryProgress() {
-  1094	            const container = document.getElementById('category-progress');
-  1095	            const categories = Object.keys(gameData.categories);
-  1096	            
-  1097	            container.innerHTML = categories.map(catKey => {
-  1098	                const category = gameData.categories[catKey];
-  1099	                const categoryHabits = gameData.habits.filter(h => h.category === catKey);
-  1100	                const streak = gameData.streaks[catKey] || 0;
-  1101	                
-  1102	                return `
-  1103	                    <div class="text-center p-4 bg-white bg-opacity-10 rounded-lg">
-  1104	                        <div class="text-3xl mb-2">${category.emoji}</div>
-  1105	                        <div class="text-white font-semibold text-sm">${category.name}</div>
-  1106	                        <div class="text-blue-200 text-xs">${categoryHabits.length} hábitos</div>
-  1107	                        <div class="text-blue-200 text-xs">Racha: ${streak} días</div>
-  1108	                    </div>
-  1109	                `;
-  1110	            }).join('');
-  1111	        }
-  1112	
-  1113	        // Wolf Profile Functions
-  1114	        function updateWolfProfile() {
-  1115	            document.getElementById('wolf-profile-name').textContent = gameData.player.name;
-  1116	            document.getElementById('wolf-profile-level').textContent = gameData.player.level;
-  1117	            document.getElementById('wolf-profile-xp').textContent = gameData.player.xp;
-  1118	            document.getElementById('wolf-profile-coins').textContent = gameData.player.coins;
-  1119	            document.getElementById('wolf-profile-lives').textContent = gameData.player.lives;
-  1120	            
-  1121	            const avatar = document.getElementById('wolf-profile-avatar');
-  1122	            avatar.className = `wolf-evolution-image ${gameData.player.avatar} mx-auto mb-4`;
-  1123	            
-  1124	            updateEvolutionPath();
-  1125	            updateBadgesGallery();
-  1126	        }
-  1127	
-  1128	        function updateEvolutionPath() {
-  1129	            const container = document.getElementById('evolution-path');
-  1130	            const levels = [
-  1131	                { level: 1, name: 'Cachorro Guerrero', xp: 0, avatar: 'level-1' },
-  1132	                { level: 2, name: 'Lobo Explorador', xp: 100, avatar: 'level-2' },
-  1133	                { level: 3, name: 'Guerrero Feroz', xp: 300, avatar: 'level-3' },
-  1134	                { level: 4, name: 'Comandante Alpha', xp: 600, avatar: 'level-4' },
-  1135	                { level: 5, name: 'General Místico', xp: 1000, avatar: 'level-5' }
-  1136	            ];
-  1137	            
-  1138	            container.innerHTML = '';
-  1139	            
-  1140	            levels.forEach(evolutionLevel => {
-  1141	                const isUnlocked = gameData.player.level >= evolutionLevel.level;
-  1142	                const isCurrent = gameData.player.level === evolutionLevel.level;
-  1143	                
-  1144	                const levelElement = document.createElement('div');
-  1145	                levelElement.className = `flex items-center p-4 rounded-lg border-2 ${
-  1146	                    isCurrent ? 'border-blue-400 bg-blue-50' : 
-  1147	                    isUnlocked ? 'border-green-400 bg-green-50' : 
-  1148	                    'border-gray-300 bg-gray-100'
-  1149	                }`;
-  1150	                
-  1151	                levelElement.innerHTML = `
-  1152	                    <div class="wolf-evolution-image ${evolutionLevel.avatar} w-16 h-16 mr-4 ${!isUnlocked ? 'opacity-50' : ''}"></div>
-  1153	                    <div class="flex-grow">
-  1154	                        <div class="font-semibold ${isCurrent ? 'text-blue-800' : isUnlocked ? 'text-green-800' : 'text-gray-600'}">
-  1155	                            ${evolutionLevel.name}
-  1156	                        </div>
-  1157	                        <div class="text-sm ${isCurrent ? 'text-blue-600' : isUnlocked ? 'text-green-600' : 'text-gray-500'}">
-  1158	                            Nivel ${evolutionLevel.level} • ${evolutionLevel.xp} XP requerido
-  1159	                        </div>
-  1160	                    </div>
-  1161	                    <div class="text-2xl">
-  1162	                        ${isCurrent ? '👑' : isUnlocked ? '✅' : '🔒'}
-  1163	                    </div>
-  1164	                `;
-  1165	                
-  1166	                container.appendChild(levelElement);
-  1167	            });
-  1168	        }
-  1169	
-  1170	        function updateBadgesGallery() {
-  1171	            const container = document.getElementById('badges-gallery');
-  1172	            const allBadges = [
-  1173	                { id: 'first_habit', name: 'Primer Paso', icon: '🌱', description: 'Crear primer hábito' },
-  1174	                { id: 'week_warrior', name: 'Guerrero Semanal', icon: '⚔️', description: '7 días de seguimiento' },
-  1175	                { id: 'energy_master', name: 'Maestro de Energía', icon: '⚡', description: '5 días consecutivos con energía alta' },
-  1176	                { id: 'perfect_week', name: 'Semana Perfecta', icon: '👑', description: '100% de hábitos completados' },
-  1177	                { id: 'streak_master', name: 'Maestro de Rachas', icon: '🔥', description: '15 días de racha en una categoría' },
-  1178	                { id: 'chronicler', name: 'Cronista', icon: '📖', description: '10 reflexiones escritas' },
-  1179	                { id: 'evolution', name: 'Evolución', icon: '🌟', description: 'Alcanzar nivel 3' },
-  1180	                { id: 'coin_collector', name: 'Colector de Monedas', icon: '🪙', description: 'Acumular 500 monedas' }
-  1181	            ];
-  1182	            
-  1183	            container.innerHTML = '';
-  1184	            
-  1185	            allBadges.forEach(badge => {
-  1186	                const isEarned = gameData.badges.includes(badge.id);
-  1187	                
-  1188	                const badgeElement = document.createElement('div');
-  1189	                badgeElement.className = `p-4 rounded-lg text-center ${
-  1190	                    isEarned ? 'bg-yellow-100 border-2 border-yellow-400' : 'bg-gray-100 border-2 border-gray-300'
-  1191	                }`;
-  1192	                badgeElement.innerHTML = `
-  1193	                    <div class="text-3xl mb-1 ${!isEarned ? 'opacity-30' : ''}">${badge.icon}</div>
-  1194	                    <div class="font-semibold text-xs ${isEarned ? 'text-yellow-800' : 'text-gray-600'}">${badge.name}</div>
-  1195	                    <div class="text-xs ${isEarned ? 'text-yellow-700' : 'text-gray-500'} mt-1">${badge.description}</div>
-  1196	                `;
-  1197	                container.appendChild(badgeElement);
-  1198	            });
-  1199	        }
-  1200	
-  1201	        // Wolf Evolution System
-  1202	        function updateWolfEvolution() {
-  1203	            const levels = [
-  1204	                { level: 1, name: 'Cachorro Guerrero', xp: 0, maxXp: 100, avatar: 'level-1' },
-  1205	                { level: 2, name: 'Lobo Explorador', xp: 100, maxXp: 300, avatar: 'level-2' },
-  1206	                { level: 3, name: 'Guerrero Feroz', xp: 300, maxXp: 600, avatar: 'level-3' },
-  1207	                { level: 4, name: 'Comandante Alpha', xp: 600, maxXp: 1000, avatar: 'level-4' },
-  1208	                { level: 5, name: 'General Místico', xp: 1000, maxXp: 1000, avatar: 'level-5' }
-  1209	            ];
-  1210	            
-  1211	            const currentLevel = levels.find(l => gameData.player.xp >= l.xp && (gameData.player.xp < l.maxXp || l.level === 5));
-  1212	            
-  1213	            if (currentLevel && currentLevel.level > gameData.player.level) {
-  1214	                // Level up!
-  1215	                gameData.player.level = currentLevel.level;
-  1216	                gameData.player.name = currentLevel.name;
-  1217	                gameData.player.avatar = currentLevel.avatar;
-  1218	                
-  1219	                showNotification(`🎉 ¡LEVEL UP! Ahora eres ${currentLevel.name}!`, 'success');
-  1220	                gameData.player.coins += 50; // Level up bonus
-  1221	            }
-  1222	            
-  1223	            if (currentLevel) {
-  1224	                gameData.player.maxXp = currentLevel.maxXp;
-  1225	            }
-  1226	            
-  1227	            updatePlayerStats();
-  1228	        }
-  1229	
-  1230	        function updatePlayerStats() {
-  1231	            // Update wolf card
-  1232	            document.getElementById('wolf-name').textContent = gameData.player.name;
-  1233	            document.getElementById('wolf-level').textContent = gameData.player.level;
-  1234	            document.getElementById('wolf-xp').textContent = gameData.player.xp;
-  1235	            document.getElementById('wolf-max-xp').textContent = gameData.player.maxXp;
-  1236	            document.getElementById('wolf-coins').textContent = gameData.player.coins;
-  1237	            document.getElementById('wolf-lives').textContent = gameData.player.lives;
-  1238	            
-  1239	            // Update XP bar
-  1240	            const xpPercentage = (gameData.player.xp / gameData.player.maxXp) * 100;
-  1241	            document.getElementById('wolf-xp-bar').style.width = `${Math.min(xpPercentage, 100)}%`;
-  1242	            
-  1243	            // Update avatar
-  1244	            const avatar = document.getElementById('wolf-avatar');
-  1245	            avatar.className = `wolf-evolution-image ${gameData.player.avatar}`;
-  1246	        }
-  1247	
-  1248	        // Streaks and Badges
-  1249	        function updateStreaks() {
-  1250	            const today = new Date().toISOString().split('T')[0];
-  1251	            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-  1252	            
-  1253	            Object.keys(gameData.categories).forEach(catKey => {
-  1254	                const categoryHabits = gameData.habits.filter(h => h.category === catKey);
-  1255	                const todayLog = gameData.dailyLogs[today];
-  1256	                const yesterdayLog = gameData.dailyLogs[yesterday];
-  1257	                
-  1258	                let todayCompleted = false;
-  1259	                let yesterdayCompleted = false;
-  1260	                
-  1261	                if (categoryHabits.length > 0) {
-  1262	                    const todayCompletedHabits = todayLog?.habits?.filter(hId => {
-  1263	                        const habit = gameData.habits.find(h => h.id === hId);
-  1264	                        return habit && habit.category === catKey;
-  1265	                    }).length || 0;
-  1266	                    
-  1267	                    const yesterdayCompletedHabits = yesterdayLog?.habits?.filter(hId => {
-  1268	                        const habit = gameData.habits.find(h => h.id === hId);
-  1269	                        return habit && habit.category === catKey;
-  1270	                    }).length || 0;
-  1271	                    
-  1272	                    todayCompleted = todayCompletedHabits === categoryHabits.length;
-  1273	                    yesterdayCompleted = yesterdayCompletedHabits === categoryHabits.length;
-  1274	                }
-  1275	                
-  1276	                if (todayCompleted) {
-  1277	                    if (yesterdayCompleted) {
-  1278	                        gameData.streaks[catKey] = (gameData.streaks[catKey] || 0) + 1;
-  1279	                    } else {
-  1280	                        gameData.streaks[catKey] = 1;
-  1281	                    }
-  1282	                } else if (!yesterdayCompleted) {
-  1283	                    gameData.streaks[catKey] = 0;
-  1284	                }
-  1285	            });
-  1286	            
-  1287	            saveGameData();
-  1288	        }
-  1289	
-  1290	        function checkBadges() {
-  1291	            const newBadges = [];
-  1292	            
-  1293	            // First habit
-  1294	            if (gameData.habits.length >= 1 && !gameData.badges.includes('first_habit')) {
-  1295	                newBadges.push('first_habit');
-  1296	            }
-  1297	            
-  1298	            // Week warrior (7 days of any tracking)
-  1299	            if (Object.keys(gameData.dailyLogs).length >= 7 && !gameData.badges.includes('week_warrior')) {
-  1300	                newBadges.push('week_warrior');
-  1301	            }
-  1302	            
-  1303	            // Evolution badge (level 3)
-  1304	            if (gameData.player.level >= 3 && !gameData.badges.includes('evolution')) {
-  1305	                newBadges.push('evolution');
-  1306	            }
-  1307	            
-  1308	            // Coin collector
-  1309	            if (gameData.player.coins >= 500 && !gameData.badges.includes('coin_collector')) {
-  1310	                newBadges.push('coin_collector');
-  1311	            }
-  1312	            
-  1313	            // Streak master
-  1314	            const maxStreak = Math.max(...Object.values(gameData.streaks));
-  1315	            if (maxStreak >= 15 && !gameData.badges.includes('streak_master')) {
-  1316	                newBadges.push('streak_master');
-  1317	            }
-  1318	            
-  1319	            // Add new badges
-  1320	            newBadges.forEach(badge => {
-  1321	                gameData.badges.push(badge);
-  1322	                showNotification(`🏆 ¡Nuevo logro desbloqueado!`, 'success');
-  1323	            });
-  1324	            
-  1325	            if (newBadges.length > 0) {
-  1326	                saveGameData();
-  1327	            }
-  1328	        }
-  1329	
-  1330	        // Migration Functions
-  1331	        function previewMigrationData() {
-  1332	            const sourceDate = document.getElementById('migration-source-date').value;
-  1333	            if (!sourceDate) {
-  1334	                showNotification('⚠️ Selecciona una fecha origen', 'error');
-  1335	                return;
-  1336	            }
-  1337	            
-  1338	            const sourceLog = gameData.dailyLogs[sourceDate];
-  1339	            if (!sourceLog) {
-  1340	                showNotification('❌ No hay datos para esa fecha', 'error');
-  1341	                return;
-  1342	            }
-  1343	            
-  1344	            // Show preview
-  1345	            const previewContainer = document.getElementById('migration-preview');
-  1346	            const contentContainer = document.getElementById('migration-content');
-  1347	            
-  1348	            let previewHTML = '<strong>Datos a migrar:</strong><br>';
-  1349	            
-  1350	            if (sourceLog.habits && sourceLog.habits.length > 0) {
-  1351	                previewHTML += `✅ ${sourceLog.habits.length} hábitos completados<br>`;
-  1352	            }
-  1353	            
-  1354	            if (sourceLog.energyLevel) {
-  1355	                previewHTML += `⚡ Nivel de energía: ${sourceLog.energyLevel}<br>`;
-  1356	            }
-  1357	            
-  1358	            if (sourceLog.reflection) {
-  1359	                previewHTML += `📝 Reflexión: "${sourceLog.reflection.substring(0, 50)}..."<br>`;
-  1360	            }
-  1361	            
-  1362	            if (sourceLog.intention) {
-  1363	                previewHTML += `🌟 Intención: "${sourceLog.intention.substring(0, 50)}..."<br>`;
-  1364	            }
-  1365	            
-  1366	            if (sourceLog.evidenceImage) {
-  1367	                previewHTML += `📸 Imagen de evidencia<br>`;
-  1368	            }
-  1369	            
-  1370	            contentContainer.innerHTML = previewHTML;
-  1371	            previewContainer.classList.remove('hidden');
-  1372	            document.getElementById('migrate-btn').disabled = false;
-  1373	        }
-  1374	
-  1375	        function executeMigration() {
-  1376	            const sourceDate = document.getElementById('migration-source-date').value;
-  1377	            const today = new Date().toISOString().split('T')[0];
-  1378	            
-  1379	            if (sourceDate === today) {
-  1380	                showNotification('❌ No puedes migrar del mismo día', 'error');
-  1381	                return;
-  1382	            }
-  1383	            
-  1384	            const sourceLog = gameData.dailyLogs[sourceDate];
-  1385	            if (!sourceLog) {
-  1386	                showNotification('❌ No hay datos para migrar', 'error');
-  1387	                return;
-  1388	            }
-  1389	            
-  1390	            // Confirm migration
-  1391	            if (!confirm('¿Estás seguro de migrar estos datos al día actual? Esto sobrescribirá la información existente.')) {
-  1392	                return;
-  1393	            }
-  1394	            
-  1395	            // Perform migration
-  1396	            if (!gameData.dailyLogs[today]) {
-  1397	                gameData.dailyLogs[today] = {};
-  1398	            }
-  1399	            
-  1400	            // Copy all data except timestamp
-  1401	            gameData.dailyLogs[today] = {
-  1402	                ...sourceLog,
-  1403	                timestamp: Date.now(),
-  1404	                migratedFrom: sourceDate
-  1405	            };
-  1406	            
-  1407	            saveGameData();
-  1408	            
-  1409	            // Update interface
-  1410	            loadDailyHabits();
-  1411	            
-  1412	            // Fill form fields
-  1413	            if (sourceLog.energyLevel) {
-  1414	                selectEnergy(sourceLog.energyLevel);
-  1415	            }
-  1416	            
-  1417	            document.getElementById('daily-reflection').value = sourceLog.reflection || '';
-  1418	            document.getElementById('tomorrow-intention').value = sourceLog.intention || '';
-  1419	            document.getElementById('request-advice').checked = sourceLog.requestAdvice || false;
-  1420	            
-  1421	            showNotification(`🚀 Datos migrados exitosamente desde ${sourceDate}`, 'success');
-  1422	            
-  1423	            // Hide preview
-  1424	            document.getElementById('migration-preview').classList.add('hidden');
-  1425	            document.getElementById('migrate-btn').disabled = true;
-  1426	        }
-  1427	
-  1428	        function exportData() {
-  1429	            const dataToExport = {
-  1430	                gameData: gameData,
-  1431	                exportDate: new Date().toISOString(),
-  1432	                version: '1.0'
-  1433	            };
-  1434	            
-  1435	            const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {type: 'application/json'});
-  1436	            const url = URL.createObjectURL(blob);
-  1437	            
-  1438	            const a = document.createElement('a');
-  1439	            a.href = url;
-  1440	            a.download = `habitwolf-backup-${new Date().toISOString().split('T')[0]}.json`;
-  1441	            document.body.appendChild(a);
-  1442	            a.click();
-  1443	            document.body.removeChild(a);
-  1444	            URL.revokeObjectURL(url);
-  1445	            
-  1446	            showNotification('💾 Respaldo descargado exitosamente', 'success');
-  1447	        }
-  1448	
-  1449	        function importData() {
-  1450	            const fileInput = document.getElementById('import-file');
-  1451	            const file = fileInput.files[0];
-  1452	            
-  1453	            if (!file) {
-  1454	                showNotification('⚠️ Selecciona un archivo de respaldo', 'error');
-  1455	                return;
-  1456	            }
-  1457	            
-  1458	            const reader = new FileReader();
-  1459	            reader.onload = function(e) {
-  1460	                try {
-  1461	                    const importedData = JSON.parse(e.target.result);
-  1462	                    
-  1463	                    if (importedData.gameData) {
-  1464	                        if (confirm('¿Estás seguro de restaurar estos datos? Esto sobrescribirá toda la información actual.')) {
-  1465	                            gameData = importedData.gameData;
-  1466	                            saveGameData();
-  1467	                            
-  1468	                            // Refresh interface
-  1469	                            initializeApp();
-  1470	                            
-  1471	                            showNotification('📤 Datos restaurados exitosamente', 'success');
-  1472	                        }
-  1473	                    } else {
-  1474	                        showNotification('❌ Archivo de respaldo inválido', 'error');
-  1475	                    }
-  1476	                } catch (error) {
-  1477	                    showNotification('❌ Error al leer el archivo de respaldo', 'error');
-  1478	                }
-  1479	            };
-  1480	            
-  1481	            reader.readAsText(file);
-  1482	        }
-  1483	
-  1484	        function resetTodayData() {
-  1485	            if (confirm('¿Estás seguro de reiniciar solo los datos de hoy?')) {
-  1486	                const today = new Date().toISOString().split('T')[0];
-  1487	                delete gameData.dailyLogs[today];
-  1488	                
-  1489	                clearDailyForm();
-  1490	                loadDailyHabits();
-  1491	                saveGameData();
-  1492	                
-  1493	                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 monedas';
-  1494	                showNotification('🔄 Datos de hoy reiniciados', 'success');
-  1495	            }
-  1496	        }
-  1497	
-  1498	        function confirmFullReset() {
-  1499	            const confirmation = prompt('⚠️ ATENCIÓN: Esto eliminará TODOS tus datos permanentemente.\nEscribe "REINICIAR" para confirmar:');
-  1500	            
-  1501	            if (confirmation === 'REINICIAR') {
-  1502	                localStorage.removeItem('habitwolf_gamedata');
-  1503	                location.reload();
-  1504	            } else {
-  1505	                showNotification('❌ Reinicio cancelado', 'error');
-  1506	            }
-  1507	        }
-  1508	
-  1509	        // Utility Functions
-  1510	        function showNotification(message, type = 'success') {
-  1511	            const container = document.getElementById('notification-container');
-  1512	            
-  1513	            const notification = document.createElement('div');
-  1514	            notification.className = `notification ${type}`;
-  1515	            notification.textContent = message;
-  1516	            
-  1517	            container.appendChild(notification);
-  1518	            
-  1519	            setTimeout(() => {
-  1520	                notification.remove();
-  1521	            }, 4000);
-  1522	        }
-  1523	
-  1524	        function updateStreaksDisplay() {
-  1525	            // This function can be expanded to show streaks in the dashboard
-  1526	        }
-  1527	
-  1528	        // Service Worker Registration
-  1529	        if ('serviceWorker' in navigator) {
-  1530	            navigator.serviceWorker.register('./sw.js')
-  1531	                .then(() => console.log('Service Worker registered'))
-  1532	                .catch(() => console.log('Service Worker registration failed'));
-  1533	        }
-  1534	    </script>
-  1535	</body>
-  1536	</html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HabitWolf Pro - Sistema de Autodisciplina Gamificado</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Aplicación gamificada de seguimiento de hábitos con sistema de evolución de lobo">
+    <meta name="theme-color" content="#4299e1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="HabitWolf Pro">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- PWA Apple Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMxYTIwMmMiLz4KPHBhdGggZD0iTTk2IDQ4QzEyMC4zIDQ4IDEzNiA2My43IDEzNiA4OEM1NiA5NiA5NiAxNDQgOTYgMTQ0UzEzNiA5NiA1NiA4OEM1NiA2My43IDcxLjcgNDggOTYgNDhaIiBmaWxsPSIjNDI5OWUxIi8+CjxjaXJjbGUgY3g9IjgwIiBjeT0iNzYiIHI9IjQiIGZpbGw9IiNmZmZmZmYiLz4KPGNpcmNsZSBjeD0iMTEyIiBjeT0iNzYiIHI9IjQiIGZpbGw9IiNmZmZmZmYiLz4KPGF0aCBkPSJNODggOTZTOTIgMTA0IDk2IDEwNFMxMDQgOTYgMTA0IDk2IiBzdHJva2U9IiNmZmZmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo=">
+    
+    <!-- CDN Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .wolf-card {
+            background: linear-gradient(145deg, #2d3748, #4a5568);
+            border: 3px solid #4299e1;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        
+        /* FIXED: Individual wolf evolution images with animation */
+        .wolf-evolution-image {
+            width: 120px;
+            height: 120px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 15px;
+            border: 3px solid #4299e1;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+            animation: wolfPulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes wolfPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(66, 153, 225, 0.5); }
+        }
+        
+        .wolf-evolution-image:hover {
+            animation-play-state: paused;
+            transform: scale(1.08);
+            box-shadow: 0 8px 25px rgba(66, 153, 225, 0.6);
+        }
+        
+        .wolf-evolution-image.level-1 { 
+            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/1f1c3248-e5b5-4e91-9b03-aee49f3908ef'); 
+        }
+        .wolf-evolution-image.level-2 { 
+            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/41296d25-6e4b-4df9-b3df-b7c85283537d'); 
+        }
+        .wolf-evolution-image.level-3 { 
+            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/05926d3b-abe5-4cdb-9b75-60173b708b55'); 
+        }
+        .wolf-evolution-image.level-4 { 
+            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/714749d4-10cb-465f-b59a-6dc3893fd4a9'); 
+        }
+        .wolf-evolution-image.level-5 { 
+            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/05acbb65-7490-4da3-acef-1fe605a8cd78'); 
+        }
+        
+        .energy-emoji {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 8px;
+            border-radius: 50%;
+        }
+        
+        .energy-emoji.selected {
+            background-color: #3b82f6;
+            transform: scale(1.2);
+        }
+        
+        .habit-checkbox {
+            transform: scale(1.5);
+            cursor: pointer;
+        }
+
+        .migration-section {
+            background: linear-gradient(145deg, #374151, #4b5563);
+            border: 2px solid #6366f1;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .date-picker-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-migration {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-migration:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-migration:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Chart container styling */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        .chart-container canvas {
+            max-height: 400px;
+        }
+        
+        /* Tab styling */
+        .tab-button {
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
+        }
+        
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Enhanced styling */
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification container -->
+    <div id="notification-container"></div>
+    
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header with Wolf Character -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-4">🐺 HabitWolf Pro</h1>
+            <p class="text-blue-200 text-lg">Sistema de Autodisciplina Gamificado</p>
+        </div>
+        
+        <!-- Wolf Card -->
+        <div class="wolf-card rounded-2xl p-6 mb-8">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-4">
+                    <div id="wolf-avatar" class="wolf-evolution-image level-1"></div>
+                    <div class="text-white">
+                        <h2 id="wolf-name" class="text-2xl font-bold">Cachorro Guerrero</h2>
+                        <p class="text-blue-200">Nivel <span id="wolf-level">1</span></p>
+                    </div>
+                </div>
+                <div class="text-white text-right">
+                    <div class="flex items-center space-x-4">
+                        <div>
+                            <div class="text-sm text-blue-200">⭐ XP</div>
+                            <div><span id="wolf-xp">0</span>/<span id="wolf-max-xp">100</span></div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-blue-200">🪙 Monedas</div>
+                            <div id="wolf-coins">0</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-blue-200">❤️ Vidas</div>
+                            <div id="wolf-lives">3</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- XP Bar -->
+            <div class="w-full bg-gray-600 rounded-full h-3 mb-4">
+                <div id="wolf-xp-bar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <!-- UPDATED: Navigation Tabs with new order -->
+        <div class="flex space-x-1 mb-6 bg-white bg-opacity-10 rounded-lg p-1">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-button active flex-1 py-3 px-4 text-white font-semibold">
+                📊 Dashboard
+            </button>
+            <button onclick="switchTab('habits')" id="tab-habits" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
+                🎯 Hábitos
+            </button>
+            <button onclick="switchTab('daily')" id="tab-daily" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
+                📅 Registro Diario
+            </button>
+            <button onclick="switchTab('profile')" id="tab-profile" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
+                🐺 Perfil
+            </button>
+            <button onclick="switchTab('guardar')" id="tab-guardar" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
+                💾 Guardar
+            </button>
+        </div>
+        
+        <!-- Dashboard Tab (now first) -->
+        <div id="dashboard-tab" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Weekly Summary -->
+                <div class="glassmorphism rounded-xl p-6">
+                    <h3 class="text-2xl font-bold text-white mb-4">Resumen Semanal</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-blue-300" id="weekly-habits">0</div>
+                            <div class="text-blue-200 text-sm">Hábitos Completados</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-green-300" id="weekly-energy">0</div>
+                            <div class="text-blue-200 text-sm">Energía Promedio</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-purple-300" id="weekly-streak">0</div>
+                            <div class="text-blue-200 text-sm">Mejor Racha</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold text-yellow-300" id="weekly-xp">0</div>
+                            <div class="text-blue-200 text-sm">XP Ganado</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Charts -->
+                <div class="glassmorphism rounded-xl p-6">
+                    <h3 class="text-2xl font-bold text-white mb-4">Progreso de Hábitos</h3>
+                    <div class="chart-container">
+                        <canvas id="habitsChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Energy Chart -->
+                <div class="glassmorphism rounded-xl p-6">
+                    <h3 class="text-2xl font-bold text-white mb-4">Niveles de Energía</h3>
+                    <div class="chart-container">
+                        <canvas id="energyChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Radar Chart -->
+                <div class="glassmorphism rounded-xl p-6">
+                    <h3 class="text-2xl font-bold text-white mb-4">Balance de Categorías</h3>
+                    <div class="chart-container">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Category Progress -->
+                <div class="glassmorphism rounded-xl p-6 lg:col-span-2">
+                    <h3 class="text-2xl font-bold text-white mb-4">Progreso por Categorías</h3>
+                    <div id="category-progress" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Dynamic category progress will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Habits Tab -->
+        <div id="habits-tab" class="tab-content hidden">
+            <div class="glassmorphism rounded-xl p-6">
+                <h3 class="text-2xl font-bold text-white mb-6">Gestión de Hábitos</h3>
+                
+                <!-- FIXED: Add New Habit with meta and unidad -->
+                <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-6">
+                    <h4 class="text-white font-semibold mb-4">Agregar Nuevo Hábito</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <input type="text" id="new-habit-name" placeholder="Nombre del hábito" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
+                        <select id="new-habit-category" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
+                            <option value="">Seleccionar categoría</option>
+                            <option value="fitness">💪 Fitness & Salud</option>
+                            <option value="learning">📚 Aprendizaje</option>
+                            <option value="productivity">⚡ Productividad</option>
+                            <option value="mindfulness">🧘 Mindfulness</option>
+                            <option value="creativity">🎨 Creatividad</option>
+                            <option value="social">👥 Social</option>
+                            <option value="nutrition">🥗 Nutrición</option>
+                            <option value="finance">💰 Finanzas</option>
+                        </select>
+                        <div class="flex">
+                            <input type="number" id="new-habit-target" placeholder="Meta" min="1" class="p-3 border border-gray-300 bg-white bg-opacity-90 rounded-l-lg flex-grow">
+                            <input type="text" id="new-habit-unit" placeholder="Unidad" class="p-3 border border-gray-300 bg-white bg-opacity-90 rounded-r-lg w-20">
+                        </div>
+                        <button onclick="addNewHabit()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                            ➕ Agregar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Habits List -->
+                <div id="habits-list" class="space-y-4">
+                    <!-- Dynamic habits list will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Daily Log Tab -->
+        <div id="daily-tab" class="tab-content hidden">
+            <div class="glassmorphism rounded-xl p-6 mb-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-white">Registro Diario</h3>
+                    <div class="text-white font-semibold" id="current-date"></div>
+                </div>
+                
+                <!-- Day Status -->
+                <div id="day-status" class="bg-blue-100 border border-blue-300 rounded-lg p-4 mb-6 text-blue-800">
+                    ⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 monedas
+                </div>
+                
+                <!-- Habits List -->
+                <div id="daily-habits-list" class="space-y-4 mb-6">
+                    <!-- Dynamic habits will be loaded here -->
+                </div>
+                
+                <!-- Energy Level -->
+                <div class="mb-6">
+                    <h4 class="text-white font-semibold mb-3">¿Cómo te sientes hoy? 💪</h4>
+                    <div class="flex space-x-4">
+                        <span class="energy-emoji text-3xl" data-level="1" onclick="selectEnergy(1)">😴</span>
+                        <span class="energy-emoji text-3xl" data-level="2" onclick="selectEnergy(2)">😐</span>
+                        <span class="energy-emoji text-3xl" data-level="3" onclick="selectEnergy(3)">🙂</span>
+                        <span class="energy-emoji text-3xl" data-level="4" onclick="selectEnergy(4)">😊</span>
+                        <span class="energy-emoji text-3xl" data-level="5" onclick="selectEnergy(5)">🔥</span>
+                    </div>
+                </div>
+                
+                <!-- Daily Reflection -->
+                <div class="mb-4">
+                    <label class="block text-white font-semibold mb-2">Reflexión del día 📝</label>
+                    <textarea id="daily-reflection" placeholder="¿Qué aprendiste hoy? ¿Qué desafíos enfrentaste?" class="w-full p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90" rows="3"></textarea>
+                </div>
+                
+                <!-- Tomorrow's Intention -->
+                <div class="mb-4">
+                    <label class="block text-white font-semibold mb-2">Intención para mañana 🌟</label>
+                    <textarea id="tomorrow-intention" placeholder="¿En qué te quieres enfocar mañana?" class="w-full p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90" rows="2"></textarea>
+                </div>
+                
+                <!-- Evidence Upload -->
+                <div class="mb-4">
+                    <label class="block text-white font-semibold mb-2">Evidencia del día (opcional) 📸</label>
+                    <input type="file" id="evidence-upload" accept="image/*" class="w-full p-2 rounded-lg border border-gray-300 bg-white bg-opacity-90">
+                </div>
+                
+                <!-- Request Advice -->
+                <div class="mb-6">
+                    <label class="flex items-center text-white">
+                        <input type="checkbox" id="request-advice" class="mr-2">
+                        <span class="font-semibold">💡 Quiero consejos para mejorar mañana</span>
+                    </label>
+                </div>
+                
+                <!-- Submit Button -->
+                <button onclick="saveDailyLog()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                    🚀 Guardar Registro del Día
+                </button>
+            </div>
+        </div>
+        
+        <!-- Profile Tab -->
+        <div id="profile-tab" class="tab-content hidden">
+            <div class="glassmorphism rounded-xl p-6">
+                <h3 class="text-2xl font-bold text-white mb-6">Perfil del Lobo</h3>
+                
+                <!-- Wolf Profile Info -->
+                <div class="text-center mb-8">
+                    <div id="wolf-profile-avatar" class="wolf-evolution-image level-1 mx-auto mb-4"></div>
+                    <h2 id="wolf-profile-name" class="text-3xl font-bold text-white mb-2">Cachorro Guerrero</h2>
+                    <div class="text-blue-200">
+                        <p>Nivel <span id="wolf-profile-level">1</span> • ⭐ <span id="wolf-profile-xp">0</span> XP</p>
+                        <p>🪙 <span id="wolf-profile-coins">0</span> monedas • ❤️ <span id="wolf-profile-lives">3</span> vidas</p>
+                    </div>
+                </div>
+                
+                <!-- Evolution Path -->
+                <div class="mb-8">
+                    <h4 class="text-xl font-bold text-white mb-4">🌟 Camino de Evolución</h4>
+                    <div id="evolution-path" class="space-y-4">
+                        <!-- Dynamic evolution path will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Badges Gallery -->
+                <div>
+                    <h4 class="text-xl font-bold text-white mb-4">🏆 Galería de Logros</h4>
+                    <div id="badges-gallery" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Dynamic badges will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPDATED: Guardar Tab (renamed from Migration) -->
+        <div id="guardar-tab" class="tab-content hidden">
+            <div class="glassmorphism rounded-xl p-6">
+                <h3 class="text-2xl font-bold text-white mb-6">💾 Gestión de Datos</h3>
+                <p class="text-blue-200 mb-6">Transfiere información de días anteriores o gestiona tus datos de respaldo.</p>
+                
+                <!-- Date Selection for Migration -->
+                <div class="migration-section">
+                    <h4 class="text-lg font-semibold text-white mb-4">🔄 Migrar Datos de Día Anterior</h4>
+                    <p class="text-blue-200 mb-4">Selecciona una fecha anterior para copiar su información al día actual:</p>
+                    
+                    <div class="date-picker-container">
+                        <label class="text-white font-medium">Fecha origen:</label>
+                        <input type="date" id="migration-source-date" class="p-2 rounded-lg border border-gray-300 bg-white">
+                        <button onclick="previewMigrationData()" class="btn-migration">👀 Previsualizar</button>
+                        <button onclick="executeMigration()" id="migrate-btn" class="btn-migration" disabled>🚀 Migrar Datos</button>
+                    </div>
+                    
+                    <!-- Migration Preview -->
+                    <div id="migration-preview" class="mt-4 hidden">
+                        <div class="bg-white bg-opacity-20 rounded-lg p-4">
+                            <h5 class="text-white font-semibold mb-2">Vista previa de datos a migrar:</h5>
+                            <div id="migration-content" class="text-blue-100 text-sm"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Backup and Restore -->
+                <div class="migration-section">
+                    <h4 class="text-lg font-semibold text-white mb-4">💾 Respaldo y Restauración</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h5 class="text-white font-medium mb-2">Crear Respaldo</h5>
+                            <p class="text-blue-200 text-sm mb-4">Exporta todos tus datos a un archivo JSON</p>
+                            <button onclick="exportData()" class="btn-migration w-full">📥 Descargar Respaldo</button>
+                        </div>
+                        <div>
+                            <h5 class="text-white font-medium mb-2">Restaurar desde Respaldo</h5>
+                            <p class="text-blue-200 text-sm mb-4">Importa datos desde un archivo de respaldo</p>
+                            <input type="file" id="import-file" accept=".json" class="w-full p-2 rounded-lg border border-gray-300 bg-white mb-2">
+                            <button onclick="importData()" class="btn-migration w-full">📤 Restaurar Datos</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Reset Options -->
+                <div class="migration-section">
+                    <h4 class="text-lg font-semibold text-white mb-4">🔄 Opciones de Reinicio</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button onclick="resetTodayData()" class="btn-migration bg-yellow-600 hover:bg-yellow-700">🔄 Reiniciar Solo Hoy</button>
+                        <button onclick="confirmFullReset()" class="btn-migration bg-red-600 hover:bg-red-700">⚠️ Reinicio Completo</button>
+                    </div>
+                    <p class="text-blue-200 text-xs mt-2">⚠️ Los reinicios son irreversibles. Crea un respaldo antes de continuar.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // FIXED: Initialize with proper date handling and form reset functionality
+        let gameData = {
+            player: {
+                name: 'Cachorro Guerrero',
+                level: 1,
+                xp: 0,
+                maxXp: 100,
+                coins: 0,
+                lives: 3,
+                avatar: 'level-1'
+            },
+            habits: [],
+            categories: {
+                fitness: { name: 'Fitness & Salud', emoji: '💪', color: '#ef4444' },
+                learning: { name: 'Aprendizaje', emoji: '📚', color: '#3b82f6' },
+                productivity: { name: 'Productividad', emoji: '⚡', color: '#f59e0b' },
+                mindfulness: { name: 'Mindfulness', emoji: '🧘', color: '#10b981' },
+                creativity: { name: 'Creatividad', emoji: '🎨', color: '#8b5cf6' },
+                social: { name: 'Social', emoji: '👥', color: '#ec4899' },
+                nutrition: { name: 'Nutrición', emoji: '🥗', color: '#84cc16' },
+                finance: { name: 'Finanzas', emoji: '💰', color: '#06b6d4' }
+            },
+            dailyLogs: {},
+            streaks: {},
+            badges: []
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadGameData();
+            initializeApp();
+        });
+
+        function initializeApp() {
+            updateCurrentDate();
+            updatePlayerStats();
+            updateWolfProfile();
+            loadDailyHabits();
+            updateHabitsList();
+            updateDashboard();
+            switchTab('dashboard'); // Start with dashboard tab
+            
+            // FIXED: Auto-update date at midnight
+            scheduleNextDayUpdate();
+        }
+
+        // FIXED: Automatic date update system
+        function scheduleNextDayUpdate() {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            
+            const msUntilMidnight = tomorrow.getTime() - now.getTime();
+            
+            setTimeout(() => {
+                // Reset daily status and update interface
+                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 monedas';
+                updateCurrentDate();
+                loadDailyHabits();
+                clearDailyForm(); // FIXED: Clear form at new day
+                showNotification('🌅 ¡Nuevo día! Listos para nuevas conquistas', 'success');
+                
+                // Schedule next update
+                scheduleNextDayUpdate();
+            }, msUntilMidnight);
+        }
+
+        function updateCurrentDate() {
+            const today = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('current-date').textContent = today.toLocaleDateString('es-ES', options);
+        }
+
+        // Load and Save Functions
+        function loadGameData() {
+            const saved = localStorage.getItem('habitwolf_gamedata');
+            if (saved) {
+                try {
+                    gameData = { ...gameData, ...JSON.parse(saved) };
+                } catch (e) {
+                    console.warn('Error loading saved data:', e);
+                }
+            }
+        }
+
+        function saveGameData() {
+            localStorage.setItem('habitwolf_gamedata', JSON.stringify(gameData));
+        }
+
+        // Tab Management
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.add('hidden'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            // Show selected tab and activate button
+            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            // Update data for specific tabs
+            if (tabName === 'dashboard') {
+                updateDashboard();
+            } else if (tabName === 'profile') {
+                updateWolfProfile();
+            } else if (tabName === 'daily') {
+                loadDailyHabits();
+            }
+        }
+
+        // FIXED: Habit Management with meta and unit
+        function addNewHabit() {
+            const name = document.getElementById('new-habit-name').value.trim();
+            const category = document.getElementById('new-habit-category').value;
+            const target = parseInt(document.getElementById('new-habit-target').value) || 1;
+            const unit = document.getElementById('new-habit-unit').value.trim() || 'vez';
+            
+            if (!name || !category) {
+                showNotification('⚠️ Completa todos los campos requeridos', 'error');
+                return;
+            }
+            
+            const newHabit = {
+                id: Date.now().toString(),
+                name: name,
+                category: category,
+                target: target,
+                unit: unit,
+                createdAt: new Date().toISOString(),
+                completed: {},
+                streak: 0,
+                totalCompleted: 0
+            };
+            
+            gameData.habits.push(newHabit);
+            gameData.streaks[newHabit.id] = 0;
+            
+            saveGameData();
+            
+            // Clear form
+            document.getElementById('new-habit-name').value = '';
+            document.getElementById('new-habit-category').value = '';
+            document.getElementById('new-habit-target').value = '';
+            document.getElementById('new-habit-unit').value = '';
+            
+            updateHabitsList();
+            loadDailyHabits();
+            showNotification('✅ Hábito agregado exitosamente', 'success');
+        }
+
+        function deleteHabit(habitId) {
+            if (confirm('¿Estás seguro de eliminar este hábito?')) {
+                gameData.habits = gameData.habits.filter(h => h.id !== habitId);
+                delete gameData.streaks[habitId];
+                
+                // Remove from daily logs
+                Object.values(gameData.dailyLogs).forEach(log => {
+                    log.habits = log.habits.filter(h => h !== habitId);
+                });
+                
+                saveGameData();
+                updateHabitsList();
+                loadDailyHabits();
+                showNotification('🗑️ Hábito eliminado', 'success');
+            }
+        }
+
+        function updateHabitsList() {
+            const container = document.getElementById('habits-list');
+            if (gameData.habits.length === 0) {
+                container.innerHTML = '<p class="text-blue-200 text-center py-8">No hay hábitos creados. ¡Agrega tu primer hábito!</p>';
+                return;
+            }
+            
+            container.innerHTML = gameData.habits.map(habit => {
+                const category = gameData.categories[habit.category];
+                const streak = gameData.streaks[habit.id] || 0;
+                
+                return `
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4 flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-2xl">${category.emoji}</span>
+                            <div>
+                                <h4 class="text-white font-semibold">${habit.name}</h4>
+                                <p class="text-blue-200 text-sm">${category.name} • Meta: ${habit.target} ${habit.unit} • Racha: ${streak} días</p>
+                            </div>
+                        </div>
+                        <button onclick="deleteHabit('${habit.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition-colors">
+                            🗑️
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Daily Log Functions
+        function loadDailyHabits() {
+            const today = new Date().toISOString().split('T')[0];
+            const container = document.getElementById('daily-habits-list');
+            
+            if (gameData.habits.length === 0) {
+                container.innerHTML = '<p class="text-blue-200 text-center py-8">No hay hábitos configurados. Ve a la pestaña "Hábitos" para agregar algunos.</p>';
+                return;
+            }
+            
+            container.innerHTML = gameData.habits.map(habit => {
+                const category = gameData.categories[habit.category];
+                const isCompleted = gameData.dailyLogs[today]?.habits?.includes(habit.id) || false;
+                
+                return `
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4 flex items-center space-x-4">
+                        <input type="checkbox" 
+                               class="habit-checkbox" 
+                               ${isCompleted ? 'checked' : ''} 
+                               onchange="toggleHabit('${habit.id}')">
+                        <span class="text-2xl">${category.emoji}</span>
+                        <div class="flex-grow">
+                            <h4 class="text-white font-semibold ${isCompleted ? 'line-through opacity-75' : ''}">${habit.name}</h4>
+                            <p class="text-blue-200 text-sm">${category.name} • Meta: ${habit.target} ${habit.unit}</p>
+                        </div>
+                        ${isCompleted ? '<span class="text-green-400 text-xl">✅</span>' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleHabit(habitId) {
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (!gameData.dailyLogs[today]) {
+                gameData.dailyLogs[today] = { habits: [] };
+            }
+            
+            const habits = gameData.dailyLogs[today].habits;
+            const index = habits.indexOf(habitId);
+            
+            if (index > -1) {
+                habits.splice(index, 1);
+            } else {
+                habits.push(habitId);
+                // Award XP and coins for completing habit
+                gameData.player.xp += 10;
+                gameData.player.coins += 1;
+            }
+            
+            saveGameData();
+            loadDailyHabits();
+            updateWolfEvolution();
+            updateStreaks();
+            checkBadges();
+        }
+
+        function selectEnergy(level) {
+            // Remove previous selection
+            document.querySelectorAll('.energy-emoji').forEach(emoji => {
+                emoji.classList.remove('selected');
+            });
+            
+            // Add selection to clicked emoji
+            document.querySelector(`[data-level="${level}"]`).classList.add('selected');
+        }
+
+        // FIXED: Save daily log with proper form clearing
+        function saveDailyLog() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (!gameData.dailyLogs[today]) {
+                gameData.dailyLogs[today] = { habits: [] };
+            }
+            
+            // Get energy level
+            const selectedEnergy = document.querySelector('.energy-emoji.selected');
+            if (selectedEnergy) {
+                gameData.dailyLogs[today].energyLevel = parseInt(selectedEnergy.dataset.level);
+            }
+            
+            // Get reflection and intention
+            gameData.dailyLogs[today].reflection = document.getElementById('daily-reflection').value;
+            gameData.dailyLogs[today].intention = document.getElementById('tomorrow-intention').value;
+            gameData.dailyLogs[today].requestAdvice = document.getElementById('request-advice').checked;
+            
+            // Handle evidence image
+            const evidenceFile = document.getElementById('evidence-upload').files[0];
+            if (evidenceFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    gameData.dailyLogs[today].evidenceImage = e.target.result;
+                    saveGameData();
+                };
+                reader.readAsDataURL(evidenceFile);
+            }
+            
+            gameData.dailyLogs[today].timestamp = Date.now();
+            
+            saveGameData();
+            
+            // SUCCESS MESSAGE
+            const completedHabits = gameData.dailyLogs[today].habits.length;
+            const totalHabits = gameData.habits.length;
+            
+            if (completedHabits === totalHabits && totalHabits > 0) {
+                showNotification('🎉 ¡Día perfecto completado! Vuelve mañana para seguir evolucionando tu lobo.', 'success');
+            } else {
+                showNotification('✅ ¡Registro guardado! Vuelve mañana para un nuevo día de conquistas.', 'success');
+            }
+            
+            // Award completion bonus
+            gameData.player.xp += 5;
+            gameData.player.coins += 2;
+            updateWolfEvolution();
+            updatePlayerStats();
+            
+            // UPDATE STATUS MESSAGE
+            document.getElementById('day-status').innerHTML = '✅ ¡Registro completado! Vuelve mañana para continuar tu evolución.';
+            
+            // FIXED: Clear the daily form after successful submission
+            clearDailyForm();
+        }
+
+        // NEW: Function to clear the daily registration form
+        function clearDailyForm() {
+            // Clear energy selection
+            document.querySelectorAll('.energy-emoji').forEach(emoji => {
+                emoji.classList.remove('selected');
+            });
+            
+            // Clear text areas
+            document.getElementById('daily-reflection').value = '';
+            document.getElementById('tomorrow-intention').value = '';
+            
+            // Clear file input
+            document.getElementById('evidence-upload').value = '';
+            
+            // Uncheck advice request
+            document.getElementById('request-advice').checked = false;
+        }
+
+        // Dashboard Functions
+        function updateDashboard() {
+            updateWeeklySummary();
+            updateCharts();
+            updateCategoryProgress();
+            updateStreaksDisplay();
+        }
+
+        function updateWeeklySummary() {
+            const weekData = getWeekData();
+            
+            document.getElementById('weekly-habits').textContent = weekData.totalHabits;
+            document.getElementById('weekly-energy').textContent = weekData.avgEnergy.toFixed(1);
+            
+            // FIXED: Handle -Infinity for weekly streak properly
+            const streakValues = Object.values(gameData.streaks);
+            let maxStreak = 0;
+            
+            if (streakValues.length > 0) {
+                const validStreaks = streakValues.filter(streak => typeof streak === 'number' && !isNaN(streak));
+                if (validStreaks.length > 0) {
+                    maxStreak = Math.max(...validStreaks);
+                }
+            }
+            
+            document.getElementById('weekly-streak').textContent = maxStreak;
+        }
+
+        // FIXED: Charts with proper error handling and radar chart
+        function updateCharts() {
+            updateHabitsChart();
+            updateEnergyChart();
+            updateRadarChart(); // NEW: Radar chart
+        }
+
+        function updateHabitsChart() {
+            const ctx = document.getElementById('habitsChart');
+            if (!ctx) return;
+            
+            // Destroy existing chart if it exists
+            if (window.habitsChart instanceof Chart) {
+                window.habitsChart.destroy();
+            }
+            
+            const weekData = getWeekData();
+            
+            window.habitsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: weekData.days,
+                    datasets: [{
+                        label: 'Hábitos Completados',
+                        data: weekData.habitsPerDay,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateEnergyChart() {
+            const ctx = document.getElementById('energyChart');
+            if (!ctx) return;
+            
+            // Destroy existing chart if it exists
+            if (window.energyChart instanceof Chart) {
+                window.energyChart.destroy();
+            }
+            
+            const weekData = getWeekData();
+            
+            window.energyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: weekData.days,
+                    datasets: [{
+                        label: 'Nivel de Energía',
+                        data: weekData.energyPerDay,
+                        backgroundColor: [
+                            '#ef4444', '#f97316', '#f59e0b',
+                            '#eab308', '#84cc16', '#22c55e',
+                            '#10b981'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5,
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // NEW: Radar Chart for category balance
+        function updateRadarChart() {
+            const ctx = document.getElementById('radarChart');
+            if (!ctx) return;
+            
+            // Destroy existing chart if it exists
+            if (window.radarChart instanceof Chart) {
+                window.radarChart.destroy();
+            }
+            
+            const categoryData = getCategoryProgressData();
+            
+            window.radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: categoryData.labels,
+                    datasets: [{
+                        label: 'Progreso por Categoría',
+                        data: categoryData.values,
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        pointBackgroundColor: '#8b5cf6',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.2)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.2)' },
+                            pointLabels: { color: '#ffffff' },
+                            ticks: { 
+                                color: '#ffffff',
+                                backdropColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getCategoryProgressData() {
+            const categories = Object.keys(gameData.categories);
+            const labels = categories.map(cat => gameData.categories[cat].name);
+            const values = categories.map(cat => {
+                const categoryHabits = gameData.habits.filter(h => h.category === cat);
+                if (categoryHabits.length === 0) return 0;
+                
+                const today = new Date().toISOString().split('T')[0];
+                const completedToday = gameData.dailyLogs[today]?.habits?.filter(hId => {
+                    const habit = gameData.habits.find(h => h.id === hId);
+                    return habit && habit.category === cat;
+                }).length || 0;
+                
+                return (completedToday / categoryHabits.length) * 100;
+            });
+            
+            return { labels, values };
+        }
+
+        function getWeekData() {
+            const days = [];
+            const habitsPerDay = [];
+            const energyPerDay = [];
+            let totalHabits = 0;
+            let totalEnergy = 0;
+            let energyDays = 0;
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const dayName = date.toLocaleDateString('es-ES', { weekday: 'short' });
+                
+                days.push(dayName);
+                
+                const dayLog = gameData.dailyLogs[dateStr];
+                const habitsCount = dayLog?.habits?.length || 0;
+                const energyLevel = dayLog?.energyLevel || 0;
+                
+                habitsPerDay.push(habitsCount);
+                energyPerDay.push(energyLevel);
+                
+                totalHabits += habitsCount;
+                if (energyLevel > 0) {
+                    totalEnergy += energyLevel;
+                    energyDays++;
+                }
+            }
+            
+            return {
+                days,
+                habitsPerDay,
+                energyPerDay,
+                totalHabits,
+                avgEnergy: energyDays > 0 ? totalEnergy / energyDays : 0
+            };
+        }
+
+        function updateCategoryProgress() {
+            const container = document.getElementById('category-progress');
+            const categories = Object.keys(gameData.categories);
+            
+            container.innerHTML = categories.map(catKey => {
+                const category = gameData.categories[catKey];
+                const categoryHabits = gameData.habits.filter(h => h.category === catKey);
+                const streak = gameData.streaks[catKey] || 0;
+                
+                return `
+                    <div class="text-center p-4 bg-white bg-opacity-10 rounded-lg">
+                        <div class="text-3xl mb-2">${category.emoji}</div>
+                        <div class="text-white font-semibold text-sm">${category.name}</div>
+                        <div class="text-blue-200 text-xs">${categoryHabits.length} hábitos</div>
+                        <div class="text-blue-200 text-xs">Racha: ${streak} días</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Wolf Profile Functions
+        function updateWolfProfile() {
+            document.getElementById('wolf-profile-name').textContent = gameData.player.name;
+            document.getElementById('wolf-profile-level').textContent = gameData.player.level;
+            document.getElementById('wolf-profile-xp').textContent = gameData.player.xp;
+            document.getElementById('wolf-profile-coins').textContent = gameData.player.coins;
+            document.getElementById('wolf-profile-lives').textContent = gameData.player.lives;
+            
+            const avatar = document.getElementById('wolf-profile-avatar');
+            avatar.className = `wolf-evolution-image ${gameData.player.avatar} mx-auto mb-4`;
+            
+            updateEvolutionPath();
+            updateBadgesGallery();
+        }
+
+        function updateEvolutionPath() {
+            const container = document.getElementById('evolution-path');
+            const levels = [
+                { level: 1, name: 'Cachorro Guerrero', xp: 0, avatar: 'level-1' },
+                { level: 2, name: 'Lobo Explorador', xp: 100, avatar: 'level-2' },
+                { level: 3, name: 'Guerrero Feroz', xp: 300, avatar: 'level-3' },
+                { level: 4, name: 'Comandante Alpha', xp: 600, avatar: 'level-4' },
+                { level: 5, name: 'General Místico', xp: 1000, avatar: 'level-5' }
+            ];
+            
+            container.innerHTML = '';
+            
+            levels.forEach(evolutionLevel => {
+                const isUnlocked = gameData.player.level >= evolutionLevel.level;
+                const isCurrent = gameData.player.level === evolutionLevel.level;
+                
+                const levelElement = document.createElement('div');
+                levelElement.className = `flex items-center p-4 rounded-lg border-2 ${
+                    isCurrent ? 'border-blue-400 bg-blue-50' : 
+                    isUnlocked ? 'border-green-400 bg-green-50' : 
+                    'border-gray-300 bg-gray-100'
+                }`;
+                
+                levelElement.innerHTML = `
+                    <div class="wolf-evolution-image ${evolutionLevel.avatar} w-16 h-16 mr-4 ${!isUnlocked ? 'opacity-50' : ''}"></div>
+                    <div class="flex-grow">
+                        <div class="font-semibold ${isCurrent ? 'text-blue-800' : isUnlocked ? 'text-green-800' : 'text-gray-600'}">
+                            ${evolutionLevel.name}
+                        </div>
+                        <div class="text-sm ${isCurrent ? 'text-blue-600' : isUnlocked ? 'text-green-600' : 'text-gray-500'}">
+                            Nivel ${evolutionLevel.level} • ${evolutionLevel.xp} XP requerido
+                        </div>
+                    </div>
+                    <div class="text-2xl">
+                        ${isCurrent ? '👑' : isUnlocked ? '✅' : '🔒'}
+                    </div>
+                `;
+                
+                container.appendChild(levelElement);
+            });
+        }
+
+        function updateBadgesGallery() {
+            const container = document.getElementById('badges-gallery');
+            const allBadges = [
+                { id: 'first_habit', name: 'Primer Paso', icon: '🌱', description: 'Crear primer hábito' },
+                { id: 'week_warrior', name: 'Guerrero Semanal', icon: '⚔️', description: '7 días de seguimiento' },
+                { id: 'energy_master', name: 'Maestro de Energía', icon: '⚡', description: '5 días consecutivos con energía alta' },
+                { id: 'perfect_week', name: 'Semana Perfecta', icon: '👑', description: '100% de hábitos completados' },
+                { id: 'streak_master', name: 'Maestro de Rachas', icon: '🔥', description: '15 días de racha en una categoría' },
+                { id: 'chronicler', name: 'Cronista', icon: '📖', description: '10 reflexiones escritas' },
+                { id: 'evolution', name: 'Evolución', icon: '🌟', description: 'Alcanzar nivel 3' },
+                { id: 'coin_collector', name: 'Colector de Monedas', icon: '🪙', description: 'Acumular 500 monedas' }
+            ];
+            
+            container.innerHTML = '';
+            
+            allBadges.forEach(badge => {
+                const isEarned = gameData.badges.includes(badge.id);
+                
+                const badgeElement = document.createElement('div');
+                badgeElement.className = `p-4 rounded-lg text-center ${
+                    isEarned ? 'bg-yellow-100 border-2 border-yellow-400' : 'bg-gray-100 border-2 border-gray-300'
+                }`;
+                badgeElement.innerHTML = `
+                    <div class="text-3xl mb-1 ${!isEarned ? 'opacity-30' : ''}">${badge.icon}</div>
+                    <div class="font-semibold text-xs ${isEarned ? 'text-yellow-800' : 'text-gray-600'}">${badge.name}</div>
+                    <div class="text-xs ${isEarned ? 'text-yellow-700' : 'text-gray-500'} mt-1">${badge.description}</div>
+                `;
+                container.appendChild(badgeElement);
+            });
+        }
+
+        // Wolf Evolution System
+        function updateWolfEvolution() {
+            const levels = [
+                { level: 1, name: 'Cachorro Guerrero', xp: 0, maxXp: 100, avatar: 'level-1' },
+                { level: 2, name: 'Lobo Explorador', xp: 100, maxXp: 300, avatar: 'level-2' },
+                { level: 3, name: 'Guerrero Feroz', xp: 300, maxXp: 600, avatar: 'level-3' },
+                { level: 4, name: 'Comandante Alpha', xp: 600, maxXp: 1000, avatar: 'level-4' },
+                { level: 5, name: 'General Místico', xp: 1000, maxXp: 1000, avatar: 'level-5' }
+            ];
+            
+            const currentLevel = levels.find(l => gameData.player.xp >= l.xp && (gameData.player.xp < l.maxXp || l.level === 5));
+            
+            if (currentLevel && currentLevel.level > gameData.player.level) {
+                // Level up!
+                gameData.player.level = currentLevel.level;
+                gameData.player.name = currentLevel.name;
+                gameData.player.avatar = currentLevel.avatar;
+                
+                showNotification(`🎉 ¡LEVEL UP! Ahora eres ${currentLevel.name}!`, 'success');
+                gameData.player.coins += 50; // Level up bonus
+            }
+            
+            if (currentLevel) {
+                gameData.player.maxXp = currentLevel.maxXp;
+            }
+            
+            updatePlayerStats();
+        }
+
+        function updatePlayerStats() {
+            // Update wolf card
+            document.getElementById('wolf-name').textContent = gameData.player.name;
+            document.getElementById('wolf-level').textContent = gameData.player.level;
+            document.getElementById('wolf-xp').textContent = gameData.player.xp;
+            document.getElementById('wolf-max-xp').textContent = gameData.player.maxXp;
+            document.getElementById('wolf-coins').textContent = gameData.player.coins;
+            document.getElementById('wolf-lives').textContent = gameData.player.lives;
+            
+            // Update XP bar
+            const xpPercentage = (gameData.player.xp / gameData.player.maxXp) * 100;
+            document.getElementById('wolf-xp-bar').style.width = `${Math.min(xpPercentage, 100)}%`;
+            
+            // Update avatar
+            const avatar = document.getElementById('wolf-avatar');
+            avatar.className = `wolf-evolution-image ${gameData.player.avatar}`;
+        }
+
+        // Streaks and Badges
+        function updateStreaks() {
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            
+            Object.keys(gameData.categories).forEach(catKey => {
+                const categoryHabits = gameData.habits.filter(h => h.category === catKey);
+                const todayLog = gameData.dailyLogs[today];
+                const yesterdayLog = gameData.dailyLogs[yesterday];
+                
+                let todayCompleted = false;
+                let yesterdayCompleted = false;
+                
+                if (categoryHabits.length > 0) {
+                    const todayCompletedHabits = todayLog?.habits?.filter(hId => {
+                        const habit = gameData.habits.find(h => h.id === hId);
+                        return habit && habit.category === catKey;
+                    }).length || 0;
+                    
+                    const yesterdayCompletedHabits = yesterdayLog?.habits?.filter(hId => {
+                        const habit = gameData.habits.find(h => h.id === hId);
+                        return habit && habit.category === catKey;
+                    }).length || 0;
+                    
+                    todayCompleted = todayCompletedHabits === categoryHabits.length;
+                    yesterdayCompleted = yesterdayCompletedHabits === categoryHabits.length;
+                }
+                
+                if (todayCompleted) {
+                    if (yesterdayCompleted) {
+                        gameData.streaks[catKey] = (gameData.streaks[catKey] || 0) + 1;
+                    } else {
+                        gameData.streaks[catKey] = 1;
+                    }
+                } else if (!yesterdayCompleted) {
+                    gameData.streaks[catKey] = 0;
+                }
+            });
+            
+            saveGameData();
+        }
+
+        function checkBadges() {
+            const newBadges = [];
+            
+            // First habit
+            if (gameData.habits.length >= 1 && !gameData.badges.includes('first_habit')) {
+                newBadges.push('first_habit');
+            }
+            
+            // Week warrior (7 days of any tracking)
+            if (Object.keys(gameData.dailyLogs).length >= 7 && !gameData.badges.includes('week_warrior')) {
+                newBadges.push('week_warrior');
+            }
+            
+            // Evolution badge (level 3)
+            if (gameData.player.level >= 3 && !gameData.badges.includes('evolution')) {
+                newBadges.push('evolution');
+            }
+            
+            // Coin collector
+            if (gameData.player.coins >= 500 && !gameData.badges.includes('coin_collector')) {
+                newBadges.push('coin_collector');
+            }
+            
+            // Streak master
+            const maxStreak = Math.max(...Object.values(gameData.streaks));
+            if (maxStreak >= 15 && !gameData.badges.includes('streak_master')) {
+                newBadges.push('streak_master');
+            }
+            
+            // Add new badges
+            newBadges.forEach(badge => {
+                gameData.badges.push(badge);
+                showNotification(`🏆 ¡Nuevo logro desbloqueado!`, 'success');
+            });
+            
+            if (newBadges.length > 0) {
+                saveGameData();
+            }
+        }
+
+        // Migration Functions
+        function previewMigrationData() {
+            const sourceDate = document.getElementById('migration-source-date').value;
+            if (!sourceDate) {
+                showNotification('⚠️ Selecciona una fecha origen', 'error');
+                return;
+            }
+            
+            const sourceLog = gameData.dailyLogs[sourceDate];
+            if (!sourceLog) {
+                showNotification('❌ No hay datos para esa fecha', 'error');
+                return;
+            }
+            
+            // Show preview
+            const previewContainer = document.getElementById('migration-preview');
+            const contentContainer = document.getElementById('migration-content');
+            
+            let previewHTML = '<strong>Datos a migrar:</strong><br>';
+            
+            if (sourceLog.habits && sourceLog.habits.length > 0) {
+                previewHTML += `✅ ${sourceLog.habits.length} hábitos completados<br>`;
+            }
+            
+            if (sourceLog.energyLevel) {
+                previewHTML += `⚡ Nivel de energía: ${sourceLog.energyLevel}<br>`;
+            }
+            
+            if (sourceLog.reflection) {
+                previewHTML += `📝 Reflexión: "${sourceLog.reflection.substring(0, 50)}..."<br>`;
+            }
+            
+            if (sourceLog.intention) {
+                previewHTML += `🌟 Intención: "${sourceLog.intention.substring(0, 50)}..."<br>`;
+            }
+            
+            if (sourceLog.evidenceImage) {
+                previewHTML += `📸 Imagen de evidencia<br>`;
+            }
+            
+            contentContainer.innerHTML = previewHTML;
+            previewContainer.classList.remove('hidden');
+            document.getElementById('migrate-btn').disabled = false;
+        }
+
+        function executeMigration() {
+            const sourceDate = document.getElementById('migration-source-date').value;
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (sourceDate === today) {
+                showNotification('❌ No puedes migrar del mismo día', 'error');
+                return;
+            }
+            
+            const sourceLog = gameData.dailyLogs[sourceDate];
+            if (!sourceLog) {
+                showNotification('❌ No hay datos para migrar', 'error');
+                return;
+            }
+            
+            // Confirm migration
+            if (!confirm('¿Estás seguro de migrar estos datos al día actual? Esto sobrescribirá la información existente.')) {
+                return;
+            }
+            
+            // Perform migration
+            if (!gameData.dailyLogs[today]) {
+                gameData.dailyLogs[today] = {};
+            }
+            
+            // Copy all data except timestamp
+            gameData.dailyLogs[today] = {
+                ...sourceLog,
+                timestamp: Date.now(),
+                migratedFrom: sourceDate
+            };
+            
+            saveGameData();
+            
+            // Update interface
+            loadDailyHabits();
+            
+            // Fill form fields
+            if (sourceLog.energyLevel) {
+                selectEnergy(sourceLog.energyLevel);
+            }
+            
+            document.getElementById('daily-reflection').value = sourceLog.reflection || '';
+            document.getElementById('tomorrow-intention').value = sourceLog.intention || '';
+            document.getElementById('request-advice').checked = sourceLog.requestAdvice || false;
+            
+            showNotification(`🚀 Datos migrados exitosamente desde ${sourceDate}`, 'success');
+            
+            // Hide preview
+            document.getElementById('migration-preview').classList.add('hidden');
+            document.getElementById('migrate-btn').disabled = true;
+        }
+
+        function exportData() {
+            const dataToExport = {
+                gameData: gameData,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `habitwolf-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('💾 Respaldo descargado exitosamente', 'success');
+        }
+
+        function importData() {
+            const fileInput = document.getElementById('import-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showNotification('⚠️ Selecciona un archivo de respaldo', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    if (importedData.gameData) {
+                        if (confirm('¿Estás seguro de restaurar estos datos? Esto sobrescribirá toda la información actual.')) {
+                            gameData = importedData.gameData;
+                            saveGameData();
+                            
+                            // Refresh interface
+                            initializeApp();
+                            
+                            showNotification('📤 Datos restaurados exitosamente', 'success');
+                        }
+                    } else {
+                        showNotification('❌ Archivo de respaldo inválido', 'error');
+                    }
+                } catch (error) {
+                    showNotification('❌ Error al leer el archivo de respaldo', 'error');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function resetTodayData() {
+            if (confirm('¿Estás seguro de reiniciar solo los datos de hoy?')) {
+                const today = new Date().toISOString().split('T')[0];
+                delete gameData.dailyLogs[today];
+                
+                clearDailyForm();
+                loadDailyHabits();
+                saveGameData();
+                
+                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 monedas';
+                showNotification('🔄 Datos de hoy reiniciados', 'success');
+            }
+        }
+
+        function confirmFullReset() {
+            const confirmation = prompt('⚠️ ATENCIÓN: Esto eliminará TODOS tus datos permanentemente.\nEscribe "REINICIAR" para confirmar:');
+            
+            if (confirmation === 'REINICIAR') {
+                localStorage.removeItem('habitwolf_gamedata');
+                location.reload();
+            } else {
+                showNotification('❌ Reinicio cancelado', 'error');
+            }
+        }
+
+        // Utility Functions
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notification-container');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+
+        function updateStreaksDisplay() {
+            // This function can be expanded to show streaks in the dashboard
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(() => console.log('Service Worker registration failed'));
+        }
+    </script>
+</body>
+</html>
