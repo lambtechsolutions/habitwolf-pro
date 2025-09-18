@@ -37,14 +37,14 @@
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
         
-        /* FIXED: Individual wolf evolution images with proper sizing */
+        /* FIXED: Individual wolf evolution images without background */
         .wolf-evolution-image {
             width: 120px;
             height: 120px;
-            background-size: 80%;
-            background-position: center bottom;
+            background-size: contain;
+            background-position: center;
             background-repeat: no-repeat;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: transparent;
             border-radius: 15px;
             border: 3px solid #4299e1;
             transition: all 0.3s ease;
@@ -132,7 +132,7 @@
             cursor: not-allowed;
         }
         
-        /* Mobile Responsive Styles */
+        /* Mobile Responsive Styles - ENHANCED for better visibility */
         @media (max-width: 640px) {
             .tab-button {
                 font-size: 10px;
@@ -153,19 +153,28 @@
             /* Fix wolf card stats overflow - stack vertically on mobile */
             .wolf-stats-container {
                 flex-direction: column !important;
-                gap: 8px !important;
+                gap: 12px !important;
                 space-x: 0 !important;
             }
             
-            /* Adjust individual stat items */
+            /* ENHANCED: Make stat items more visible on mobile */
             .wolf-stat-item {
                 text-align: center !important;
                 min-width: auto !important;
-                font-size: 0.8rem;
+                font-size: 1rem !important;
+                background: rgba(0,0,0,0.3);
+                padding: 8px;
+                border-radius: 8px;
             }
             
             .wolf-stat-item .text-sm {
-                font-size: 0.7rem;
+                font-size: 0.75rem !important;
+                margin-bottom: 4px;
+            }
+            
+            .wolf-stat-item div:last-child {
+                font-size: 1.25rem !important;
+                font-weight: bold;
             }
             
             /* Make wolf name smaller on mobile */
@@ -217,25 +226,36 @@
             box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
         }
         
-        /* Notification styles */
+        /* Enhanced Notification styles */
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
             padding: 15px 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             color: white;
             font-weight: 600;
             z-index: 1000;
             animation: slideIn 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
         }
         
         .notification.success {
             background: linear-gradient(135deg, #10b981, #059669);
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
         
         .notification.error {
             background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .notification.habit-complete {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            font-size: 1.1rem;
+            padding: 20px 25px;
         }
         
         @keyframes slideIn {
@@ -243,11 +263,65 @@
             to { transform: translateX(0); opacity: 1; }
         }
         
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        
+        .celebration-animation {
+            animation: bounceIn 0.6s ease;
+        }
+        
         /* Enhanced styling */
         .glassmorphism {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Shop item styling */
+        .shop-item {
+            background: linear-gradient(145deg, #f8fafc, #e2e8f0);
+            border: 2px solid #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        
+        .shop-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #4299e1;
+        }
+        
+        .shop-item.purchased {
+            opacity: 0.6;
+            background: linear-gradient(145deg, #f1f5f9, #cbd5e1);
+        }
+        
+        /* Golden Ratio Visualization */
+        .golden-spiral {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+        }
+        
+        .fibonacci-point {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #f59e0b;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .fibonacci-point.active {
+            background: #10b981;
+            transform: translate(-50%, -50%) scale(1.5);
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.5);
         }
     </style>
 </head>
@@ -260,6 +334,7 @@
         <div class="text-center mb-8">
             <h1 class="text-4xl font-bold text-white mb-4">🐺 HabitWolf Pro</h1>
             <p class="text-blue-200 text-lg">Sistema de Autodisciplina Gamificado</p>
+            <p class="text-blue-300 text-sm mt-2">Versión 2.0 - Compatible con futuras actualizaciones</p>
         </div>
         
         <!-- Wolf Card -->
@@ -297,25 +372,34 @@
         </div>
         
         <!-- Navigation Tabs -->
-        <div class="flex space-x-1 mb-6 bg-white bg-opacity-10 rounded-lg p-1">
-            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-button active flex-1 py-3 px-4 text-white font-semibold">
+        <div class="flex space-x-1 mb-6 bg-white bg-opacity-10 rounded-lg p-1 overflow-x-auto">
+            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-button active flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
                 📊 Dashboard
             </button>
-            <button onclick="switchTab('habits')" id="tab-habits" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
+            <button onclick="switchTab('habits')" id="tab-habits" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
                 🎯 Hábitos
             </button>
-            <button onclick="switchTab('daily')" id="tab-daily" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
-                📅 Registro Diario
+            <button onclick="switchTab('daily')" id="tab-daily" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
+                📅 Diario
             </button>
-            <button onclick="switchTab('profile')" id="tab-profile" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
+            <button onclick="switchTab('analysis')" id="tab-analysis" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
+                📈 Análisis
+            </button>
+            <button onclick="switchTab('journal')" id="tab-journal" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
+                📖 Journal
+            </button>
+            <button onclick="switchTab('shop')" id="tab-shop" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
+                🛒 Tienda
+            </button>
+            <button onclick="switchTab('profile')" id="tab-profile" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
                 🐺 Perfil
             </button>
-            <button onclick="switchTab('guardar')" id="tab-guardar" class="tab-button flex-1 py-3 px-4 text-white font-semibold">
-                💾 Guardar
+            <button onclick="switchTab('guardar')" id="tab-guardar" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
+                💾 Datos
             </button>
         </div>
         
-        <!-- Dashboard Tab (now first) -->
+        <!-- Dashboard Tab -->
         <div id="dashboard-tab" class="tab-content">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Weekly Summary -->
@@ -357,11 +441,12 @@
                     </div>
                 </div>
                 
-                <!-- Radar Chart -->
+                <!-- Fibonacci Golden Ratio Chart -->
                 <div class="glassmorphism rounded-xl p-6">
-                    <h3 class="text-2xl font-bold text-white mb-4">Balance de Categorías</h3>
-                    <div class="chart-container">
-                        <canvas id="radarChart"></canvas>
+                    <h3 class="text-2xl font-bold text-white mb-4">🌀 Proporción Áurea - Fibonacci</h3>
+                    <p class="text-blue-200 text-sm mb-4">Método del libro "El Éxito Después de 100 Fracasos"</p>
+                    <div class="golden-spiral bg-gradient-to-br from-purple-900 to-blue-900 rounded-lg" id="fibonacci-chart">
+                        <!-- Fibonacci spiral will be generated here -->
                     </div>
                 </div>
                 
@@ -423,7 +508,7 @@
                 
                 <!-- Day Status -->
                 <div id="day-status" class="bg-blue-100 border border-blue-300 rounded-lg p-4 mb-6 text-blue-800">
-                    ⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🌙 Lupus
+                    ⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 Lupus
                 </div>
                 
                 <!-- Habits List -->
@@ -476,10 +561,79 @@
             </div>
         </div>
         
+        <!-- Analysis Tab - RESTORED -->
+        <div id="analysis-tab" class="tab-content hidden">
+            <div class="glassmorphism rounded-xl p-6">
+                <h3 class="text-2xl font-bold text-white mb-6">📈 Análisis Semanal Detallado</h3>
+                
+                <!-- Analysis Controls -->
+                <div class="mb-6">
+                    <button onclick="generateWeeklyAnalysis()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                        🔍 Generar Análisis Completo
+                    </button>
+                </div>
+                
+                <!-- Analysis Results -->
+                <div id="weekly-analysis-results" class="space-y-6">
+                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
+                        <h4 class="text-xl font-bold text-white mb-4">Esperando análisis...</h4>
+                        <p class="text-blue-200">Haz clic en "Generar Análisis Completo" para ver un reporte detallado de tu progreso.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Journal Tab - NEW -->
+        <div id="journal-tab" class="tab-content hidden">
+            <div class="glassmorphism rounded-xl p-6">
+                <h3 class="text-2xl font-bold text-white mb-6">📖 Journal Personal</h3>
+                
+                <!-- Journal Entry Form -->
+                <div class="mb-6 bg-white bg-opacity-10 rounded-lg p-4">
+                    <h4 class="text-white font-semibold mb-4">Nueva Entrada</h4>
+                    <div class="space-y-4">
+                        <input type="text" id="journal-title" placeholder="Título de la entrada" class="w-full p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
+                        <textarea id="journal-content" placeholder="Escribe tus pensamientos, reflexiones, planes..." class="w-full p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90" rows="6"></textarea>
+                        <div class="flex justify-between items-center">
+                            <select id="journal-mood" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
+                                <option value="">Estado de ánimo</option>
+                                <option value="excellent">😄 Excelente</option>
+                                <option value="good">😊 Bien</option>
+                                <option value="neutral">😐 Normal</option>
+                                <option value="bad">😔 Mal</option>
+                                <option value="terrible">😢 Terrible</option>
+                            </select>
+                            <button onclick="saveJournalEntry()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                                💾 Guardar Entrada
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Journal Entries -->
+                <div id="journal-entries" class="space-y-4">
+                    <!-- Dynamic journal entries will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Shop Tab - RESTORED -->
+        <div id="shop-tab" class="tab-content hidden">
+            <div class="glassmorphism rounded-xl p-6">
+                <h3 class="text-2xl font-bold text-white mb-6">🛒 Tienda de Recompensas</h3>
+                <p class="text-blue-200 mb-6">Gasta tus Lupus en recompensas "sin culpa" que hayas ganado con esfuerzo</p>
+                
+                <!-- Shop Items -->
+                <div id="shop-items" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dynamic shop items will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
         <!-- Profile Tab -->
         <div id="profile-tab" class="tab-content hidden">
             <div class="glassmorphism rounded-xl p-6">
-                <h3 class="text-2xl font-bold text-white mb-6">Perfil del Lobo</h3>
+                <h3 class="text-2xl font-bold text-white mb-6">🐺 Perfil del Lobo</h3>
                 
                 <!-- Wolf Profile Info -->
                 <div class="text-center mb-8">
@@ -487,7 +641,7 @@
                     <h2 id="wolf-profile-name" class="text-3xl font-bold text-white mb-2">Cachorro Guerrero</h2>
                     <div class="text-blue-200">
                         <p>Nivel <span id="wolf-profile-level">1</span> • ⭐ <span id="wolf-profile-xp">0</span> XP</p>
-                        <p>🌙 <span id="wolf-profile-coins">0</span> Lupus • ❤️ <span id="wolf-profile-lives">3</span> vidas</p>
+                        <p>🪙 <span id="wolf-profile-coins">0</span> Lupus • ❤️ <span id="wolf-profile-lives">3</span> vidas</p>
                     </div>
                 </div>
                 
@@ -514,6 +668,12 @@
             <div class="glassmorphism rounded-xl p-6">
                 <h3 class="text-2xl font-bold text-white mb-6">💾 Gestión de Datos</h3>
                 <p class="text-blue-200 mb-6">Transfiere información de días anteriores o gestiona tus datos de respaldo.</p>
+                
+                <!-- Version Compatibility Notice -->
+                <div class="bg-green-100 border border-green-300 rounded-lg p-4 mb-6 text-green-800">
+                    <h4 class="font-semibold mb-2">✅ Compatibilidad de Versiones</h4>
+                    <p class="text-sm">Esta versión 2.0 incluye compatibilidad hacia adelante. Tus datos se mantendrán funcionando en futuras actualizaciones del juego.</p>
+                </div>
                 
                 <!-- Date Selection for Migration -->
                 <div class="migration-section">
@@ -568,8 +728,9 @@
     </div>
 
     <script>
-        // Initialize with proper date handling and form reset functionality
+        // Enhanced Game Data with version compatibility
         let gameData = {
+            version: '2.0', // Version tracking for compatibility
             player: {
                 name: 'Cachorro Guerrero',
                 level: 1,
@@ -592,7 +753,21 @@
             },
             dailyLogs: {},
             streaks: {},
-            badges: []
+            badges: [],
+            // NEW: Journal entries
+            journal: [],
+            // RESTORED: Shop items
+            shopItems: [
+                { id: 'coffee', name: 'Café Premium', cost: 10, icon: '☕', description: 'Una taza de tu café favorito' },
+                { id: 'movie', name: 'Película/Serie', cost: 25, icon: '🎬', description: 'Una tarde de entretenimiento' },
+                { id: 'dessert', name: 'Postre Especial', cost: 15, icon: '🍰', description: 'Tu postre favorito sin culpa' },
+                { id: 'book', name: 'Libro Nuevo', cost: 40, icon: '📚', description: 'Un libro que has querido leer' },
+                { id: 'game', name: 'Videojuego', cost: 60, icon: '🎮', description: 'Tiempo de juego sin remordimientos' },
+                { id: 'massage', name: 'Masaje/Spa', cost: 80, icon: '💆', description: 'Relajación total merecida' },
+                { id: 'hobby', name: 'Material para Hobby', cost: 50, icon: '🎨', description: 'Inversión en tu pasatiempo favorito' },
+                { id: 'outing', name: 'Salida Especial', cost: 70, icon: '🎊', description: 'Una salida que has estado posponiendo' }
+            ],
+            purchasedItems: []
         };
 
         // Initialize app
@@ -608,10 +783,77 @@
             loadDailyHabits();
             updateHabitsList();
             updateDashboard();
+            updateShopItems();
+            updateJournalEntries();
             switchTab('dashboard'); // Start with dashboard tab
             
             // Auto-update date at midnight
             scheduleNextDayUpdate();
+            
+            // Auto-save every 30 seconds
+            setInterval(saveGameData, 30000);
+        }
+
+        // VERSION COMPATIBILITY: Enhanced data loading with migration support
+        function loadGameData() {
+            const saved = localStorage.getItem('habitwolf_gamedata');
+            if (saved) {
+                try {
+                    const loadedData = JSON.parse(saved);
+                    
+                    // Version compatibility check
+                    if (!loadedData.version || loadedData.version < '2.0') {
+                        console.log('Migrating from older version...');
+                        // Migrate old data structure to new format
+                        gameData = migrateOldData(loadedData);
+                    } else {
+                        gameData = { ...gameData, ...loadedData };
+                    }
+                    
+                    // Ensure all new fields exist
+                    if (!gameData.journal) gameData.journal = [];
+                    if (!gameData.shopItems) gameData.shopItems = gameData.shopItems || getDefaultShopItems();
+                    if (!gameData.purchasedItems) gameData.purchasedItems = [];
+                    
+                } catch (e) {
+                    console.warn('Error loading saved data:', e);
+                }
+            }
+        }
+
+        function migrateOldData(oldData) {
+            // Migrate from older versions while preserving user data
+            const migratedData = {
+                ...gameData,  // Use new structure as base
+                ...oldData    // Overlay old data
+            };
+            
+            // Ensure version is updated
+            migratedData.version = '2.0';
+            
+            // Add new fields if missing
+            if (!migratedData.journal) migratedData.journal = [];
+            if (!migratedData.shopItems) migratedData.shopItems = getDefaultShopItems();
+            if (!migratedData.purchasedItems) migratedData.purchasedItems = [];
+            
+            return migratedData;
+        }
+
+        function getDefaultShopItems() {
+            return [
+                { id: 'coffee', name: 'Café Premium', cost: 10, icon: '☕', description: 'Una taza de tu café favorito' },
+                { id: 'movie', name: 'Película/Serie', cost: 25, icon: '🎬', description: 'Una tarde de entretenimiento' },
+                { id: 'dessert', name: 'Postre Especial', cost: 15, icon: '🍰', description: 'Tu postre favorito sin culpa' },
+                { id: 'book', name: 'Libro Nuevo', cost: 40, icon: '📚', description: 'Un libro que has querido leer' },
+                { id: 'game', name: 'Videojuego', cost: 60, icon: '🎮', description: 'Tiempo de juego sin remordimientos' },
+                { id: 'massage', name: 'Masaje/Spa', cost: 80, icon: '💆', description: 'Relajación total merecida' },
+                { id: 'hobby', name: 'Material para Hobby', cost: 50, icon: '🎨', description: 'Inversión en tu pasatiempo favorito' },
+                { id: 'outing', name: 'Salida Especial', cost: 70, icon: '🎊', description: 'Una salida que has estado posponiendo' }
+            ];
+        }
+
+        function saveGameData() {
+            localStorage.setItem('habitwolf_gamedata', JSON.stringify(gameData));
         }
 
         // Automatic date update system
@@ -625,7 +867,7 @@
             
             setTimeout(() => {
                 // Reset daily status and update interface
-                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🌙 Lupus';
+                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 Lupus';
                 updateCurrentDate();
                 loadDailyHabits();
                 clearDailyForm();
@@ -647,22 +889,6 @@
             document.getElementById('current-date').textContent = today.toLocaleDateString('es-ES', options);
         }
 
-        // Load and Save Functions
-        function loadGameData() {
-            const saved = localStorage.getItem('habitwolf_gamedata');
-            if (saved) {
-                try {
-                    gameData = { ...gameData, ...JSON.parse(saved) };
-                } catch (e) {
-                    console.warn('Error loading saved data:', e);
-                }
-            }
-        }
-
-        function saveGameData() {
-            localStorage.setItem('habitwolf_gamedata', JSON.stringify(gameData));
-        }
-
         // Tab Management
         function switchTab(tabName) {
             // Hide all tabs
@@ -680,10 +906,17 @@
             // Update data for specific tabs
             if (tabName === 'dashboard') {
                 updateDashboard();
+                updateFibonacciChart();
             } else if (tabName === 'profile') {
                 updateWolfProfile();
             } else if (tabName === 'daily') {
                 loadDailyHabits();
+            } else if (tabName === 'shop') {
+                updateShopItems();
+            } else if (tabName === 'journal') {
+                updateJournalEntries();
+            } else if (tabName === 'analysis') {
+                // Analysis tab is ready to use
             }
         }
 
@@ -708,7 +941,8 @@
                 createdAt: new Date().toISOString(),
                 completed: {},
                 streak: 0,
-                totalCompleted: 0
+                totalCompleted: 0,
+                fibonacciLevel: 1  // NEW: For Fibonacci progression
             };
             
             gameData.habits.push(newHabit);
@@ -756,6 +990,7 @@
             container.innerHTML = gameData.habits.map(habit => {
                 const category = gameData.categories[habit.category];
                 const streak = gameData.streaks[habit.id] || 0;
+                const fibLevel = habit.fibonacciLevel || 1;
                 
                 return `
                     <div class="bg-white bg-opacity-10 rounded-lg p-4 flex items-center justify-between">
@@ -764,6 +999,7 @@
                             <div>
                                 <h4 class="text-white font-semibold">${habit.name}</h4>
                                 <p class="text-blue-200 text-sm">${category.name} • Meta: ${habit.target} ${habit.unit} • Racha: ${streak} días</p>
+                                <p class="text-yellow-200 text-xs">🌀 Nivel Fibonacci: ${fibLevel}</p>
                             </div>
                         </div>
                         <button onclick="deleteHabit('${habit.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition-colors">
@@ -819,9 +1055,22 @@
                 habits.splice(index, 1);
             } else {
                 habits.push(habitId);
-                // Award XP and coins for completing habit
+                // ENHANCED: Award XP and coins for completing habit
                 gameData.player.xp += 10;
                 gameData.player.coins += 1;
+                
+                // Find habit and update Fibonacci level
+                const habit = gameData.habits.find(h => h.id === habitId);
+                if (habit) {
+                    habit.totalCompleted += 1;
+                    
+                    // Update Fibonacci progression
+                    updateFibonacciProgression(habit);
+                    
+                    // RESTORED: Show celebration notification
+                    const category = gameData.categories[habit.category];
+                    showNotification(`🎉 ¡${category.emoji} ${habit.name} completado! +10 XP, +1 🪙`, 'habit-complete');
+                }
             }
             
             gameData.dailyLogs[today].habits = habits;
@@ -831,6 +1080,21 @@
             updateWolfEvolution();
             updateStreaks();
             checkBadges();
+            updatePlayerStats();
+        }
+
+        // NEW: Fibonacci progression system
+        function updateFibonacciProgression(habit) {
+            const fibSequence = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233];
+            const completions = habit.totalCompleted;
+            
+            // Find current Fibonacci level based on completions
+            for (let i = 0; i < fibSequence.length; i++) {
+                if (completions >= fibSequence[i] && (i === fibSequence.length - 1 || completions < fibSequence[i + 1])) {
+                    habit.fibonacciLevel = i + 1;
+                    break;
+                }
+            }
         }
 
         function selectEnergy(level) {
@@ -944,13 +1208,13 @@
             }
             
             document.getElementById('weekly-streak').textContent = maxStreak;
+            document.getElementById('weekly-xp').textContent = weekData.totalXP || 0;
         }
 
         // Charts with proper error handling and radar chart
         function updateCharts() {
             updateHabitsChart();
             updateEnergyChart();
-            updateRadarChart();
         }
 
         function updateHabitsChart() {
@@ -1049,72 +1313,60 @@
             });
         }
 
-        // Radar Chart for category balance
-        function updateRadarChart() {
-            const ctx = document.getElementById('radarChart');
-            if (!ctx) return;
+        // NEW: Fibonacci Golden Ratio Chart
+        function updateFibonacciChart() {
+            const container = document.getElementById('fibonacci-chart');
+            if (!container) return;
             
-            // Destroy existing chart if it exists
-            if (window.radarChart instanceof Chart) {
-                window.radarChart.destroy();
-            }
+            container.innerHTML = '';
             
-            const categoryData = getCategoryProgressData();
+            const width = container.offsetWidth;
+            const height = container.offsetHeight;
+            const centerX = width / 2;
+            const centerY = height / 2;
             
-            window.radarChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: categoryData.labels,
-                    datasets: [{
-                        label: 'Progreso por Categoría',
-                        data: categoryData.values,
-                        borderColor: '#8b5cf6',
-                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
-                        pointBackgroundColor: '#8b5cf6',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        }
-                    },
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(255, 255, 255, 0.2)' },
-                            grid: { color: 'rgba(255, 255, 255, 0.2)' },
-                            pointLabels: { color: '#ffffff' },
-                            ticks: { 
-                                color: '#ffffff',
-                                backdropColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    }
+            // Golden ratio
+            const phi = (1 + Math.sqrt(5)) / 2;
+            const fibSequence = [1, 1, 2, 3, 5, 8, 13, 21, 34];
+            
+            gameData.habits.forEach((habit, habitIndex) => {
+                const completions = habit.totalCompleted || 0;
+                const fibLevel = habit.fibonacciLevel || 1;
+                
+                // Calculate position based on golden spiral
+                const angle = habitIndex * (2 * Math.PI / gameData.habits.length);
+                const radius = (fibLevel / fibSequence.length) * Math.min(width, height) * 0.3;
+                
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                
+                // Create point for each completion
+                for (let i = 0; i < Math.min(completions, 20); i++) {
+                    const spiralAngle = angle + (i * 2 * Math.PI / phi);
+                    const spiralRadius = radius * (1 + i * 0.1);
+                    
+                    const pointX = centerX + Math.cos(spiralAngle) * spiralRadius;
+                    const pointY = centerY + Math.sin(spiralAngle) * spiralRadius;
+                    
+                    const point = document.createElement('div');
+                    point.className = `fibonacci-point ${i < fibLevel ? 'active' : ''}`;
+                    point.style.left = `${pointX}px`;
+                    point.style.top = `${pointY}px`;
+                    point.title = `${habit.name} - Progreso ${i + 1}`;
+                    
+                    container.appendChild(point);
                 }
             });
-        }
-
-        function getCategoryProgressData() {
-            const categories = Object.keys(gameData.categories);
-            const labels = categories.map(cat => gameData.categories[cat].name);
-            const values = categories.map(cat => {
-                const categoryHabits = gameData.habits.filter(h => h.category === cat);
-                if (categoryHabits.length === 0) return 0;
-                
-                const today = new Date().toISOString().split('T')[0];
-                const completedToday = gameData.dailyLogs[today]?.habits?.filter(hId => {
-                    const habit = gameData.habits.find(h => h.id === hId);
-                    return habit && habit.category === cat;
-                }).length || 0;
-                
-                return (completedToday / categoryHabits.length) * 100;
-            });
             
-            return { labels, values };
+            // Add center point
+            const centerPoint = document.createElement('div');
+            centerPoint.className = 'fibonacci-point active';
+            centerPoint.style.left = `${centerX}px`;
+            centerPoint.style.top = `${centerY}px`;
+            centerPoint.style.background = '#8b5cf6';
+            centerPoint.style.transform = 'translate(-50%, -50%) scale(2)';
+            centerPoint.title = 'Centro de la Proporción Áurea';
+            container.appendChild(centerPoint);
         }
 
         function getWeekData() {
@@ -1123,6 +1375,7 @@
             const energyPerDay = [];
             let totalHabits = 0;
             let totalEnergy = 0;
+            let totalXP = 0;
             let energyDays = 0;
             
             for (let i = 6; i >= 0; i--) {
@@ -1141,6 +1394,7 @@
                 energyPerDay.push(energyLevel);
                 
                 totalHabits += habitsCount;
+                totalXP += habitsCount * 10; // 10 XP per habit
                 if (energyLevel > 0) {
                     totalEnergy += energyLevel;
                     energyDays++;
@@ -1152,6 +1406,7 @@
                 habitsPerDay,
                 energyPerDay,
                 totalHabits,
+                totalXP,
                 avgEnergy: energyDays > 0 ? totalEnergy / energyDays : 0
             };
         }
@@ -1174,6 +1429,294 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        // RESTORED: Weekly Analysis
+        function generateWeeklyAnalysis() {
+            const container = document.getElementById('weekly-analysis-results');
+            const weekData = getWeekData();
+            const today = new Date().toISOString().split('T')[0];
+            const todayLog = gameData.dailyLogs[today];
+            
+            let analysisHTML = `
+                <div class="space-y-6">
+                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
+                        <h4 class="text-xl font-bold text-white mb-4">📊 Resumen General</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-blue-300">${weekData.totalHabits}</div>
+                                <div class="text-blue-200 text-sm">Hábitos completados esta semana</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-green-300">${weekData.avgEnergy.toFixed(1)}</div>
+                                <div class="text-blue-200 text-sm">Energía promedio</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-purple-300">${gameData.player.level}</div>
+                                <div class="text-blue-200 text-sm">Nivel actual</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-yellow-300">${gameData.player.coins}</div>
+                                <div class="text-blue-200 text-sm">Lupus acumulados</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
+                        <h4 class="text-xl font-bold text-white mb-4">🎯 Análisis de Consistencia</h4>
+                        <div class="space-y-4">
+            `;
+            
+            // Analyze each habit
+            gameData.habits.forEach(habit => {
+                const category = gameData.categories[habit.category];
+                const streak = gameData.streaks[habit.id] || 0;
+                const completionRate = calculateHabitCompletionRate(habit.id);
+                
+                let status = '🔴 Necesita atención';
+                let recommendation = 'Intenta ser más consistente con este hábito.';
+                
+                if (completionRate >= 80) {
+                    status = '🟢 Excelente';
+                    recommendation = '¡Sigue así! Tu consistencia es ejemplar.';
+                } else if (completionRate >= 60) {
+                    status = '🟡 Bien';
+                    recommendation = 'Buen progreso, puedes mejorar un poco más.';
+                } else if (completionRate >= 40) {
+                    status = '🟠 Regular';
+                    recommendation = 'Considera ajustar la meta o encontrar motivaciones adicionales.';
+                }
+                
+                analysisHTML += `
+                    <div class="border-l-4 border-blue-400 pl-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h5 class="text-white font-semibold">${category.emoji} ${habit.name}</h5>
+                                <p class="text-blue-200 text-sm">Tasa de completación: ${completionRate}% | Racha: ${streak} días</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm">${status}</div>
+                            </div>
+                        </div>
+                        <p class="text-blue-100 text-sm mt-2">${recommendation}</p>
+                    </div>
+                `;
+            });
+            
+            analysisHTML += `
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
+                        <h4 class="text-xl font-bold text-white mb-4">💡 Recomendaciones Personalizadas</h4>
+                        <div class="space-y-3 text-blue-100">
+            `;
+            
+            // Generate personalized recommendations
+            const recommendations = generatePersonalizedRecommendations();
+            recommendations.forEach(rec => {
+                analysisHTML += `<p>• ${rec}</p>`;
+            });
+            
+            analysisHTML += `
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = analysisHTML;
+            showNotification('📈 ¡Análisis semanal generado!', 'success');
+        }
+
+        function calculateHabitCompletionRate(habitId) {
+            let completions = 0;
+            let totalDays = 0;
+            
+            // Check last 7 days
+            for (let i = 0; i < 7; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                const dayLog = gameData.dailyLogs[dateStr];
+                if (dayLog) {
+                    totalDays++;
+                    if (dayLog.habits && dayLog.habits.includes(habitId)) {
+                        completions++;
+                    }
+                }
+            }
+            
+            return totalDays > 0 ? Math.round((completions / totalDays) * 100) : 0;
+        }
+
+        function generatePersonalizedRecommendations() {
+            const recommendations = [];
+            const weekData = getWeekData();
+            
+            if (weekData.avgEnergy < 3) {
+                recommendations.push('Tu energía promedio es baja. Considera mejorar tu sueño y nutrición.');
+            }
+            
+            if (weekData.totalHabits < 10) {
+                recommendations.push('Intenta completar más hábitos esta semana. Pequeños pasos llevan a grandes cambios.');
+            }
+            
+            if (gameData.player.coins > 50) {
+                recommendations.push('Tienes muchos Lupus acumulados. ¡Considera usar la tienda para recompensarte!');
+            }
+            
+            const oldestHabit = gameData.habits.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0];
+            if (oldestHabit) {
+                const streak = gameData.streaks[oldestHabit.id] || 0;
+                if (streak === 0) {
+                    recommendations.push(`Tu hábito "${oldestHabit.name}" necesita más atención. ¡Empieza una nueva racha hoy!`);
+                }
+            }
+            
+            if (recommendations.length === 0) {
+                recommendations.push('¡Excelente trabajo! Continúa con tu rutina actual, está funcionando muy bien.');
+            }
+            
+            return recommendations;
+        }
+
+        // NEW: Journal Functions
+        function saveJournalEntry() {
+            const title = document.getElementById('journal-title').value.trim();
+            const content = document.getElementById('journal-content').value.trim();
+            const mood = document.getElementById('journal-mood').value;
+            
+            if (!title && !content) {
+                showNotification('⚠️ Escribe un título o contenido para la entrada', 'error');
+                return;
+            }
+            
+            const entry = {
+                id: Date.now().toString(),
+                title: title || 'Sin título',
+                content: content,
+                mood: mood,
+                date: new Date().toISOString(),
+                timestamp: Date.now()
+            };
+            
+            gameData.journal.unshift(entry); // Add to beginning
+            saveGameData();
+            
+            // Clear form
+            document.getElementById('journal-title').value = '';
+            document.getElementById('journal-content').value = '';
+            document.getElementById('journal-mood').value = '';
+            
+            updateJournalEntries();
+            showNotification('📖 Entrada de journal guardada', 'success');
+        }
+
+        function updateJournalEntries() {
+            const container = document.getElementById('journal-entries');
+            
+            if (gameData.journal.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-blue-200">No hay entradas en tu journal.</p>
+                        <p class="text-blue-300 text-sm mt-2">Escribe tu primera reflexión arriba ✍️</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = gameData.journal.map(entry => {
+                const date = new Date(entry.date).toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                const moodEmojis = {
+                    excellent: '😄',
+                    good: '😊',
+                    neutral: '😐',
+                    bad: '😔',
+                    terrible: '😢'
+                };
+                
+                return `
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="text-white font-semibold">${entry.title}</h4>
+                            <div class="flex items-center space-x-2">
+                                ${entry.mood ? `<span class="text-xl">${moodEmojis[entry.mood]}</span>` : ''}
+                                <button onclick="deleteJournalEntry('${entry.id}')" class="text-red-400 hover:text-red-300 text-sm">🗑️</button>
+                            </div>
+                        </div>
+                        <p class="text-blue-100 text-sm mb-2">${date}</p>
+                        <p class="text-white">${entry.content}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function deleteJournalEntry(entryId) {
+            if (confirm('¿Estás seguro de eliminar esta entrada del journal?')) {
+                gameData.journal = gameData.journal.filter(entry => entry.id !== entryId);
+                saveGameData();
+                updateJournalEntries();
+                showNotification('🗑️ Entrada eliminada', 'success');
+            }
+        }
+
+        // RESTORED: Shop Functions
+        function updateShopItems() {
+            const container = document.getElementById('shop-items');
+            
+            container.innerHTML = gameData.shopItems.map(item => {
+                const isPurchased = gameData.purchasedItems.includes(item.id);
+                const canAfford = gameData.player.coins >= item.cost;
+                
+                return `
+                    <div class="shop-item ${isPurchased ? 'purchased' : ''} rounded-lg p-4">
+                        <div class="text-center">
+                            <div class="text-4xl mb-2">${item.icon}</div>
+                            <h4 class="font-semibold text-gray-800 mb-1">${item.name}</h4>
+                            <p class="text-gray-600 text-sm mb-3">${item.description}</p>
+                            <div class="text-lg font-bold text-blue-600 mb-3">🪙 ${item.cost}</div>
+                            ${isPurchased ? 
+                                '<div class="bg-green-500 text-white px-4 py-2 rounded-lg text-sm">✅ Comprado</div>' :
+                                `<button onclick="purchaseItem('${item.id}')" ${!canAfford ? 'disabled' : ''} 
+                                 class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-colors text-sm">
+                                    ${canAfford ? 'Comprar' : 'Sin Lupus'}
+                                 </button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function purchaseItem(itemId) {
+            const item = gameData.shopItems.find(i => i.id === itemId);
+            if (!item) return;
+            
+            if (gameData.player.coins < item.cost) {
+                showNotification('❌ No tienes suficientes Lupus', 'error');
+                return;
+            }
+            
+            if (gameData.purchasedItems.includes(itemId)) {
+                showNotification('ℹ️ Ya compraste este item', 'error');
+                return;
+            }
+            
+            gameData.player.coins -= item.cost;
+            gameData.purchasedItems.push(itemId);
+            
+            saveGameData();
+            updateShopItems();
+            updatePlayerStats();
+            
+            showNotification(`🎉 ¡Compraste ${item.icon} ${item.name}! ¡Disfrútalo sin culpa!`, 'success');
         }
 
         // Wolf Profile Functions
@@ -1243,7 +1786,9 @@
                 { id: 'streak_master', name: 'Maestro de Rachas', icon: '🔥', description: '15 días de racha en una categoría' },
                 { id: 'chronicler', name: 'Cronista', icon: '📖', description: '10 reflexiones escritas' },
                 { id: 'evolution', name: 'Evolución', icon: '🌟', description: 'Alcanzar nivel 3' },
-                { id: 'coin_collector', name: 'Colector de Lupus', icon: '🌙', description: 'Acumular 500 Lupus' }
+                { id: 'coin_collector', name: 'Colector de Lupus', icon: '🪙', description: 'Acumular 500 Lupus' },
+                { id: 'fibonacci_master', name: 'Maestro Fibonacci', icon: '🌀', description: 'Alcanzar nivel 8 en un hábito' },
+                { id: 'journal_keeper', name: 'Guardian del Journal', icon: '📚', description: 'Escribir 20 entradas' }
             ];
             
             container.innerHTML = '';
@@ -1376,6 +1921,17 @@
                 newBadges.push('coin_collector');
             }
             
+            // Fibonacci master
+            const hasHighFibLevel = gameData.habits.some(habit => (habit.fibonacciLevel || 1) >= 8);
+            if (hasHighFibLevel && !gameData.badges.includes('fibonacci_master')) {
+                newBadges.push('fibonacci_master');
+            }
+            
+            // Journal keeper
+            if (gameData.journal.length >= 20 && !gameData.badges.includes('journal_keeper')) {
+                newBadges.push('journal_keeper');
+            }
+            
             // Streak master
             const streakValues = Object.values(gameData.streaks);
             let maxStreak = 0;
@@ -1503,7 +2059,7 @@
             const dataToExport = {
                 gameData: gameData,
                 exportDate: new Date().toISOString(),
-                version: '1.0'
+                version: '2.0'
             };
             
             const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {type: 'application/json'});
@@ -1511,13 +2067,13 @@
             
             const a = document.createElement('a');
             a.href = url;
-            a.download = `habitwolf-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `habitwolf-backup-v2-${new Date().toISOString().split('T')[0]}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showNotification('💾 Respaldo descargado exitosamente', 'success');
+            showNotification('💾 Respaldo v2.0 descargado exitosamente', 'success');
         }
 
         function importData() {
@@ -1536,7 +2092,13 @@
                     
                     if (importedData.gameData) {
                         if (confirm('¿Estás seguro de restaurar estos datos? Esto sobrescribirá toda la información actual.')) {
-                            gameData = importedData.gameData;
+                            // Handle version compatibility
+                            if (!importedData.version || importedData.version < '2.0') {
+                                gameData = migrateOldData(importedData.gameData);
+                            } else {
+                                gameData = importedData.gameData;
+                            }
+                            
                             saveGameData();
                             
                             // Refresh interface
@@ -1564,7 +2126,7 @@
                 loadDailyHabits();
                 saveGameData();
                 
-                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🌙 Lupus';
+                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 Lupus';
                 showNotification('🔄 Datos de hoy reiniciados', 'success');
             }
         }
@@ -1580,19 +2142,22 @@
             }
         }
 
-        // Utility Functions
+        // ENHANCED: Utility Functions with better notifications
         function showNotification(message, type = 'success') {
             const container = document.getElementById('notification-container');
             
             const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
+            notification.className = `notification ${type} celebration-animation`;
             notification.textContent = message;
             
             container.appendChild(notification);
             
             setTimeout(() => {
-                notification.remove();
-            }, 4000);
+                notification.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, type === 'habit-complete' ? 5000 : 4000);
         }
 
         function updateStreaksDisplay() {
