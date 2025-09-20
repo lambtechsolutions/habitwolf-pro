@@ -453,8 +453,15 @@
                 <!-- Category Progress -->
                 <div class="glassmorphism rounded-xl p-6 lg:col-span-2">
                     <h3 class="text-2xl font-bold text-white mb-4">Progreso por Categorías</h3>
-                    <div id="category-progress" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <!-- Dynamic category progress will be loaded here -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Radar Chart -->
+                        <div class="chart-container">
+                            <canvas id="categoriesRadarChart"></canvas>
+                        </div>
+                        <!-- Category Progress Bars -->
+                        <div id="category-progress" class="grid grid-cols-2 gap-4">
+                            <!-- Dynamic category progress will be loaded here -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1215,6 +1222,7 @@
         function updateCharts() {
             updateHabitsChart();
             updateEnergyChart();
+            updateCategoriesRadarChart();
         }
 
         function updateHabitsChart() {
@@ -1367,6 +1375,84 @@
             centerPoint.style.transform = 'translate(-50%, -50%) scale(2)';
             centerPoint.title = 'Centro de la Proporción Áurea';
             container.appendChild(centerPoint);
+        }
+
+        // Categories Radar Chart
+        function updateCategoriesRadarChart() {
+            const ctx = document.getElementById('categoriesRadarChart');
+            if (!ctx) return;
+            
+            // Destroy existing chart if it exists
+            if (window.categoriesRadarChart instanceof Chart) {
+                window.categoriesRadarChart.destroy();
+            }
+            
+            // Get categories data
+            const categories = ['Salud', 'Trabajo', 'Relaciones', 'Crecimiento', 'Creatividad', 'Finanzas'];
+            const categoryData = categories.map(category => {
+                const categoryHabits = gameData.habits.filter(habit => habit.category === category);
+                if (categoryHabits.length === 0) return 0;
+                
+                const totalCompleted = categoryHabits.reduce((sum, habit) => sum + (habit.totalCompleted || 0), 0);
+                const averageProgress = totalCompleted / categoryHabits.length;
+                return Math.min(averageProgress, 10); // Max 10 for better visualization
+            });
+            
+            window.categoriesRadarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        label: 'Progreso por Categoría',
+                        data: categoryData,
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#8b5cf6',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { 
+                                color: '#ffffff',
+                                font: { size: 14 }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: { 
+                                color: '#ffffff',
+                                backdropColor: 'rgba(0, 0, 0, 0.5)',
+                                font: { size: 12 }
+                            },
+                            grid: { 
+                                color: 'rgba(255, 255, 255, 0.3)',
+                                lineWidth: 1
+                            },
+                            pointLabels: {
+                                color: '#ffffff',
+                                font: { 
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            angleLines: { 
+                                color: 'rgba(255, 255, 255, 0.3)',
+                                lineWidth: 1
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function getWeekData() {
