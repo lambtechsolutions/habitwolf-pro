@@ -475,7 +475,7 @@
                 <!-- Add New Habit with meta and unidad -->
                 <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-6">
                     <h4 class="text-white font-semibold mb-4">Agregar Nuevo Hábito</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                         <input type="text" id="new-habit-name" placeholder="Nombre del hábito" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
                         <select id="new-habit-category" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
                             <option value="">Seleccionar categoría</option>
@@ -488,10 +488,8 @@
                             <option value="nutrition">🥗 Nutrición</option>
                             <option value="finance">💰 Finanzas</option>
                         </select>
-                        <div class="flex">
-                            <input type="number" id="new-habit-target" placeholder="Meta" min="1" class="p-3 border border-gray-300 bg-white bg-opacity-90 rounded-l-lg flex-grow">
-                            <input type="text" id="new-habit-unit" placeholder="Unidad" class="p-3 border border-gray-300 bg-white bg-opacity-90 rounded-r-lg w-20">
-                        </div>
+                        <input type="number" id="new-habit-target" placeholder="Meta" min="1" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
+                        <input type="text" id="new-habit-unit" placeholder="Unidad (ej: kg, min, páginas)" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
                         <button onclick="addNewHabit()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
                             ➕ Agregar
                         </button>
