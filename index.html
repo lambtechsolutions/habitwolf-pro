@@ -474,7 +474,7 @@
                 
                 <!-- Add New Habit with meta and unidad -->
                 <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-6">
-                    <h4 class="text-white font-semibold mb-4">Agregar Nuevo Hábito</h4>
+                    <h4 id="habit-form-title" class="text-white font-semibold mb-4">Agregar Nuevo Hábito</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                         <input type="text" id="new-habit-name" placeholder="Nombre del hábito" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
                         <select id="new-habit-category" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
@@ -490,7 +490,7 @@
                         </select>
                         <input type="number" id="new-habit-target" placeholder="Meta" min="1" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
                         <input type="text" id="new-habit-unit" placeholder="Unidad (ej: kg, min, páginas)" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
-                        <button onclick="addNewHabit()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                        <button id="habit-form-button" onclick="addNewHabit()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
                             ➕ Agregar
                         </button>
                     </div>
@@ -966,6 +966,85 @@
             showNotification('✅ Hábito agregado exitosamente', 'success');
         }
 
+        function editHabit(habitId) {
+            const habit = gameData.habits.find(h => h.id === habitId);
+            if (!habit) return;
+            
+            // Fill form with current habit data
+            document.getElementById('new-habit-name').value = habit.name;
+            document.getElementById('new-habit-category').value = habit.category;
+            document.getElementById('new-habit-target').value = habit.target;
+            document.getElementById('new-habit-unit').value = habit.unit;
+            
+            // Change form to edit mode
+            document.getElementById('habit-form-title').textContent = 'Editar Hábito';
+            document.getElementById('habit-form-button').innerHTML = '💾 Guardar Cambios';
+            document.getElementById('habit-form-button').setAttribute('onclick', `saveHabitEdit('${habitId}')`);
+            
+            // Add cancel button
+            const cancelButton = document.createElement('button');
+            cancelButton.innerHTML = '❌ Cancelar';
+            cancelButton.className = 'bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors';
+            cancelButton.onclick = cancelHabitEdit;
+            
+            const buttonContainer = document.getElementById('habit-form-button').parentNode;
+            buttonContainer.appendChild(cancelButton);
+            
+            // Scroll to form
+            document.querySelector('.bg-white.bg-opacity-10').scrollIntoView({ behavior: 'smooth' });
+            
+            showNotification('✏️ Editando hábito. Modifica los campos y guarda los cambios.', 'success');
+        }
+        
+        function saveHabitEdit(habitId) {
+            const name = document.getElementById('new-habit-name').value.trim();
+            const category = document.getElementById('new-habit-category').value;
+            const target = parseInt(document.getElementById('new-habit-target').value) || 1;
+            const unit = document.getElementById('new-habit-unit').value.trim() || 'vez';
+            
+            if (!name || !category) {
+                showNotification('⚠️ Completa todos los campos requeridos', 'error');
+                return;
+            }
+            
+            // Find and update habit
+            const habitIndex = gameData.habits.findIndex(h => h.id === habitId);
+            if (habitIndex !== -1) {
+                gameData.habits[habitIndex] = {
+                    ...gameData.habits[habitIndex],
+                    name: name,
+                    category: category,
+                    target: target,
+                    unit: unit
+                };
+                
+                saveGameData();
+                cancelHabitEdit();
+                updateHabitsList();
+                loadDailyHabits();
+                showNotification('✅ Hábito actualizado exitosamente', 'success');
+            }
+        }
+        
+        function cancelHabitEdit() {
+            // Reset form
+            document.getElementById('new-habit-name').value = '';
+            document.getElementById('new-habit-category').value = '';
+            document.getElementById('new-habit-target').value = '';
+            document.getElementById('new-habit-unit').value = '';
+            
+            // Reset form to add mode
+            document.getElementById('habit-form-title').textContent = 'Agregar Nuevo Hábito';
+            document.getElementById('habit-form-button').innerHTML = '➕ Agregar';
+            document.getElementById('habit-form-button').setAttribute('onclick', 'addNewHabit()');
+            
+            // Remove cancel button if exists
+            const cancelButton = document.querySelector('button[onclick="cancelHabitEdit()"]');
+            if (cancelButton) {
+                cancelButton.remove();
+            }
+        }
+
         function deleteHabit(habitId) {
             if (confirm('¿Estás seguro de eliminar este hábito?')) {
                 gameData.habits = gameData.habits.filter(h => h.id !== habitId);
@@ -1007,9 +1086,14 @@
                                 <p class="text-yellow-200 text-xs">🌀 Nivel Fibonacci: ${fibLevel}</p>
                             </div>
                         </div>
-                        <button onclick="deleteHabit('${habit.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition-colors">
-                            🗑️
-                        </button>
+                        <div class="flex space-x-2">
+                            <button onclick="editHabit('${habit.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition-colors">
+                                ✏️
+                            </button>
+                            <button onclick="deleteHabit('${habit.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition-colors">
+                                🗑️
+                            </button>
+                        </div>
                     </div>
                 `;
             }).join('');
