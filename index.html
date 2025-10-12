@@ -274,6 +274,17 @@
             animation: bounceIn 0.6s ease;
         }
         
+        @keyframes goldenPulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1); 
+                box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.2); 
+                box-shadow: 0 0 16px rgba(255, 215, 0, 0.9);
+            }
+        }
+        
         /* Enhanced styling */
         .glassmorphism {
             background: rgba(255, 255, 255, 0.1);
@@ -375,6 +386,9 @@
         <div class="flex space-x-1 mb-6 bg-white bg-opacity-10 rounded-lg p-1 overflow-x-auto">
             <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-button active flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
                 📊 Dashboard
+            </button>
+            <button onclick="switchTab('morning')" id="tab-morning" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
+                🌅 Rutina Matutina
             </button>
             <button onclick="switchTab('habits')" id="tab-habits" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
                 🎯 Hábitos
@@ -588,6 +602,146 @@
             </div>
         </div>
         
+        <!-- Morning Routine Tab - Brian Tracy Method -->
+        <div id="morning-tab" class="tab-content hidden">
+            <div class="glassmorphism rounded-xl p-6">
+                <h3 class="text-2xl font-bold text-white mb-6">🌅 Ritual Matutino - Método Brian Tracy</h3>
+                <p class="text-blue-200 mb-6">Los primeros 30 minutos del día determinan el 80% de tu productividad y estado emocional.</p>
+                
+                <!-- Morning Checklist -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Pilar 1: Despertar Consciente -->
+                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
+                        <h4 class="text-white font-bold text-lg mb-4">🌅 1. Despertar Consciente</h4>
+                        <p class="text-blue-200 text-sm mb-4">5 minutos antes de levantarte</p>
+                        <div class="space-y-3">
+                            <div class="space-y-2">
+                                <label class="text-white text-sm font-medium">¿Cómo quiero sentirme hoy?</label>
+                                <input type="text" id="morning-feeling" placeholder="Ej: Energizado, confiado, tranquilo..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-white text-sm font-medium">3 cosas más importantes que debo lograr:</label>
+                                <input type="text" id="morning-priority1" placeholder="1. Prioridad más importante" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
+                                <input type="text" id="morning-priority2" placeholder="2. Segunda prioridad" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
+                                <input type="text" id="morning-priority3" placeholder="3. Tercera prioridad" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-white text-sm font-medium">¿Qué tipo de persona voy a elegir ser hoy?</label>
+                                <input type="text" id="morning-identity" placeholder="Ej: Un líder, un guerrero disciplinado..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pilar 2: Programación de Gratitud -->
+                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
+                        <h4 class="text-white font-bold text-lg mb-4">🙏 2. Programación de Gratitud</h4>
+                        <p class="text-blue-200 text-sm mb-4">Sé específico, incluye detalles</p>
+                        <div class="space-y-3">
+                            <div class="space-y-2">
+                                <label class="text-white text-sm font-medium">Gratitud 1:</label>
+                                <textarea id="morning-gratitude1" placeholder="Describe específicamente por qué estás agradecido..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800" rows="2"></textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-white text-sm font-medium">Gratitud 2:</label>
+                                <textarea id="morning-gratitude2" placeholder="Otra cosa específica por la que estás agradecido..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800" rows="2"></textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-white text-sm font-medium">Gratitud 3:</label>
+                                <textarea id="morning-gratitude3" placeholder="Una tercera gratitud con detalles..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pilar 3: Visualización -->
+                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
+                        <h4 class="text-white font-bold text-lg mb-4">🎯 3. Visualización de Resultados</h4>
+                        <p class="text-blue-200 text-sm mb-4">10 minutos visualizando tu día ideal</p>
+                        <div class="space-y-3">
+                            <div class="space-y-2">
+                                <label class="text-white text-sm font-medium">Visualización del día perfecto:</label>
+                                <textarea id="morning-visualization" placeholder="Describe vívidamente cómo quieres que se desarrolle tu día. Incluye conversaciones, reuniones, logros. Usa todos los sentidos..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pilar 4: Compromiso de Acción -->
+                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
+                        <h4 class="text-white font-bold text-lg mb-4">🎯 4. Compromiso de Acción</h4>
+                        <p class="text-blue-200 text-sm mb-4">Acciones específicas con tiempo exacto</p>
+                        <div class="space-y-3">
+                            <div class="space-y-2">
+                                <label class="text-white text-sm font-medium">Acción para crecimiento profesional:</label>
+                                <input type="text" id="morning-action-work" placeholder="Ej: Llamar a cliente X a las 10:00 AM" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-white text-sm font-medium">Acción para salud:</label>
+                                <input type="text" id="morning-action-health" placeholder="Ej: Caminar 30 min en el parque a las 7:00 AM" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-white text-sm font-medium">Acción para relaciones:</label>
+                                <input type="text" id="morning-action-relationship" placeholder="Ej: Enviar mensaje de apoyo a mamá a las 12:00 PM" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pilar 5: Declaración de Identidad -->
+                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
+                        <h4 class="text-white font-bold text-lg mb-4">👑 5. Declaración de Identidad</h4>
+                        <p class="text-blue-200 text-sm mb-4">Declara conscientemente quién eliges ser</p>
+                        <div class="space-y-3">
+                            <div class="space-y-2">
+                                <label class="text-white text-sm font-medium">Mi declaración de identidad para hoy:</label>
+                                <textarea id="morning-declaration" placeholder="Ej: Hoy elijo ser valiente, disciplinado y compasivo. Soy un líder que inspira con su ejemplo..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progreso y Estadísticas -->
+                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
+                        <h4 class="text-white font-bold text-lg mb-4">📊 Progreso del Ritual</h4>
+                        <div id="morning-routine-stats" class="space-y-3">
+                            <div class="flex justify-between text-white">
+                                <span>Días consecutivos:</span>
+                                <span id="morning-streak" class="font-bold text-yellow-300">0</span>
+                            </div>
+                            <div class="flex justify-between text-white">
+                                <span>Total completado:</span>
+                                <span id="morning-total" class="font-bold text-green-300">0</span>
+                            </div>
+                            <div class="flex justify-between text-white">
+                                <span>Ritual de hoy:</span>
+                                <span id="morning-today-status" class="font-bold text-blue-300">Pendiente</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="mt-8 flex gap-4 flex-wrap">
+                    <button onclick="saveMorningRoutine()" class="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center">
+                        🌅 Completar Ritual Matutino
+                    </button>
+                    <button onclick="loadMorningRoutine()" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors">
+                        🔄 Cargar Último Ritual
+                    </button>
+                    <button onclick="clearMorningRoutine()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors">
+                        🗑️ Limpiar Formulario
+                    </button>
+                </div>
+                
+                <!-- Morning Entries History -->
+                <div class="mt-8">
+                    <h4 class="text-white font-bold text-lg mb-4">📋 Historial de Rituales</h4>
+                    <div id="morning-routine-history" class="space-y-4">
+                        <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                            <p class="text-blue-200 text-center">No hay rituales matutinos guardados.</p>
+                            <p class="text-blue-300 text-sm text-center mt-2">Completa tu primer ritual usando el formulario de arriba ✨</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Journal Tab - NEW -->
         <div id="journal-tab" class="tab-content hidden">
             <div class="glassmorphism rounded-xl p-6">
@@ -754,13 +908,33 @@
                 creativity: { name: 'Creatividad', emoji: '🎨', color: '#8b5cf6' },
                 social: { name: 'Social', emoji: '👥', color: '#ec4899' },
                 nutrition: { name: 'Nutrición', emoji: '🥗', color: '#84cc16' },
-                finance: { name: 'Finanzas', emoji: '💰', color: '#06b6d4' }
+                finance: { name: 'Finanzas', emoji: '💰', color: '#06b6d4' },
+                morning: { name: 'Rutina Matutina', emoji: '🌅', color: '#fb923c' },
+                sleep: { name: 'Sueño', emoji: '😴', color: '#6366f1' },
+                water: { name: 'Hidratación', emoji: '💧', color: '#0ea5e9' },
+                meditation: { name: 'Meditación', emoji: '🕉️', color: '#059669' },
+                reading: { name: 'Lectura', emoji: '📖', color: '#7c3aed' },
+                exercise: { name: 'Ejercicio', emoji: '🏃', color: '#dc2626' },
+                family: { name: 'Familia', emoji: '👨‍👩‍👧‍👦', color: '#f59e0b' },
+                work: { name: 'Trabajo', emoji: '💼', color: '#475569' },
+                travel: { name: 'Viajes', emoji: '✈️', color: '#0284c7' },
+                hobby: { name: 'Hobbies', emoji: '🎯', color: '#7c2d12' },
+                music: { name: 'Música', emoji: '🎵', color: '#be185d' },
+                cooking: { name: 'Cocinar', emoji: '👨‍🍳', color: '#ea580c' },
+                cleaning: { name: 'Limpieza', emoji: '🧹', color: '#65a30d' },
+                technology: { name: 'Tecnología', emoji: '💻', color: '#1e40af' },
+                nature: { name: 'Naturaleza', emoji: '🌳', color: '#166534' },
+                pets: { name: 'Mascotas', emoji: '🐕', color: '#92400e' },
+                selfcare: { name: 'Cuidado Personal', emoji: '💆‍♂️', color: '#be123c' },
+                spiritual: { name: 'Espiritual', emoji: '🙏', color: '#581c87' }
             },
             dailyLogs: {},
             streaks: {},
             badges: [],
             // NEW: Journal entries
             journal: [],
+            // NEW: Morning routines - Brian Tracy method
+            morningRoutines: [],
             // RESTORED: Shop items
             shopItems: [
                 { id: 'coffee', name: 'Café Premium', cost: 10, icon: '☕', description: 'Una taza de tu café favorito' },
@@ -770,7 +944,19 @@
                 { id: 'game', name: 'Videojuego', cost: 60, icon: '🎮', description: 'Tiempo de juego sin remordimientos' },
                 { id: 'massage', name: 'Masaje/Spa', cost: 80, icon: '💆', description: 'Relajación total merecida' },
                 { id: 'hobby', name: 'Material para Hobby', cost: 50, icon: '🎨', description: 'Inversión en tu pasatiempo favorito' },
-                { id: 'outing', name: 'Salida Especial', cost: 70, icon: '🎊', description: 'Una salida que has estado posponiendo' }
+                { id: 'outing', name: 'Salida Especial', cost: 70, icon: '🎊', description: 'Una salida que has estado posponiendo' },
+                { id: 'tea', name: 'Té Premium', cost: 8, icon: '🍵', description: 'Momento de tranquilidad con té especial' },
+                { id: 'snack', name: 'Snack Gourmet', cost: 12, icon: '🍿', description: 'Tu snack favorito sin remordimientos' },
+                { id: 'music', name: 'Música Premium', cost: 20, icon: '🎵', description: 'Suscripción o álbum musical' },
+                { id: 'workout', name: 'Clase de Ejercicio', cost: 35, icon: '🏋️', description: 'Clase especial o equipo fitness' },
+                { id: 'supplies', name: 'Útiles Creativos', cost: 45, icon: '✏️', description: 'Material para proyectos creativos' },
+                { id: 'restaurant', name: 'Comida Favorita', cost: 55, icon: '🍕', description: 'Orden de tu restaurante favorito' },
+                { id: 'tech', name: 'Gadget Pequeño', cost: 75, icon: '📱', description: 'Accesorio tecnológico que deseas' },
+                { id: 'clothes', name: 'Prenda de Vestir', cost: 90, icon: '👕', description: 'Esa prenda que has estado viendo' },
+                { id: 'experience', name: 'Experiencia Nueva', cost: 100, icon: '🎢', description: 'Actividad o experiencia diferente' },
+                { id: 'course', name: 'Curso Online', cost: 120, icon: '🎓', description: 'Inversión en tu crecimiento personal' },
+                { id: 'trip', name: 'Escapada Fin de Semana', cost: 200, icon: '🏖️', description: 'Pequeño viaje que has querido hacer' },
+                { id: 'luxury', name: 'Lujo Personal', cost: 300, icon: '💎', description: 'Ese capricho especial que te mereces' }
             ],
             purchasedItems: []
         };
@@ -790,6 +976,8 @@
             updateDashboard();
             updateShopItems();
             updateJournalEntries();
+            updateMorningRoutineStats();
+            updateMorningRoutineHistory();
             switchTab('dashboard'); // Start with dashboard tab
             
             // Auto-update date at midnight
@@ -1139,12 +1327,14 @@
             
             const habits = gameData.dailyLogs[today].habits || [];
             const index = habits.indexOf(habitId);
+            const wasCompleted = index > -1;
             
-            if (index > -1) {
+            if (wasCompleted) {
+                // Remove completion - no rewards/penalties for now
                 habits.splice(index, 1);
             } else {
+                // Add completion and give rewards only if not previously completed today
                 habits.push(habitId);
-                // ENHANCED: Award XP and coins for completing habit
                 gameData.player.xp += 10;
                 gameData.player.coins += 1;
                 
@@ -1156,7 +1346,7 @@
                     // Update Fibonacci progression
                     updateFibonacciProgression(habit);
                     
-                    // RESTORED: Show celebration notification
+                    // Show celebration notification
                     const category = gameData.categories[habit.category];
                     showNotification(`🎉 ¡${category.emoji} ${habit.name} completado! +10 XP, +1 🪙`, 'habit-complete');
                 }
@@ -1403,7 +1593,7 @@
             });
         }
 
-        // NEW: Fibonacci Golden Ratio Chart
+        // NEW: Fibonacci Golden Ratio Chart - Enhanced
         function updateFibonacciChart() {
             const container = document.getElementById('fibonacci-chart');
             if (!container) return;
@@ -1417,46 +1607,124 @@
             
             // Golden ratio
             const phi = (1 + Math.sqrt(5)) / 2;
-            const fibSequence = [1, 1, 2, 3, 5, 8, 13, 21, 34];
             
-            gameData.habits.forEach((habit, habitIndex) => {
-                const completions = habit.totalCompleted || 0;
-                const fibLevel = habit.fibonacciLevel || 1;
-                
-                // Calculate position based on golden spiral
-                const angle = habitIndex * (2 * Math.PI / gameData.habits.length);
-                const radius = (fibLevel / fibSequence.length) * Math.min(width, height) * 0.3;
+            // Get perfect days (days when ALL habits were completed)
+            const perfectDays = getPerfectDays();
+            const totalPerfectDays = perfectDays.length;
+            
+            if (totalPerfectDays === 0) {
+                // Show inspiring message when no perfect days
+                const message = document.createElement('div');
+                message.className = 'flex flex-col items-center justify-center h-full text-center';
+                message.innerHTML = `
+                    <div class="text-6xl mb-4">🌟</div>
+                    <div class="text-white text-lg font-semibold mb-2">Proporción Áurea Esperando</div>
+                    <div class="text-blue-200 text-sm max-w-xs">
+                        Completa TODOS los hábitos en un día para comenzar a formar la espiral dorada de la perfección.
+                    </div>
+                    <div class="text-yellow-300 text-xs mt-2">✨ Cada día perfecto agrega un punto a la espiral ✨</div>
+                `;
+                container.appendChild(message);
+                return;
+            }
+            
+            // Create golden spiral based on perfect days
+            for (let i = 0; i < Math.min(totalPerfectDays, 50); i++) {
+                // Calculate spiral position using golden ratio
+                const angle = i * (2 * Math.PI / phi);
+                const radius = (i + 1) * 8; // Spiral grows outward
                 
                 const x = centerX + Math.cos(angle) * radius;
                 const y = centerY + Math.sin(angle) * radius;
                 
-                // Create point for each completion
-                for (let i = 0; i < Math.min(completions, 20); i++) {
-                    const spiralAngle = angle + (i * 2 * Math.PI / phi);
-                    const spiralRadius = radius * (1 + i * 0.1);
+                // Create spiral point
+                const point = document.createElement('div');
+                point.className = 'fibonacci-point active';
+                point.style.cssText = `
+                    position: absolute;
+                    left: ${x}px;
+                    top: ${y}px;
+                    width: ${6 + (i * 0.5)}px;
+                    height: ${6 + (i * 0.5)}px;
+                    background: linear-gradient(45deg, #ffd700, #ffed4e);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%);
+                    box-shadow: 0 0 ${8 + i}px rgba(255, 215, 0, 0.6);
+                    animation: goldenPulse 2s ease-in-out infinite;
+                    animation-delay: ${i * 0.1}s;
+                `;
+                point.title = `Día Perfecto #${i + 1} - ${perfectDays[i]}`;
+                
+                container.appendChild(point);
+                
+                // Draw connection line to previous point
+                if (i > 0) {
+                    const prevAngle = (i - 1) * (2 * Math.PI / phi);
+                    const prevRadius = i * 8;
+                    const prevX = centerX + Math.cos(prevAngle) * prevRadius;
+                    const prevY = centerY + Math.sin(prevAngle) * prevRadius;
                     
-                    const pointX = centerX + Math.cos(spiralAngle) * spiralRadius;
-                    const pointY = centerY + Math.sin(spiralAngle) * spiralRadius;
+                    const line = document.createElement('div');
+                    const lineLength = Math.sqrt(Math.pow(x - prevX, 2) + Math.pow(y - prevY, 2));
+                    const lineAngle = Math.atan2(y - prevY, x - prevX) * (180 / Math.PI);
                     
-                    const point = document.createElement('div');
-                    point.className = `fibonacci-point ${i < fibLevel ? 'active' : ''}`;
-                    point.style.left = `${pointX}px`;
-                    point.style.top = `${pointY}px`;
-                    point.title = `${habit.name} - Progreso ${i + 1}`;
+                    line.style.cssText = `
+                        position: absolute;
+                        left: ${prevX}px;
+                        top: ${prevY}px;
+                        width: ${lineLength}px;
+                        height: 1px;
+                        background: linear-gradient(90deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.6));
+                        transform: rotate(${lineAngle}deg);
+                        transform-origin: 0 50%;
+                    `;
                     
-                    container.appendChild(point);
+                    container.appendChild(line);
                 }
-            });
+            }
             
             // Add center point
             const centerPoint = document.createElement('div');
-            centerPoint.className = 'fibonacci-point active';
-            centerPoint.style.left = `${centerX}px`;
-            centerPoint.style.top = `${centerY}px`;
-            centerPoint.style.background = '#8b5cf6';
-            centerPoint.style.transform = 'translate(-50%, -50%) scale(2)';
-            centerPoint.title = 'Centro de la Proporción Áurea';
+            centerPoint.style.cssText = `
+                position: absolute;
+                left: ${centerX}px;
+                top: ${centerY}px;
+                width: 16px;
+                height: 16px;
+                background: radial-gradient(circle, #8b5cf6, #6d28d9);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+                border: 2px solid #ffd700;
+            `;
+            centerPoint.title = `Centro Áureo - ${totalPerfectDays} días perfectos`;
             container.appendChild(centerPoint);
+            
+            // Add progress indicator
+            const progressIndicator = document.createElement('div');
+            progressIndicator.className = 'absolute top-2 right-2 text-xs text-yellow-300 font-semibold';
+            progressIndicator.textContent = `${totalPerfectDays} días perfectos`;
+            container.appendChild(progressIndicator);
+        }
+        
+        // Helper function to get days when ALL habits were completed
+        function getPerfectDays() {
+            const perfectDays = [];
+            
+            // Check each day in logs
+            Object.keys(gameData.dailyLogs).forEach(dateStr => {
+                const dayLog = gameData.dailyLogs[dateStr];
+                const totalHabitsForDay = gameData.habits.length;
+                const completedHabitsForDay = dayLog.habits ? dayLog.habits.length : 0;
+                
+                // Only count as perfect if ALL habits were completed AND there were habits to complete
+                if (totalHabitsForDay > 0 && completedHabitsForDay === totalHabitsForDay) {
+                    perfectDays.push(dateStr);
+                }
+            });
+            
+            // Sort by date (oldest first) to maintain proper spiral formation
+            return perfectDays.sort();
         }
 
         // Categories Radar Chart
@@ -1720,30 +1988,132 @@
 
         function generatePersonalizedRecommendations() {
             const recommendations = [];
+            const insights = [];
             const weekData = getWeekData();
             
-            if (weekData.avgEnergy < 3) {
-                recommendations.push('Tu energía promedio es baja. Considera mejorar tu sueño y nutrición.');
+            // Análisis de energía
+            if (weekData.avgEnergy < 2) {
+                recommendations.push('🔋 CRÍTICO: Tu energía está muy baja. Prioriza sueño, nutrición e hidratación inmediatamente.');
+                insights.push('Energía crítica detectada - revisa patrones de sueño');
+            } else if (weekData.avgEnergy < 3) {
+                recommendations.push('⚡ Tu energía promedio es baja. Considera mejorar tu sueño, nutrición y hacer ejercicio ligero.');
+                insights.push('Energía por debajo del promedio - necesita mejora');
+            } else if (weekData.avgEnergy > 4) {
+                recommendations.push('🌟 ¡Excelente nivel de energía! Aprovecha esta fase para establecer hábitos más desafiantes.');
+                insights.push('Alta energía - momento perfecto para nuevos desafíos');
             }
             
-            if (weekData.totalHabits < 10) {
-                recommendations.push('Intenta completar más hábitos esta semana. Pequeños pasos llevan a grandes cambios.');
-            }
-            
-            if (gameData.player.coins > 50) {
-                recommendations.push('Tienes muchos Lupus acumulados. ¡Considera usar la tienda para recompensarte!');
-            }
-            
-            const oldestHabit = gameData.habits.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))[0];
-            if (oldestHabit) {
-                const streak = gameData.streaks[oldestHabit.id] || 0;
-                if (streak === 0) {
-                    recommendations.push(`Tu hábito "${oldestHabit.name}" necesita más atención. ¡Empieza una nueva racha hoy!`);
+            // Análisis de consistencia por categorías
+            const categoryAnalysis = {};
+            Object.keys(gameData.categories).forEach(catKey => {
+                const categoryHabits = gameData.habits.filter(h => h.category === catKey);
+                if (categoryHabits.length > 0) {
+                    const avgCompletion = categoryHabits.reduce((sum, h) => sum + getHabitWeeklyCompletion(h.id), 0) / categoryHabits.length;
+                    categoryAnalysis[catKey] = avgCompletion;
                 }
+            });
+            
+            // Encontrar categoría más fuerte y más débil
+            const strongestCategory = Object.keys(categoryAnalysis).reduce((a, b) => categoryAnalysis[a] > categoryAnalysis[b] ? a : b);
+            const weakestCategory = Object.keys(categoryAnalysis).reduce((a, b) => categoryAnalysis[a] < categoryAnalysis[b] ? a : b);
+            
+            if (strongestCategory && categoryAnalysis[strongestCategory] > 70) {
+                recommendations.push(`🏆 Excelente en ${gameData.categories[strongestCategory].name} (${Math.round(categoryAnalysis[strongestCategory])}% completado). ¡Eres un ejemplo!`);
+                insights.push(`Fortaleza identificada: ${gameData.categories[strongestCategory].name}`);
             }
             
-            if (recommendations.length === 0) {
-                recommendations.push('¡Excelente trabajo! Continúa con tu rutina actual, está funcionando muy bien.');
+            if (weakestCategory && categoryAnalysis[weakestCategory] < 30) {
+                recommendations.push(`📈 ${gameData.categories[weakestCategory].name} necesita atención (${Math.round(categoryAnalysis[weakestCategory])}% completado). Enfócate aquí esta semana.`);
+                insights.push(`Área de mejora: ${gameData.categories[weakestCategory].name}`);
+            }
+            
+            // Análisis de streaks
+            const activeStreaks = Object.values(gameData.streaks).filter(s => s > 0);
+            const longestStreak = Math.max(...activeStreaks, 0);
+            
+            if (longestStreak > 14) {
+                recommendations.push(`🔥 ¡INCREÍBLE! Tienes una racha de ${longestStreak} días. Eres imparable, mantén el momentum.`);
+                insights.push('Streak excepcional mantenida');
+            } else if (longestStreak > 7) {
+                recommendations.push(`🎯 Gran racha de ${longestStreak} días. Estás construyendo disciplina sólida.`);
+                insights.push('Buena consistencia en streaks');
+            } else if (activeStreaks.length === 0) {
+                recommendations.push('🎪 No tienes streaks activos. ¡Hoy es perfecto para comenzar una nueva racha!');
+                insights.push('Sin streaks activos - oportunidad de reinicio');
+            }
+            
+            // Análisis de progreso Fibonacci
+            const fibonacciHabits = gameData.habits.filter(h => (h.fibonacciLevel || 0) > 5);
+            if (fibonacciHabits.length > 0) {
+                recommendations.push(`🌟 ${fibonacciHabits.length} hábito(s) han alcanzado nivel Fibonacci avanzado. ¡Tu progreso es exponencial!`);
+                insights.push('Progreso Fibonacci avanzado detectado');
+            }
+            
+            // Análisis de recompensas
+            if (gameData.player.coins > 100) {
+                recommendations.push('💰 Tienes muchos Lupus acumulados (100+). ¡Es momento de recompensarte en la tienda!');
+                insights.push('Alto nivel de Lupus sin gastar');
+            } else if (gameData.player.coins < 5) {
+                recommendations.push('🪙 Pocos Lupus disponibles. Completa más hábitos para poder recompensarte pronto.');
+                insights.push('Nivel bajo de recompensas disponibles');
+            }
+            
+            // Análisis de balance vida-trabajo
+            const workHabits = gameData.habits.filter(h => ['work', 'productivity', 'learning'].includes(h.category));
+            const lifeHabits = gameData.habits.filter(h => ['fitness', 'social', 'mindfulness', 'creativity'].includes(h.category));
+            
+            if (workHabits.length > lifeHabits.length * 2) {
+                recommendations.push('⚖️ Tienes muchos hábitos de trabajo/productividad. Considera agregar más hábitos de bienestar personal.');
+                insights.push('Desbalance hacia trabajo detectado');
+            } else if (lifeHabits.length > workHabits.length * 2) {
+                recommendations.push('💼 Enfocado en bienestar personal. Considera agregar hábitos de crecimiento profesional.');
+                insights.push('Enfoque principalmente en vida personal');
+            }
+            
+            // Análisis temporal - mejor día de la semana
+            const dayPerformance = {};
+            ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].forEach(day => {
+                let completions = 0;
+                let totalDays = 0;
+                for (let i = 0; i < 28; i += 7) { // Últimas 4 semanas
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    if (date.getDay() === ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].indexOf(day)) {
+                        const dateStr = date.toISOString().split('T')[0];
+                        const dayLog = gameData.dailyLogs[dateStr];
+                        if (dayLog) {
+                            totalDays++;
+                            completions += dayLog.habits?.length || 0;
+                        }
+                    }
+                }
+                if (totalDays > 0) dayPerformance[day] = completions / totalDays;
+            });
+            
+            const bestDay = Object.keys(dayPerformance).reduce((a, b) => dayPerformance[a] > dayPerformance[b] ? a : b, '');
+            const worstDay = Object.keys(dayPerformance).reduce((a, b) => dayPerformance[a] < dayPerformance[b] ? a : b, '');
+            
+            const dayNames = {
+                'monday': 'Lunes', 'tuesday': 'Martes', 'wednesday': 'Miércoles', 
+                'thursday': 'Jueves', 'friday': 'Viernes', 'saturday': 'Sábado', 'sunday': 'Domingo'
+            };
+            
+            if (bestDay && worstDay && bestDay !== worstDay) {
+                recommendations.push(`📊 Tu mejor día es ${dayNames[bestDay]} y el más difícil ${dayNames[worstDay]}. Planifica más hábitos ligeros los ${dayNames[worstDay]}.`);
+                insights.push(`Patrón semanal: mejor ${dayNames[bestDay]}, peor ${dayNames[worstDay]}`);
+            }
+            
+            // Mensaje motivacional final
+            if (recommendations.length === 0 || weekData.totalHabits > 25) {
+                recommendations.push('🏆 ¡EXCELENTE TRABAJO! Tu disciplina es inspiradora. Continúa así, estás construyendo un futuro extraordinario.');
+                insights.push('Rendimiento excepcional');
+            }
+            
+            // Agregar insights al final
+            if (insights.length > 0) {
+                recommendations.push('');
+                recommendations.push('📋 INSIGHTS DETECTADOS:');
+                insights.forEach(insight => recommendations.push(`• ${insight}`));
             }
             
             return recommendations;
@@ -2307,6 +2677,222 @@
                 location.reload();
             } else {
                 showNotification('❌ Reinicio cancelado', 'error');
+            }
+        }
+
+        // NEW: Morning Routine Functions - Brian Tracy Method
+        function saveMorningRoutine() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Collect all form data
+            const morningData = {
+                date: today,
+                timestamp: Date.now(),
+                feeling: document.getElementById('morning-feeling').value.trim(),
+                priorities: [
+                    document.getElementById('morning-priority1').value.trim(),
+                    document.getElementById('morning-priority2').value.trim(),
+                    document.getElementById('morning-priority3').value.trim()
+                ].filter(p => p.length > 0),
+                identity: document.getElementById('morning-identity').value.trim(),
+                gratitudes: [
+                    document.getElementById('morning-gratitude1').value.trim(),
+                    document.getElementById('morning-gratitude2').value.trim(),
+                    document.getElementById('morning-gratitude3').value.trim()
+                ].filter(g => g.length > 0),
+                visualization: document.getElementById('morning-visualization').value.trim(),
+                actions: {
+                    work: document.getElementById('morning-action-work').value.trim(),
+                    health: document.getElementById('morning-action-health').value.trim(),
+                    relationship: document.getElementById('morning-action-relationship').value.trim()
+                },
+                declaration: document.getElementById('morning-declaration').value.trim()
+            };
+            
+            // Validate minimum requirements
+            if (!morningData.feeling && morningData.priorities.length === 0 && morningData.gratitudes.length === 0) {
+                showNotification('⚠️ Completa al menos el estado emocional, una prioridad o una gratitud', 'error');
+                return;
+            }
+            
+            // Initialize morning routines array if it doesn't exist
+            if (!gameData.morningRoutines) {
+                gameData.morningRoutines = [];
+            }
+            
+            // Remove any existing routine for today (overwrite)
+            gameData.morningRoutines = gameData.morningRoutines.filter(routine => routine.date !== today);
+            
+            // Add new routine
+            gameData.morningRoutines.unshift(morningData);
+            
+            // Reward completion
+            gameData.player.xp += 25; // Higher reward for morning routine
+            gameData.player.coins += 3;
+            
+            saveGameData();
+            updatePlayerStats();
+            updateMorningRoutineStats();
+            updateMorningRoutineHistory();
+            
+            showNotification('🌅 ¡Ritual matutino completado! +25 XP, +3 🪙 - ¡Excelente comienzo de día!', 'habit-complete');
+            
+            // Clear form after successful save
+            clearMorningRoutine();
+        }
+        
+        function loadMorningRoutine() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (!gameData.morningRoutines) {
+                showNotification('ℹ️ No hay rituales matutinos previos para cargar', 'error');
+                return;
+            }
+            
+            // Find today's routine first, then latest routine
+            let routine = gameData.morningRoutines.find(r => r.date === today);
+            if (!routine && gameData.morningRoutines.length > 0) {
+                routine = gameData.morningRoutines[0]; // Most recent
+            }
+            
+            if (!routine) {
+                showNotification('ℹ️ No hay rituales matutinos para cargar', 'error');
+                return;
+            }
+            
+            // Populate form fields
+            document.getElementById('morning-feeling').value = routine.feeling || '';
+            document.getElementById('morning-priority1').value = routine.priorities[0] || '';
+            document.getElementById('morning-priority2').value = routine.priorities[1] || '';
+            document.getElementById('morning-priority3').value = routine.priorities[2] || '';
+            document.getElementById('morning-identity').value = routine.identity || '';
+            document.getElementById('morning-gratitude1').value = routine.gratitudes[0] || '';
+            document.getElementById('morning-gratitude2').value = routine.gratitudes[1] || '';
+            document.getElementById('morning-gratitude3').value = routine.gratitudes[2] || '';
+            document.getElementById('morning-visualization').value = routine.visualization || '';
+            document.getElementById('morning-action-work').value = routine.actions?.work || '';
+            document.getElementById('morning-action-health').value = routine.actions?.health || '';
+            document.getElementById('morning-action-relationship').value = routine.actions?.relationship || '';
+            document.getElementById('morning-declaration').value = routine.declaration || '';
+            
+            const dateStr = routine.date === today ? 'de hoy' : `del ${routine.date}`;
+            showNotification(`📋 Ritual matutino ${dateStr} cargado`, 'success');
+        }
+        
+        function clearMorningRoutine() {
+            // Clear all form fields
+            document.getElementById('morning-feeling').value = '';
+            document.getElementById('morning-priority1').value = '';
+            document.getElementById('morning-priority2').value = '';
+            document.getElementById('morning-priority3').value = '';
+            document.getElementById('morning-identity').value = '';
+            document.getElementById('morning-gratitude1').value = '';
+            document.getElementById('morning-gratitude2').value = '';
+            document.getElementById('morning-gratitude3').value = '';
+            document.getElementById('morning-visualization').value = '';
+            document.getElementById('morning-action-work').value = '';
+            document.getElementById('morning-action-health').value = '';
+            document.getElementById('morning-action-relationship').value = '';
+            document.getElementById('morning-declaration').value = '';
+            
+            showNotification('🧹 Formulario de ritual matutino limpiado', 'success');
+        }
+        
+        function updateMorningRoutineStats() {
+            if (!gameData.morningRoutines) {
+                gameData.morningRoutines = [];
+            }
+            
+            const total = gameData.morningRoutines.length;
+            let streak = 0;
+            const today = new Date();
+            
+            // Calculate consecutive days streak
+            for (let i = 0; i < 365; i++) { // Max 365 days back
+                const checkDate = new Date(today);
+                checkDate.setDate(today.getDate() - i);
+                const checkDateStr = checkDate.toISOString().split('T')[0];
+                
+                const hasRoutineForDay = gameData.morningRoutines.some(routine => routine.date === checkDateStr);
+                
+                if (hasRoutineForDay) {
+                    streak++;
+                } else {
+                    break; // Streak broken
+                }
+            }
+            
+            // Check if today is complete
+            const todayStr = today.toISOString().split('T')[0];
+            const todayComplete = gameData.morningRoutines.some(routine => routine.date === todayStr);
+            
+            // Update display
+            document.getElementById('morning-streak').textContent = streak;
+            document.getElementById('morning-total').textContent = total;
+            document.getElementById('morning-today-status').textContent = todayComplete ? '✅ Completado' : '⏰ Pendiente';
+            document.getElementById('morning-today-status').className = `font-bold ${todayComplete ? 'text-green-300' : 'text-orange-300'}`;
+        }
+        
+        function updateMorningRoutineHistory() {
+            const container = document.getElementById('morning-routine-history');
+            
+            if (!gameData.morningRoutines || gameData.morningRoutines.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                        <p class="text-blue-200 text-center">No hay rituales matutinos guardados.</p>
+                        <p class="text-blue-300 text-sm text-center mt-2">Completa tu primer ritual usando el formulario de arriba ✨</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const recentRoutines = gameData.morningRoutines.slice(0, 5); // Last 5 routines
+            
+            container.innerHTML = recentRoutines.map(routine => {
+                const date = new Date(routine.date).toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                return `
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <h5 class="text-white font-semibold">🌅 ${date}</h5>
+                            <button onclick="deleteMorningRoutine('${routine.date}')" class="text-red-400 hover:text-red-300 text-sm">🗑️</button>
+                        </div>
+                        
+                        ${routine.feeling ? `<div class="mb-2"><span class="text-blue-200 text-sm">Estado:</span> <span class="text-white">${routine.feeling}</span></div>` : ''}
+                        
+                        ${routine.priorities.length > 0 ? `
+                            <div class="mb-2">
+                                <span class="text-blue-200 text-sm">Prioridades:</span>
+                                <ul class="text-white text-sm mt-1 ml-4">
+                                    ${routine.priorities.map((p, i) => `<li>• ${p}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                        
+                        ${routine.identity ? `<div class="mb-2"><span class="text-blue-200 text-sm">Identidad:</span> <span class="text-white text-sm">${routine.identity}</span></div>` : ''}
+                        
+                        ${routine.gratitudes.length > 0 ? `
+                            <div class="text-blue-200 text-sm">
+                                Gratitudes: ${routine.gratitudes.length} registradas
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function deleteMorningRoutine(date) {
+            if (confirm(`¿Estás seguro de eliminar el ritual matutino del ${date}?`)) {
+                gameData.morningRoutines = gameData.morningRoutines.filter(routine => routine.date !== date);
+                saveGameData();
+                updateMorningRoutineStats();
+                updateMorningRoutineHistory();
+                showNotification('🗑️ Ritual matutino eliminado', 'success');
             }
         }
 
