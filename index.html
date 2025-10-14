@@ -1,779 +1,4 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HabitWolf Pro - Sistema de Autodisciplina Gamificado</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="description" content="Aplicación gamificada de seguimiento de hábitos con sistema de evolución de lobo">
-    <meta name="theme-color" content="#4299e1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="HabitWolf Pro">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="./manifest.json">
-    
-    <!-- PWA Apple Icons -->
-    <link rel="apple-touch-icon" href="./icon-192x192.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="./icon-512x512.png">
-    
-    <!-- CDN Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .wolf-card {
-            background: linear-gradient(145deg, #2d3748, #4a5568);
-            border: 3px solid #4299e1;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        }
-        
-        /* FIXED: Individual wolf evolution images without background */
-        .wolf-evolution-image {
-            width: 120px;
-            height: 120px;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: transparent;
-            border-radius: 15px;
-            border: 3px solid #4299e1;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
-            animation: wolfPulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes wolfPulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3); }
-            50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(66, 153, 225, 0.5); }
-        }
-        
-        .wolf-evolution-image:hover {
-            animation-play-state: paused;
-            transform: scale(1.08);
-            box-shadow: 0 8px 25px rgba(66, 153, 225, 0.6);
-        }
-        
-        .wolf-evolution-image.level-1 { 
-            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/1f1c3248-e5b5-4e91-9b03-aee49f3908ef'); 
-        }
-        .wolf-evolution-image.level-2 { 
-            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/41296d25-6e4b-4df9-b3df-b7c85283537d'); 
-        }
-        .wolf-evolution-image.level-3 { 
-            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/05926d3b-abe5-4cdb-9b75-60173b708b55'); 
-        }
-        .wolf-evolution-image.level-4 { 
-            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/714749d4-10cb-465f-b59a-6dc3893fd4a9'); 
-        }
-        .wolf-evolution-image.level-5 { 
-            background-image: url('https://cdn1.genspark.ai/user-upload-image/gpt_image_generated/05acbb65-7490-4da3-acef-1fe605a8cd78'); 
-        }
-        
-        .energy-emoji {
-            cursor: pointer;
-            transition: all 0.2s ease;
-            padding: 8px;
-            border-radius: 50%;
-        }
-        
-        .energy-emoji.selected {
-            background-color: #3b82f6;
-            transform: scale(1.2);
-        }
-        
-        .habit-checkbox {
-            transform: scale(1.5);
-            cursor: pointer;
-        }
-
-        .migration-section {
-            background: linear-gradient(145deg, #374151, #4b5563);
-            border: 2px solid #6366f1;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-
-        .date-picker-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-migration {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-migration:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-migration:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* Mobile Responsive Styles - ENHANCED for better visibility */
-        @media (max-width: 640px) {
-            .tab-button {
-                font-size: 10px;
-                padding: 8px 4px;
-                font-weight: 600;
-                line-height: 1.2;
-            }
-            
-            .wolf-card {
-                padding: 16px;
-            }
-            
-            .wolf-evolution-image {
-                width: 80px;
-                height: 80px;
-            }
-            
-            /* Fix wolf card stats overflow - stack vertically on mobile */
-            .wolf-stats-container {
-                flex-direction: column !important;
-                gap: 12px !important;
-                space-x: 0 !important;
-            }
-            
-            /* ENHANCED: Make stat items more visible on mobile */
-            .wolf-stat-item {
-                text-align: center !important;
-                min-width: auto !important;
-                font-size: 1rem !important;
-                background: rgba(0,0,0,0.3);
-                padding: 8px;
-                border-radius: 8px;
-            }
-            
-            .wolf-stat-item .text-sm {
-                font-size: 0.75rem !important;
-                margin-bottom: 4px;
-            }
-            
-            .wolf-stat-item div:last-child {
-                font-size: 1.25rem !important;
-                font-weight: bold;
-            }
-            
-            /* Make wolf name smaller on mobile */
-            #wolf-name {
-                font-size: 1.25rem;
-            }
-            
-            /* Adjust spacing between avatar and info */
-            .wolf-card .flex.items-center.justify-between {
-                flex-direction: column;
-                align-items: center;
-                gap: 16px;
-            }
-            
-            .wolf-card .flex.items-center.justify-between .text-right {
-                text-align: center !important;
-            }
-            
-            /* Make the avatar section take less space */
-            .wolf-card .flex.items-center.space-x-4 {
-                flex-direction: column;
-                text-align: center;
-                gap: 8px;
-                space-x: 0;
-            }
-        }
-        
-        /* Chart container styling */
-        .chart-container {
-            position: relative;
-            height: 400px;
-            width: 100%;
-        }
-        
-        .chart-container canvas {
-            max-height: 400px;
-        }
-        
-        /* Tab styling */
-        .tab-button {
-            transition: all 0.3s ease;
-            border-radius: 8px 8px 0 0;
-        }
-        
-        .tab-button.active {
-            background: linear-gradient(135deg, #4299e1, #3182ce);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
-        }
-        
-        /* Enhanced Notification styles */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            z-index: 1000;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            backdrop-filter: blur(10px);
-        }
-        
-        .notification.success {
-            background: linear-gradient(135deg, #10b981, #059669);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-        
-        .notification.error {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-        
-        .notification.habit-complete {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            font-size: 1.1rem;
-            padding: 20px 25px;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        @keyframes bounceIn {
-            0% { transform: scale(0.3); opacity: 0; }
-            50% { transform: scale(1.05); opacity: 1; }
-            70% { transform: scale(0.9); }
-            100% { transform: scale(1); }
-        }
-        
-        .celebration-animation {
-            animation: bounceIn 0.6s ease;
-        }
-        
-        @keyframes goldenPulse {
-            0%, 100% { 
-                transform: translate(-50%, -50%) scale(1); 
-                box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
-            }
-            50% { 
-                transform: translate(-50%, -50%) scale(1.2); 
-                box-shadow: 0 0 16px rgba(255, 215, 0, 0.9);
-            }
-        }
-        
-        /* Enhanced styling */
-        .glassmorphism {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        /* Shop item styling */
-        .shop-item {
-            background: linear-gradient(145deg, #f8fafc, #e2e8f0);
-            border: 2px solid #cbd5e1;
-            transition: all 0.3s ease;
-        }
-        
-        .shop-item:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            border-color: #4299e1;
-        }
-        
-        .shop-item.purchased {
-            opacity: 0.6;
-            background: linear-gradient(145deg, #f1f5f9, #cbd5e1);
-        }
-        
-        /* Golden Ratio Visualization */
-        .golden-spiral {
-            position: relative;
-            width: 100%;
-            height: 400px;
-            overflow: hidden;
-        }
-        
-        .fibonacci-point {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: #f59e0b;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .fibonacci-point.active {
-            background: #10b981;
-            transform: translate(-50%, -50%) scale(1.5);
-            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.5);
-        }
-    </style>
-</head>
-<body>
-    <!-- Notification container -->
-    <div id="notification-container"></div>
-    
-    <div class="container mx-auto px-4 py-8 max-w-6xl">
-        <!-- Header with Wolf Character -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-white mb-4">🐺 HabitWolf Pro</h1>
-            <p class="text-blue-200 text-lg">Sistema de Autodisciplina Gamificado</p>
-            <p class="text-blue-300 text-sm mt-2">Versión 2.0 - Compatible con futuras actualizaciones</p>
-        </div>
-        
-        <!-- Wolf Card -->
-        <div class="wolf-card rounded-2xl p-6 mb-8">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center space-x-4">
-                    <div id="wolf-avatar" class="wolf-evolution-image level-1"></div>
-                    <div class="text-white">
-                        <h2 id="wolf-name" class="text-2xl font-bold">Cachorro Guerrero</h2>
-                        <p class="text-blue-200">Nivel <span id="wolf-level">1</span></p>
-                    </div>
-                </div>
-                <div class="text-white text-right">
-                    <div class="wolf-stats-container flex items-center space-x-4">
-                        <div class="wolf-stat-item">
-                            <div class="text-sm text-blue-200">⭐ XP</div>
-                            <div><span id="wolf-xp">0</span>/<span id="wolf-max-xp">100</span></div>
-                        </div>
-                        <div class="wolf-stat-item">
-                            <div class="text-sm text-blue-200">🪙 Lupus</div>
-                            <div id="wolf-coins">0</div>
-                        </div>
-                        <div class="wolf-stat-item">
-                            <div class="text-sm text-blue-200">❤️ Vidas</div>
-                            <div id="wolf-lives">3</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- XP Bar -->
-            <div class="w-full bg-gray-600 rounded-full h-3 mb-4">
-                <div id="wolf-xp-bar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
-            </div>
-        </div>
-        
-        <!-- Navigation Tabs -->
-        <div class="flex space-x-1 mb-6 bg-white bg-opacity-10 rounded-lg p-1 overflow-x-auto">
-            <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-button active flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
-                📊 Dashboard
-            </button>
-            <button onclick="switchTab('morning')" id="tab-morning" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
-                🌅 Rutina Matutina
-            </button>
-            <button onclick="switchTab('habits')" id="tab-habits" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
-                🎯 Hábitos
-            </button>
-            <button onclick="switchTab('daily')" id="tab-daily" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
-                📅 Diario
-            </button>
-            <button onclick="switchTab('analysis')" id="tab-analysis" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
-                📈 Análisis
-            </button>
-            <button onclick="switchTab('journal')" id="tab-journal" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
-                📖 Journal
-            </button>
-            <button onclick="switchTab('shop')" id="tab-shop" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
-                🛒 Tienda
-            </button>
-            <button onclick="switchTab('profile')" id="tab-profile" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
-                🐺 Perfil
-            </button>
-            <button onclick="switchTab('guardar')" id="tab-guardar" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
-                💾 Datos
-            </button>
-        </div>
-        
-        <!-- Dashboard Tab -->
-        <div id="dashboard-tab" class="tab-content">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Weekly Summary -->
-                <div class="glassmorphism rounded-xl p-6">
-                    <h3 class="text-2xl font-bold text-white mb-4">Resumen Semanal</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-blue-300" id="weekly-habits">0</div>
-                            <div class="text-blue-200 text-sm">Hábitos Completados</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-green-300" id="weekly-energy">0</div>
-                            <div class="text-blue-200 text-sm">Energía Promedio</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-purple-300" id="weekly-streak">0</div>
-                            <div class="text-blue-200 text-sm">Mejor Racha</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-3xl font-bold text-yellow-300" id="weekly-xp">0</div>
-                            <div class="text-blue-200 text-sm">XP Ganado</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Charts -->
-                <div class="glassmorphism rounded-xl p-6">
-                    <h3 class="text-2xl font-bold text-white mb-4">Progreso de Hábitos</h3>
-                    <div class="chart-container">
-                        <canvas id="habitsChart"></canvas>
-                    </div>
-                </div>
-                
-                <!-- Energy Chart -->
-                <div class="glassmorphism rounded-xl p-6">
-                    <h3 class="text-2xl font-bold text-white mb-4">Niveles de Energía</h3>
-                    <div class="chart-container">
-                        <canvas id="energyChart"></canvas>
-                    </div>
-                </div>
-                
-                <!-- Fibonacci Golden Ratio Chart -->
-                <div class="glassmorphism rounded-xl p-6">
-                    <h3 class="text-2xl font-bold text-white mb-4">🌀 Proporción Áurea - Fibonacci</h3>
-                    <p class="text-blue-200 text-sm mb-4">Método del libro "El Éxito Después de 100 Fracasos"</p>
-                    <div class="golden-spiral bg-gradient-to-br from-purple-900 to-blue-900 rounded-lg" id="fibonacci-chart">
-                        <!-- Fibonacci spiral will be generated here -->
-                    </div>
-                </div>
-                
-                <!-- Category Progress -->
-                <div class="glassmorphism rounded-xl p-6 lg:col-span-2">
-                    <h3 class="text-2xl font-bold text-white mb-4">Progreso por Categorías</h3>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Radar Chart -->
-                        <div class="chart-container">
-                            <canvas id="categoriesRadarChart"></canvas>
-                        </div>
-                        <!-- Category Progress Bars -->
-                        <div id="category-progress" class="grid grid-cols-2 gap-4">
-                            <!-- Dynamic category progress will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Habits Tab -->
-        <div id="habits-tab" class="tab-content hidden">
-            <div class="glassmorphism rounded-xl p-6">
-                <h3 class="text-2xl font-bold text-white mb-6">Gestión de Hábitos</h3>
-                
-                <!-- Add New Habit with meta and unidad -->
-                <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-6">
-                    <h4 id="habit-form-title" class="text-white font-semibold mb-4">Agregar Nuevo Hábito</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                        <input type="text" id="new-habit-name" placeholder="Nombre del hábito" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
-                        <select id="new-habit-category" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
-                            <option value="">Seleccionar categoría</option>
-                            <option value="fitness">💪 Fitness & Salud</option>
-                            <option value="learning">📚 Aprendizaje</option>
-                            <option value="productivity">⚡ Productividad</option>
-                            <option value="mindfulness">🧘 Mindfulness</option>
-                            <option value="creativity">🎨 Creatividad</option>
-                            <option value="social">👥 Social</option>
-                            <option value="nutrition">🥗 Nutrición</option>
-                            <option value="finance">💰 Finanzas</option>
-                            <option value="morning">🌅 Rutina Matutina</option>
-                            <option value="sleep">😴 Sueño</option>
-                            <option value="water">💧 Hidratación</option>
-                            <option value="meditation">🕉️ Meditación</option>
-                            <option value="reading">📖 Lectura</option>
-                            <option value="exercise">🏃 Ejercicio</option>
-                            <option value="family">👨‍👩‍👧‍👦 Familia</option>
-                            <option value="work">💼 Trabajo</option>
-                            <option value="travel">✈️ Viajes</option>
-                            <option value="hobby">🎯 Hobbies</option>
-                            <option value="music">🎵 Música</option>
-                            <option value="cooking">👨‍🍳 Cocinar</option>
-                            <option value="cleaning">🧹 Limpieza</option>
-                            <option value="technology">💻 Tecnología</option>
-                            <option value="nature">🌳 Naturaleza</option>
-                            <option value="pets">🐕 Mascotas</option>
-                            <option value="selfcare">💆‍♂️ Cuidado Personal</option>
-                            <option value="spiritual">🙏 Espiritual</option>
-                        </select>
-                        <input type="number" id="new-habit-target" placeholder="Meta" min="1" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
-                        <input type="text" id="new-habit-unit" placeholder="Unidad (ej: kg, min, páginas)" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
-                        <button id="habit-form-button" onclick="addNewHabit()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                            ➕ Agregar
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Habits List -->
-                <div id="habits-list" class="space-y-4">
-                    <!-- Dynamic habits list will be loaded here -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- Daily Log Tab -->
-        <div id="daily-tab" class="tab-content hidden">
-            <div class="glassmorphism rounded-xl p-6 mb-6">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-2xl font-bold text-white">Registro Diario</h3>
-                    <div class="text-white font-semibold" id="current-date"></div>
-                </div>
-                
-                <!-- Day Status -->
-                <div id="day-status" class="bg-blue-100 border border-blue-300 rounded-lg p-4 mb-6 text-blue-800">
-                    ⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 Lupus
-                </div>
-                
-                <!-- Habits List -->
-                <div id="daily-habits-list" class="space-y-4 mb-6">
-                    <!-- Dynamic habits will be loaded here -->
-                </div>
-                
-                <!-- Energy Level -->
-                <div class="mb-6">
-                    <h4 class="text-white font-semibold mb-3">¿Cómo te sientes hoy? 💪</h4>
-                    <div class="flex space-x-4">
-                        <span class="energy-emoji text-3xl" data-level="1" onclick="selectEnergy(1)">😴</span>
-                        <span class="energy-emoji text-3xl" data-level="2" onclick="selectEnergy(2)">😐</span>
-                        <span class="energy-emoji text-3xl" data-level="3" onclick="selectEnergy(3)">🙂</span>
-                        <span class="energy-emoji text-3xl" data-level="4" onclick="selectEnergy(4)">😊</span>
-                        <span class="energy-emoji text-3xl" data-level="5" onclick="selectEnergy(5)">🔥</span>
-                    </div>
-                </div>
-                
-                <!-- Daily Reflection -->
-                <div class="mb-4">
-                    <label class="block text-white font-semibold mb-2">Reflexión del día 📝</label>
-                    <textarea id="daily-reflection" placeholder="¿Qué aprendiste hoy? ¿Qué desafíos enfrentaste?" class="w-full p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90" rows="3"></textarea>
-                </div>
-                
-                <!-- Tomorrow's Intention -->
-                <div class="mb-4">
-                    <label class="block text-white font-semibold mb-2">Intención para mañana 🌟</label>
-                    <textarea id="tomorrow-intention" placeholder="¿En qué te quieres enfocar mañana?" class="w-full p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90" rows="2"></textarea>
-                </div>
-                
-                <!-- Evidence Upload -->
-                <div class="mb-4">
-                    <label class="block text-white font-semibold mb-2">Evidencia del día (opcional) 📸</label>
-                    <input type="file" id="evidence-upload" accept="image/*" class="w-full p-2 rounded-lg border border-gray-300 bg-white bg-opacity-90">
-                </div>
-                
-                <!-- Request Advice -->
-                <div class="mb-6">
-                    <label class="flex items-center text-white">
-                        <input type="checkbox" id="request-advice" class="mr-2">
-                        <span class="font-semibold">💡 Quiero consejos para mejorar mañana</span>
-                    </label>
-                </div>
-                
-                <!-- Submit Button -->
-                <button onclick="saveDailyLog()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                    🚀 Guardar Registro del Día
-                </button>
-            </div>
-        </div>
-        
-        <!-- Analysis Tab - RESTORED -->
-        <div id="analysis-tab" class="tab-content hidden">
-            <div class="glassmorphism rounded-xl p-6">
-                <h3 class="text-2xl font-bold text-white mb-6">📈 Análisis Semanal Detallado</h3>
-                
-                <!-- Analysis Controls -->
-                <div class="mb-6">
-                    <button onclick="generateWeeklyAnalysis()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
-                        🔍 Generar Análisis Completo
-                    </button>
-                </div>
-                
-                <!-- Analysis Results -->
-                <div id="weekly-analysis-results" class="space-y-6">
-                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
-                        <h4 class="text-xl font-bold text-white mb-4">Esperando análisis...</h4>
-                        <p class="text-blue-200">Haz clic en "Generar Análisis Completo" para ver un reporte detallado de tu progreso.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Morning Routine Tab - Brian Tracy Method -->
-        <div id="morning-tab" class="tab-content hidden">
-            <div class="glassmorphism rounded-xl p-6">
-                <h3 class="text-2xl font-bold text-white mb-6">🌅 Ritual Matutino - Método Brian Tracy</h3>
-                <p class="text-blue-200 mb-6">Los primeros 30 minutos del día determinan el 80% de tu productividad y estado emocional.</p>
-                
-                <!-- Morning Checklist -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Pilar 1: Despertar Consciente -->
-                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
-                        <h4 class="text-white font-bold text-lg mb-4">🌅 1. Despertar Consciente</h4>
-                        <p class="text-blue-200 text-sm mb-4">5 minutos antes de levantarte</p>
-                        <div class="space-y-3">
-                            <div class="space-y-2">
-                                <label class="text-white text-sm font-medium">¿Cómo quiero sentirme hoy?</label>
-                                <input type="text" id="morning-feeling" placeholder="Ej: Energizado, confiado, tranquilo..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-white text-sm font-medium">3 cosas más importantes que debo lograr:</label>
-                                <input type="text" id="morning-priority1" placeholder="1. Prioridad más importante" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
-                                <input type="text" id="morning-priority2" placeholder="2. Segunda prioridad" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
-                                <input type="text" id="morning-priority3" placeholder="3. Tercera prioridad" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-white text-sm font-medium">¿Qué tipo de persona voy a elegir ser hoy?</label>
-                                <input type="text" id="morning-identity" placeholder="Ej: Un líder, un guerrero disciplinado..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Pilar 2: Programación de Gratitud -->
-                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
-                        <h4 class="text-white font-bold text-lg mb-4">🙏 2. Programación de Gratitud</h4>
-                        <p class="text-blue-200 text-sm mb-4">Sé específico, incluye detalles</p>
-                        <div class="space-y-3">
-                            <div class="space-y-2">
-                                <label class="text-white text-sm font-medium">Gratitud 1:</label>
-                                <textarea id="morning-gratitude1" placeholder="Describe específicamente por qué estás agradecido..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800" rows="2"></textarea>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-white text-sm font-medium">Gratitud 2:</label>
-                                <textarea id="morning-gratitude2" placeholder="Otra cosa específica por la que estás agradecido..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800" rows="2"></textarea>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-white text-sm font-medium">Gratitud 3:</label>
-                                <textarea id="morning-gratitude3" placeholder="Una tercera gratitud con detalles..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800" rows="2"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Pilar 3: Visualización -->
-                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
-                        <h4 class="text-white font-bold text-lg mb-4">🎯 3. Visualización de Resultados</h4>
-                        <p class="text-blue-200 text-sm mb-4">10 minutos visualizando tu día ideal</p>
-                        <div class="space-y-3">
-                            <div class="space-y-2">
-                                <label class="text-white text-sm font-medium">Visualización del día perfecto:</label>
-                                <textarea id="morning-visualization" placeholder="Describe vívidamente cómo quieres que se desarrolle tu día. Incluye conversaciones, reuniones, logros. Usa todos los sentidos..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800" rows="4"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Pilar 4: Compromiso de Acción -->
-                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
-                        <h4 class="text-white font-bold text-lg mb-4">🎯 4. Compromiso de Acción</h4>
-                        <p class="text-blue-200 text-sm mb-4">Acciones específicas con tiempo exacto</p>
-                        <div class="space-y-3">
-                            <div class="space-y-2">
-                                <label class="text-white text-sm font-medium">Acción para crecimiento profesional:</label>
-                                <input type="text" id="morning-action-work" placeholder="Ej: Llamar a cliente X a las 10:00 AM" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-white text-sm font-medium">Acción para salud:</label>
-                                <input type="text" id="morning-action-health" placeholder="Ej: Caminar 30 min en el parque a las 7:00 AM" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-white text-sm font-medium">Acción para relaciones:</label>
-                                <input type="text" id="morning-action-relationship" placeholder="Ej: Enviar mensaje de apoyo a mamá a las 12:00 PM" class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Pilar 5: Declaración de Identidad -->
-                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
-                        <h4 class="text-white font-bold text-lg mb-4">👑 5. Declaración de Identidad</h4>
-                        <p class="text-blue-200 text-sm mb-4">Declara conscientemente quién eliges ser</p>
-                        <div class="space-y-3">
-                            <div class="space-y-2">
-                                <label class="text-white text-sm font-medium">Mi declaración de identidad para hoy:</label>
-                                <textarea id="morning-declaration" placeholder="Ej: Hoy elijo ser valiente, disciplinado y compasivo. Soy un líder que inspira con su ejemplo..." class="w-full p-2 rounded border bg-white bg-opacity-90 text-gray-800" rows="3"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Progreso y Estadísticas -->
-                    <div class="bg-white bg-opacity-10 rounded-lg p-6">
-                        <h4 class="text-white font-bold text-lg mb-4">📊 Progreso del Ritual</h4>
-                        <div id="morning-routine-stats" class="space-y-3">
-                            <div class="flex justify-between text-white">
-                                <span>Días consecutivos:</span>
-                                <span id="morning-streak" class="font-bold text-yellow-300">0</span>
-                            </div>
-                            <div class="flex justify-between text-white">
-                                <span>Total completado:</span>
-                                <span id="morning-total" class="font-bold text-green-300">0</span>
-                            </div>
-                            <div class="flex justify-between text-white">
-                                <span>Ritual de hoy:</span>
-                                <span id="morning-today-status" class="font-bold text-blue-300">Pendiente</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="mt-8 flex gap-4 flex-wrap">
-                    <button onclick="saveMorningRoutine()" class="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center">
-                        🌅 Completar Ritual Matutino
-                    </button>
-                    <button onclick="loadMorningRoutine()" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors">
-                        🔄 Cargar Último Ritual
-                    </button>
-                    <button onclick="clearMorningRoutine()" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors">
-                        🗑️ Limpiar Formulario
-                    </button>
-                </div>
-                
-                <!-- Morning Entries History -->
-                <div class="mt-8">
-                    <h4 class="text-white font-bold text-lg mb-4">📋 Historial de Rituales</h4>
-                    <div id="morning-routine-history" class="space-y-4">
-                        <div class="bg-white bg-opacity-10 rounded-lg p-4">
-                            <p class="text-blue-200 text-center">No hay rituales matutinos guardados.</p>
-                            <p class="text-blue-300 text-sm text-center mt-2">Completa tu primer ritual usando el formulario de arriba ✨</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Journal Tab - NEW -->
-        <div id="journal-tab" class="tab-content hidden">
-            <div class="glassmorphism rounded-xl p-6">
-                <h3 class="text-2xl font-bold text-white mb-6">📖 Journal Personal</h3>
-                
-                <!-- Journal Entry Form -->
-                <div class="mb-6 bg-white bg-opacity-10 rounded-lg p-4">
-                    <h4 class="text-white font-semibold mb-4">Nueva Entrada</h4>
-                    <div class="space-y-4">
-                        <input type="text" id="journal-title" placeholder="Título de la entrada" class="w-full p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
-                        <textarea id="journal-content" placeholder="Escribe tus pensamientos, reflexiones, planes..." class="w-full p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90" rows="6"></textarea>
-                        <div class="flex justify-between items-center">
-                            <select id="journal-mood" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
+urnal-mood" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
                                 <option value="">Estado de ánimo</option>
                                 <option value="excellent">😄 Excelente</option>
                                 <option value="good">😊 Bien</option>
@@ -1352,12 +577,14 @@
                 // Remove completion - no rewards/penalties for now
                 habits.splice(index, 1);
             } else {
-                // Add completion and give rewards only if not previously completed today
+                // Add completion and give rewards ONLY if not previously completed today
                 habits.push(habitId);
+                
+                // Only give rewards on first completion of the day
                 gameData.player.xp += 10;
                 gameData.player.coins += 1;
                 
-                // Find habit and update Fibonacci level
+                // Find habit and update Fibonacci level ONLY on first completion
                 const habit = gameData.habits.find(h => h.id === habitId);
                 if (habit) {
                     habit.totalCompleted += 1;
@@ -1373,12 +600,16 @@
             
             gameData.dailyLogs[today].habits = habits;
             
+            // Force immediate save for critical data
             saveGameData();
             loadDailyHabits();
             updateWolfEvolution();
             updateStreaks();
             checkBadges();
             updatePlayerStats();
+            
+            // Additional force save after updates
+            setTimeout(() => saveGameData(), 100);
         }
 
         // NEW: Fibonacci progression system
@@ -2027,7 +1258,7 @@
             Object.keys(gameData.categories).forEach(catKey => {
                 const categoryHabits = gameData.habits.filter(h => h.category === catKey);
                 if (categoryHabits.length > 0) {
-                    const avgCompletion = categoryHabits.reduce((sum, h) => sum + getHabitWeeklyCompletion(h.id), 0) / categoryHabits.length;
+                    const avgCompletion = categoryHabits.reduce((sum, h) => sum + calculateHabitCompletionRate(h.id), 0) / categoryHabits.length;
                     categoryAnalysis[catKey] = avgCompletion;
                 }
             });
@@ -2295,10 +1526,10 @@
             const container = document.getElementById('evolution-path');
             const levels = [
                 { level: 1, name: 'Cachorro Guerrero', xp: 0, avatar: 'level-1' },
-                { level: 2, name: 'Lobo Explorador', xp: 100, avatar: 'level-2' },
-                { level: 3, name: 'Guerrero Feroz', xp: 300, avatar: 'level-3' },
-                { level: 4, name: 'Comandante Alpha', xp: 600, avatar: 'level-4' },
-                { level: 5, name: 'General Místico', xp: 1000, avatar: 'level-5' }
+                { level: 2, name: 'Lobo Explorador', xp: 210, avatar: 'level-2' },
+                { level: 3, name: 'Guerrero Feroz', xp: 660, avatar: 'level-3' },
+                { level: 4, name: 'Comandante Alpha', xp: 1320, avatar: 'level-4' },
+                { level: 5, name: 'General Místico', xp: 2640, avatar: 'level-5' }
             ];
             
             container.innerHTML = '';
@@ -2369,11 +1600,11 @@
         // Wolf Evolution System
         function updateWolfEvolution() {
             const levels = [
-                { level: 1, name: 'Cachorro Guerrero', xp: 0, maxXp: 100, avatar: 'level-1' },
-                { level: 2, name: 'Lobo Explorador', xp: 100, maxXp: 300, avatar: 'level-2' },
-                { level: 3, name: 'Guerrero Feroz', xp: 300, maxXp: 600, avatar: 'level-3' },
-                { level: 4, name: 'Comandante Alpha', xp: 600, maxXp: 1000, avatar: 'level-4' },
-                { level: 5, name: 'General Místico', xp: 1000, maxXp: 1000, avatar: 'level-5' }
+                { level: 1, name: 'Cachorro Guerrero', xp: 0, maxXp: 210, avatar: 'level-1' },        // ~21 días
+                { level: 2, name: 'Lobo Explorador', xp: 210, maxXp: 660, avatar: 'level-2' },       // ~66 días total
+                { level: 3, name: 'Guerrero Feroz', xp: 660, maxXp: 1320, avatar: 'level-3' },      // ~132 días total
+                { level: 4, name: 'Comandante Alpha', xp: 1320, maxXp: 2640, avatar: 'level-4' },   // ~264 días total
+                { level: 5, name: 'General Místico', xp: 2640, maxXp: 3650, avatar: 'level-5' }     // ~365 días total (1 año)
             ];
             
             const currentLevel = levels.find(l => gameData.player.xp >= l.xp && (gameData.player.xp < l.maxXp || l.level === 5));
@@ -2701,11 +1932,14 @@
 
         // NEW: Morning Routine Functions - Brian Tracy Method
         function saveMorningRoutine() {
-            const today = new Date().toISOString().split('T')[0];
+            // Fix timezone issue - use local date
+            const today = new Date();
+            const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000));
+            const todayStr = localDate.toISOString().split('T')[0];
             
             // Collect all form data
             const morningData = {
-                date: today,
+                date: todayStr,
                 timestamp: Date.now(),
                 feeling: document.getElementById('morning-feeling').value.trim(),
                 priorities: [
@@ -2740,7 +1974,7 @@
             }
             
             // Remove any existing routine for today (overwrite)
-            gameData.morningRoutines = gameData.morningRoutines.filter(routine => routine.date !== today);
+            gameData.morningRoutines = gameData.morningRoutines.filter(routine => routine.date !== todayStr);
             
             // Add new routine
             gameData.morningRoutines.unshift(morningData);
