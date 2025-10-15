@@ -478,6 +478,13 @@
                             <!-- Dynamic category progress will be loaded here -->
                         </div>
                     </div>
+                    <!-- Information about category grouping -->
+                    <div class="mt-4 p-4 bg-blue-900 bg-opacity-30 rounded-lg border border-blue-500 border-opacity-30">
+                        <p class="text-blue-200 text-sm">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <strong>Categorías Agrupadas:</strong> El gráfico muestra 7 meta-categorías que agrupan tus 25+ categorías individuales para una mejor visualización y análisis de patrones.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1762,31 +1769,86 @@
                 window.categoriesRadarChart.destroy();
             }
             
-            // Get categories data
-            const categories = ['Salud', 'Trabajo', 'Relaciones', 'Crecimiento', 'Creatividad', 'Finanzas'];
-            const categoryData = categories.map(category => {
-                const categoryHabits = gameData.habits.filter(habit => habit.category === category);
-                if (categoryHabits.length === 0) return 0;
-                
-                const totalCompleted = categoryHabits.reduce((sum, habit) => sum + (habit.totalCompleted || 0), 0);
-                const averageProgress = totalCompleted / categoryHabits.length;
-                return Math.min(averageProgress, 10); // Max 10 for better visualization
+            // Super-categorías que agrupan las 25 categorías detalladas
+            const superCategories = {
+                'Salud Física': {
+                    emoji: '💪',
+                    categories: ['fitness', 'exercise', 'nutrition', 'water', 'sleep', 'selfcare'],
+                    color: '#ef4444'
+                },
+                'Bienestar Mental': {
+                    emoji: '🧠',
+                    categories: ['mindfulness', 'meditation', 'spiritual', 'reading'],
+                    color: '#10b981'
+                },
+                'Productividad': {
+                    emoji: '⚡',
+                    categories: ['productivity', 'work', 'technology', 'morning'],
+                    color: '#f59e0b'
+                },
+                'Desarrollo Personal': {
+                    emoji: '🎨',
+                    categories: ['learning', 'creativity', 'music', 'hobby', 'course'],
+                    color: '#8b5cf6'
+                },
+                'Relaciones Sociales': {
+                    emoji: '👥',
+                    categories: ['social', 'family', 'pets', 'travel'],
+                    color: '#ec4899'
+                },
+                'Vida Doméstica': {
+                    emoji: '🏠',
+                    categories: ['cooking', 'cleaning', 'nature'],
+                    color: '#84cc16'
+                },
+                'Finanzas': {
+                    emoji: '💰',
+                    categories: ['finance'],
+                    color: '#06b6d4'
+                }
+            };
+
+            // Calcular progreso por super-categoría
+            const superCategoryLabels = [];
+            const superCategoryData = [];
+            const backgroundColors = [];
+            const borderColors = [];
+
+            Object.entries(superCategories).forEach(([superCatName, superCatData]) => {
+                // Encontrar todos los hábitos que pertenecen a esta super-categoría
+                const superCatHabits = gameData.habits.filter(habit => 
+                    superCatData.categories.includes(habit.category)
+                );
+
+                let averageProgress = 0;
+                if (superCatHabits.length > 0) {
+                    const totalCompleted = superCatHabits.reduce((sum, habit) => 
+                        sum + (habit.totalCompleted || 0), 0
+                    );
+                    averageProgress = totalCompleted / superCatHabits.length;
+                }
+
+                superCategoryLabels.push(`${superCatData.emoji} ${superCatName}`);
+                superCategoryData.push(Math.min(averageProgress, 10)); // Max 10 para mejor visualización
+                backgroundColors.push(superCatData.color + '33'); // Transparencia
+                borderColors.push(superCatData.color);
             });
             
             window.categoriesRadarChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: categories,
+                    labels: superCategoryLabels,
                     datasets: [{
                         label: 'Progreso por Categoría',
-                        data: categoryData,
+                        data: superCategoryData,
                         borderColor: '#8b5cf6',
                         backgroundColor: 'rgba(139, 92, 246, 0.2)',
                         borderWidth: 3,
-                        pointBackgroundColor: '#8b5cf6',
+                        pointBackgroundColor: borderColors,
                         pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5
+                        pointBorderWidth: 3,
+                        pointRadius: 7,
+                        pointHoverRadius: 10
                     }]
                 },
                 options: {
@@ -1798,6 +1860,24 @@
                                 color: '#ffffff',
                                 font: { size: 14 }
                             }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const superCatName = context[0].label.split(' ').slice(1).join(' ');
+                                    const superCatData = superCategories[superCatName];
+                                    if (superCatData) {
+                                        const habitsInCategory = gameData.habits.filter(habit => 
+                                            superCatData.categories.includes(habit.category)
+                                        );
+                                        return `${context[0].label} (${habitsInCategory.length} hábitos)`;
+                                    }
+                                    return context[0].label;
+                                },
+                                label: function(context) {
+                                    return `Progreso promedio: ${context.parsed.r.toFixed(1)}/10`;
+                                }
+                            }
                         }
                     },
                     scales: {
@@ -1807,7 +1887,8 @@
                             ticks: { 
                                 color: '#ffffff',
                                 backdropColor: 'rgba(0, 0, 0, 0.5)',
-                                font: { size: 12 }
+                                font: { size: 12 },
+                                stepSize: 2
                             },
                             grid: { 
                                 color: 'rgba(255, 255, 255, 0.3)',
@@ -1816,7 +1897,7 @@
                             pointLabels: {
                                 color: '#ffffff',
                                 font: { 
-                                    size: 14,
+                                    size: 12,
                                     weight: 'bold'
                                 }
                             },
@@ -1874,21 +1955,88 @@
 
         function updateCategoryProgress() {
             const container = document.getElementById('category-progress');
-            const categories = Object.keys(gameData.categories);
             
-            container.innerHTML = categories.map(catKey => {
-                const category = gameData.categories[catKey];
-                const categoryHabits = gameData.habits.filter(h => h.category === catKey);
-                const streak = gameData.streaks[catKey] || 0;
+            // Usar las mismas super-categorías del gráfico radar
+            const superCategories = {
+                'Salud Física': {
+                    emoji: '💪',
+                    categories: ['fitness', 'exercise', 'nutrition', 'water', 'sleep', 'selfcare'],
+                    color: '#ef4444'
+                },
+                'Bienestar Mental': {
+                    emoji: '🧠',
+                    categories: ['mindfulness', 'meditation', 'spiritual', 'reading'],
+                    color: '#10b981'
+                },
+                'Productividad': {
+                    emoji: '⚡',
+                    categories: ['productivity', 'work', 'technology', 'morning'],
+                    color: '#f59e0b'
+                },
+                'Desarrollo Personal': {
+                    emoji: '🎨',
+                    categories: ['learning', 'creativity', 'music', 'hobby', 'course'],
+                    color: '#8b5cf6'
+                },
+                'Relaciones Sociales': {
+                    emoji: '👥',
+                    categories: ['social', 'family', 'pets', 'travel'],
+                    color: '#ec4899'
+                },
+                'Vida Doméstica': {
+                    emoji: '🏠',
+                    categories: ['cooking', 'cleaning', 'nature'],
+                    color: '#84cc16'
+                },
+                'Finanzas': {
+                    emoji: '💰',
+                    categories: ['finance'],
+                    color: '#06b6d4'
+                }
+            };
+            
+            container.innerHTML = Object.entries(superCategories).map(([superCatName, superCatData]) => {
+                const superCatHabits = gameData.habits.filter(habit => 
+                    superCatData.categories.includes(habit.category)
+                );
+                
+                // Calcular progreso promedio
+                let averageProgress = 0;
+                if (superCatHabits.length > 0) {
+                    const totalCompleted = superCatHabits.reduce((sum, habit) => 
+                        sum + (habit.totalCompleted || 0), 0
+                    );
+                    averageProgress = totalCompleted / superCatHabits.length;
+                }
+                
+                // Calcular racha promedio
+                const totalStreak = superCatHabits.reduce((sum, habit) => 
+                    sum + (gameData.streaks[habit.id] || 0), 0
+                );
+                const avgStreak = superCatHabits.length > 0 ? Math.round(totalStreak / superCatHabits.length) : 0;
                 
                 return `
-                    <div class="text-center p-4 bg-white bg-opacity-10 rounded-lg">
-                        <div class="text-3xl mb-2">${category.emoji}</div>
-                        <div class="text-white font-semibold text-sm">${category.name}</div>
-                        <div class="text-blue-200 text-xs">${categoryHabits.length} hábitos</div>
-                        <div class="text-blue-200 text-xs">Racha: ${streak} días</div>
+                    <div class="text-center p-4 bg-white bg-opacity-10 rounded-lg border-l-4 hover:bg-opacity-20 transition-all duration-300" 
+                         style="border-left-color: ${superCatData.color}">
+                        <div class="text-3xl mb-2">${superCatData.emoji}</div>
+                        <div class="text-white font-semibold text-sm">${superCatName}</div>
+                        <div class="text-blue-200 text-xs">${superCatHabits.length} hábitos</div>
+                        <div class="text-blue-200 text-xs">Progreso: ${averageProgress.toFixed(1)}/10</div>
+                        <div class="text-blue-200 text-xs">Racha promedio: ${avgStreak} días</div>
+                        <div class="w-full bg-gray-700 rounded-full h-2 mt-2">
+                            <div class="h-2 rounded-full transition-all duration-500" 
+                                 style="width: ${Math.min((averageProgress / 10) * 100, 100)}%; background-color: ${superCatData.color}">
+                            </div>
+                        </div>
                     </div>
                 `;
+            }).filter((_, index, arr) => {
+                // Solo mostrar super-categorías que tengan hábitos
+                const superCatData = Object.values(superCategories)[index];
+                const superCatHabits = gameData.habits.filter(habit => 
+                    superCatData.categories.includes(habit.category)
+                );
+                return superCatHabits.length > 0;
             }).join('');
         }
 
