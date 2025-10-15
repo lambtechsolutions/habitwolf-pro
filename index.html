@@ -259,6 +259,13 @@
             padding: 20px 25px;
         }
         
+        .notification.habit-uncomplete {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            font-size: 1.1rem;
+            padding: 20px 25px;
+        }
+        
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -1330,9 +1337,11 @@
                 return `
                     <div class="bg-white bg-opacity-10 rounded-lg p-4 flex items-center space-x-4">
                         <input type="checkbox" 
+                               id="habit-${habit.id}"
                                class="habit-checkbox" 
                                ${isCompleted ? 'checked' : ''} 
-                               onchange="toggleHabit('${habit.id}')">
+                               onchange="toggleHabit('${habit.id}')"
+                               data-habit-id="${habit.id}">
                         <span class="text-2xl">${category.emoji}</span>
                         <div class="flex-grow">
                             <h4 class="text-white font-semibold ${isCompleted ? 'line-through opacity-75' : ''}">${habit.name}</h4>
@@ -1344,54 +1353,110 @@
             }).join('');
         }
 
+        // FIXED: Prevent multiple clicks from awarding infinite points
+        let isProcessingHabitToggle = false;
+        let habitToggleCooldown = new Set();
+        
         function toggleHabit(habitId) {
-            const today = new Date().toISOString().split('T')[0];
-            
-            if (!gameData.dailyLogs[today]) {
-                gameData.dailyLogs[today] = { habits: [] };
+            // CRITICAL FIX: Prevent multiple simultaneous executions
+            if (isProcessingHabitToggle || habitToggleCooldown.has(habitId)) {
+                console.log('⚠️ Toggle already in progress, ignoring duplicate click for habit:', habitId);
+                return;
             }
             
-            const habits = gameData.dailyLogs[today].habits || [];
-            const index = habits.indexOf(habitId);
-            const wasCompleted = index > -1;
+            // Add to cooldown set and global lock
+            isProcessingHabitToggle = true;
+            habitToggleCooldown.add(habitId);
             
-            if (wasCompleted) {
-                // Remove completion - no rewards/penalties for now
-                habits.splice(index, 1);
-            } else {
-                // Add completion and give rewards ONLY if not previously completed today
-                habits.push(habitId);
+            try {
+                const today = new Date().toISOString().split('T')[0];
                 
-                // Only give rewards on first completion of the day
-                gameData.player.xp += 10;
-                gameData.player.coins += 1;
-                
-                // Find habit and update Fibonacci level ONLY on first completion
-                const habit = gameData.habits.find(h => h.id === habitId);
-                if (habit) {
-                    habit.totalCompleted += 1;
-                    
-                    // Update Fibonacci progression
-                    updateFibonacciProgression(habit);
-                    
-                    // Show celebration notification
-                    const category = gameData.categories[habit.category];
-                    showNotification(`🎉 ¡${category.emoji} ${habit.name} completado! +10 XP, +1 🪙`, 'habit-complete');
+                if (!gameData.dailyLogs[today]) {
+                    gameData.dailyLogs[today] = { habits: [] };
                 }
+                
+                const habits = gameData.dailyLogs[today].habits || [];
+                const index = habits.indexOf(habitId);
+                const wasCompleted = index > -1;
+                
+                // Double verification with checkbox state
+                const checkbox = document.getElementById(`habit-${habitId}`);
+                const checkboxState = checkbox ? checkbox.checked : false;
+                
+                console.log(`🔍 Toggling habit ${habitId}: wasCompleted=${wasCompleted}, checkboxState=${checkboxState}`);
+                
+                if (wasCompleted && !checkboxState) {
+                    // UNCOMPLETE: Remove completion and subtract rewards
+                    habits.splice(index, 1);
+                    
+                    // Subtract rewards when uncompleting (if positive)
+                    if (gameData.player.xp >= 10) gameData.player.xp -= 10;
+                    if (gameData.player.coins >= 1) gameData.player.coins -= 1;
+                    
+                    // Decrement habit total completion
+                    const habit = gameData.habits.find(h => h.id === habitId);
+                    if (habit && habit.totalCompleted > 0) {
+                        habit.totalCompleted -= 1;
+                    }
+                    
+                    showNotification(`↩️ Hábito desmarcado. -10 XP, -1 🪙`, 'habit-uncomplete');
+                    
+                } else if (!wasCompleted && checkboxState) {
+                    // COMPLETE: Add completion and give rewards ONLY if not previously completed today
+                    habits.push(habitId);
+                    
+                    // Give rewards on first completion of the day
+                    gameData.player.xp += 10;
+                    gameData.player.coins += 1;
+                    
+                    // Find habit and update Fibonacci level ONLY on first completion
+                    const habit = gameData.habits.find(h => h.id === habitId);
+                    if (habit) {
+                        habit.totalCompleted += 1;
+                        
+                        // Update Fibonacci progression
+                        updateFibonacciProgression(habit);
+                        
+                        // Show celebration notification
+                        const category = gameData.categories[habit.category];
+                        showNotification(`🎉 ¡${category.emoji} ${habit.name} completado! +10 XP, +1 🪙`, 'habit-complete');
+                    }
+                    
+                    console.log(`✅ Rewards awarded for ${habitId}: +10 XP, +1 coin`);
+                    
+                } else {
+                    // Invalid state - checkbox and data don't match, just sync without rewards
+                    console.log(`⚠️ Inconsistent state for habit ${habitId}, syncing without rewards`);
+                    if (checkboxState && !wasCompleted) {
+                        habits.push(habitId);
+                    } else if (!checkboxState && wasCompleted) {
+                        habits.splice(index, 1);
+                    }
+                }
+                
+                // Update the habits array
+                gameData.dailyLogs[today].habits = [...new Set(habits)]; // Remove duplicates just in case
+                
+                // Force immediate save for critical data
+                saveGameData();
+                loadDailyHabits();
+                updateWolfEvolution();
+                updateStreaks();
+                checkBadges();
+                updatePlayerStats();
+                
+                // Additional force save after updates
+                setTimeout(() => saveGameData(), 100);
+                
+            } catch (error) {
+                console.error('❌ Error in toggleHabit:', error);
+            } finally {
+                // CRITICAL: Always unlock the function after processing
+                setTimeout(() => {
+                    isProcessingHabitToggle = false;
+                    habitToggleCooldown.delete(habitId);
+                }, 300); // Increased cooldown to 300ms
             }
-            
-            gameData.dailyLogs[today].habits = habits;
-            
-            // Force immediate save for critical data
-            saveGameData();
-            loadDailyHabits();
-            updateWolfEvolution();
-            updateStreaks();
-            checkBadges();
-            updatePlayerStats();
-            
-            // Additional force save after updates
-            setTimeout(() => saveGameData(), 100);
         }
 
         // NEW: Fibonacci progression system
