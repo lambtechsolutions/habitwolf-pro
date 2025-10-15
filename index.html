@@ -553,9 +553,29 @@
         <!-- Daily Log Tab -->
         <div id="daily-tab" class="tab-content hidden">
             <div class="glassmorphism rounded-xl p-6 mb-6">
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
                     <h3 class="text-2xl font-bold text-white">Registro Diario</h3>
-                    <div class="text-white font-semibold" id="current-date"></div>
+                    
+                    <!-- Date Navigation -->
+                    <div class="flex items-center space-x-2 bg-white bg-opacity-10 rounded-lg p-2">
+                        <button onclick="navigateDailyDate(-1)" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition-colors">
+                            ◀️ Anterior
+                        </button>
+                        <input type="date" id="daily-date-picker" onchange="loadDailyForDate(this.value)" 
+                               class="bg-white bg-opacity-90 text-gray-800 px-3 py-1 rounded border">
+                        <button onclick="navigateDailyDate(1)" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition-colors">
+                            Siguiente ▶️
+                        </button>
+                        <button onclick="goToToday()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded transition-colors font-semibold">
+                            📅 HOY
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Current Date Display -->
+                <div class="text-center mb-4">
+                    <div class="text-white font-semibold text-lg" id="current-daily-date"></div>
+                    <div class="text-blue-200 text-sm" id="daily-date-status"></div>
                 </div>
                 
                 <!-- Day Status -->
@@ -638,8 +658,33 @@
         <!-- Morning Routine Tab - Brian Tracy Method -->
         <div id="morning-tab" class="tab-content hidden">
             <div class="glassmorphism rounded-xl p-6">
-                <h3 class="text-2xl font-bold text-white mb-6">🌅 Ritual Matutino - Método Brian Tracy</h3>
-                <p class="text-blue-200 mb-6">Los primeros 30 minutos del día determinan el 80% de tu productividad y estado emocional.</p>
+                <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                    <div>
+                        <h3 class="text-2xl font-bold text-white">🌅 Ritual Matutino - Método Brian Tracy</h3>
+                        <p class="text-blue-200">Los primeros 30 minutos del día determinan el 80% de tu productividad y estado emocional.</p>
+                    </div>
+                    
+                    <!-- Morning Date Navigation -->
+                    <div class="flex items-center space-x-2 bg-white bg-opacity-10 rounded-lg p-2">
+                        <button onclick="navigateMorningDate(-1)" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded transition-colors">
+                            ◀️ Anterior
+                        </button>
+                        <input type="date" id="morning-date-picker" onchange="loadMorningForDate(this.value)" 
+                               class="bg-white bg-opacity-90 text-gray-800 px-3 py-1 rounded border">
+                        <button onclick="navigateMorningDate(1)" class="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded transition-colors">
+                            Siguiente ▶️
+                        </button>
+                        <button onclick="goToTodayMorning()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded transition-colors font-semibold">
+                            📅 HOY
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Current Morning Date Display -->
+                <div class="text-center mb-6">
+                    <div class="text-white font-semibold text-lg" id="current-morning-date"></div>
+                    <div class="text-orange-200 text-sm" id="morning-date-status"></div>
+                </div>
                 
                 <!-- Morning Checklist -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -920,6 +965,10 @@
     </div>
 
     <script>
+        // ENHANCED: Date navigation variables
+        let currentDailyDate = new Date().toISOString().split('T')[0];
+        let currentMorningDate = new Date().toISOString().split('T')[0];
+        
         // Enhanced Game Data with version compatibility
         let gameData = {
             version: '2.0', // Version tracking for compatibility
@@ -1004,6 +1053,7 @@
             updateCurrentDate();
             updatePlayerStats();
             updateWolfProfile();
+            initializeDatePickers(); // NEW: Initialize date navigation
             loadDailyHabits();
             updateHabitsList();
             updateDashboard();
@@ -1113,6 +1163,132 @@
                 day: 'numeric' 
             };
             document.getElementById('current-date').textContent = today.toLocaleDateString('es-ES', options);
+        }
+
+        // NEW: Date Navigation Functions
+        function initializeDatePickers() {
+            // Initialize daily date picker
+            const dailyPicker = document.getElementById('daily-date-picker');
+            const morningPicker = document.getElementById('morning-date-picker');
+            
+            if (dailyPicker) {
+                dailyPicker.value = currentDailyDate;
+                updateDailyDateDisplay();
+            }
+            
+            if (morningPicker) {
+                morningPicker.value = currentMorningDate;
+                updateMorningDateDisplay();
+            }
+        }
+        
+        function updateDailyDateDisplay() {
+            const date = new Date(currentDailyDate + 'T00:00:00');
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            
+            const formattedDate = date.toLocaleDateString('es-ES', options);
+            const today = new Date().toISOString().split('T')[0];
+            const isToday = currentDailyDate === today;
+            const isPast = currentDailyDate < today;
+            const isFuture = currentDailyDate > today;
+            
+            document.getElementById('current-daily-date').textContent = formattedDate;
+            
+            let status = '';
+            if (isToday) {
+                status = '📅 HOY - Completa tus hábitos actuales';
+            } else if (isPast) {
+                status = '⏪ Día pasado - Puedes completar hábitos perdidos';
+            } else if (isFuture) {
+                status = '⏭️ Día futuro - Solo visualización';
+            }
+            
+            document.getElementById('daily-date-status').textContent = status;
+        }
+        
+        function updateMorningDateDisplay() {
+            const date = new Date(currentMorningDate + 'T00:00:00');
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            
+            const formattedDate = date.toLocaleDateString('es-ES', options);
+            const today = new Date().toISOString().split('T')[0];
+            const isToday = currentMorningDate === today;
+            const isPast = currentMorningDate < today;
+            const isFuture = currentMorningDate > today;
+            
+            document.getElementById('current-morning-date').textContent = formattedDate;
+            
+            let status = '';
+            if (isToday) {
+                status = '🌅 HOY - Ritual matutino del día actual';
+            } else if (isPast) {
+                status = '⏪ Día pasado - Puedes completar rituales perdidos';
+            } else if (isFuture) {
+                status = '⏭️ Día futuro - Solo visualización';
+            }
+            
+            document.getElementById('morning-date-status').textContent = status;
+        }
+        
+        function navigateDailyDate(direction) {
+            const currentDate = new Date(currentDailyDate + 'T00:00:00');
+            currentDate.setDate(currentDate.getDate() + direction);
+            currentDailyDate = currentDate.toISOString().split('T')[0];
+            
+            document.getElementById('daily-date-picker').value = currentDailyDate;
+            updateDailyDateDisplay();
+            loadDailyForDate(currentDailyDate);
+        }
+        
+        function navigateMorningDate(direction) {
+            const currentDate = new Date(currentMorningDate + 'T00:00:00');
+            currentDate.setDate(currentDate.getDate() + direction);
+            currentMorningDate = currentDate.toISOString().split('T')[0];
+            
+            document.getElementById('morning-date-picker').value = currentMorningDate;
+            updateMorningDateDisplay();
+            loadMorningForDate(currentMorningDate);
+        }
+        
+        function loadDailyForDate(dateStr) {
+            currentDailyDate = dateStr;
+            updateDailyDateDisplay();
+            loadDailyHabitsForDate(dateStr);
+            loadDailyFormDataForDate(dateStr);
+        }
+        
+        function loadMorningForDate(dateStr) {
+            currentMorningDate = dateStr;
+            updateMorningDateDisplay();
+            loadMorningRoutineForDate(dateStr);
+        }
+        
+        function goToToday() {
+            const today = new Date().toISOString().split('T')[0];
+            currentDailyDate = today;
+            document.getElementById('daily-date-picker').value = today;
+            updateDailyDateDisplay();
+            loadDailyForDate(today);
+            showNotification('📅 Volviste al día actual', 'success');
+        }
+        
+        function goToTodayMorning() {
+            const today = new Date().toISOString().split('T')[0];
+            currentMorningDate = today;
+            document.getElementById('morning-date-picker').value = today;
+            updateMorningDateDisplay();
+            loadMorningForDate(today);
+            showNotification('🌅 Volviste al ritual de hoy', 'success');
         }
 
         // Tab Management
@@ -1322,8 +1498,13 @@
 
         // Daily Log Functions
         function loadDailyHabits() {
-            const today = new Date().toISOString().split('T')[0];
+            loadDailyHabitsForDate(currentDailyDate);
+        }
+        
+        function loadDailyHabitsForDate(dateStr) {
             const container = document.getElementById('daily-habits-list');
+            const today = new Date().toISOString().split('T')[0];
+            const isFuture = dateStr > today;
             
             if (gameData.habits.length === 0) {
                 container.innerHTML = '<p class="text-blue-200 text-center py-8">No hay hábitos configurados. Ve a la pestaña "Hábitos" para agregar algunos.</p>';
@@ -1332,7 +1513,7 @@
             
             container.innerHTML = gameData.habits.map(habit => {
                 const category = gameData.categories[habit.category];
-                const isCompleted = gameData.dailyLogs[today]?.habits?.includes(habit.id) || false;
+                const isCompleted = gameData.dailyLogs[dateStr]?.habits?.includes(habit.id) || false;
                 
                 return `
                     <div class="bg-white bg-opacity-10 rounded-lg p-4 flex items-center space-x-4">
@@ -1340,17 +1521,55 @@
                                id="habit-${habit.id}"
                                class="habit-checkbox" 
                                ${isCompleted ? 'checked' : ''} 
-                               onchange="toggleHabit('${habit.id}')"
+                               ${isFuture ? 'disabled' : ''}
+                               onchange="toggleHabitForDate('${habit.id}', '${dateStr}')"
                                data-habit-id="${habit.id}">
                         <span class="text-2xl">${category.emoji}</span>
                         <div class="flex-grow">
                             <h4 class="text-white font-semibold ${isCompleted ? 'line-through opacity-75' : ''}">${habit.name}</h4>
-                            <p class="text-blue-200 text-sm">${category.name} • Meta: ${habit.target} ${habit.unit}</p>
+                            <p class="text-blue-200 text-sm">${category.name} • Meta: ${habit.target} ${habit.unit} ${isFuture ? '• 🔒 Futuro' : ''}</p>
                         </div>
                         ${isCompleted ? '<span class="text-green-400 text-xl">✅</span>' : ''}
                     </div>
                 `;
             }).join('');
+        }
+        
+        function loadDailyFormDataForDate(dateStr) {
+            const dayLog = gameData.dailyLogs[dateStr];
+            const isFuture = dateStr > new Date().toISOString().split('T')[0];
+            
+            // Clear form first
+            clearDailyForm();
+            
+            if (dayLog && !isFuture) {
+                // Load existing data
+                if (dayLog.energyLevel) {
+                    selectEnergy(dayLog.energyLevel);
+                }
+                
+                document.getElementById('daily-reflection').value = dayLog.reflection || '';
+                document.getElementById('tomorrow-intention').value = dayLog.intention || '';
+                document.getElementById('request-advice').checked = dayLog.requestAdvice || false;
+            }
+            
+            // Disable form fields for future dates
+            const formElements = [
+                'daily-reflection', 'tomorrow-intention', 'request-advice', 'evidence-upload'
+            ];
+            
+            formElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.disabled = isFuture;
+                }
+            });
+            
+            // Disable energy emojis for future dates
+            document.querySelectorAll('.energy-emoji').forEach(emoji => {
+                emoji.style.pointerEvents = isFuture ? 'none' : 'auto';
+                emoji.style.opacity = isFuture ? '0.5' : '1';
+            });
         }
 
         // FIXED: Prevent multiple clicks from awarding infinite points
@@ -1358,6 +1577,12 @@
         let habitToggleCooldown = new Set();
         
         function toggleHabit(habitId) {
+            // Default to current daily date for backwards compatibility
+            const today = new Date().toISOString().split('T')[0];
+            toggleHabitForDate(habitId, today);
+        }
+        
+        function toggleHabitForDate(habitId, dateStr) {
             // CRITICAL FIX: Prevent multiple simultaneous executions
             if (isProcessingHabitToggle || habitToggleCooldown.has(habitId)) {
                 console.log('⚠️ Toggle already in progress, ignoring duplicate click for habit:', habitId);
@@ -1370,12 +1595,20 @@
             
             try {
                 const today = new Date().toISOString().split('T')[0];
+                const isFuture = dateStr > today;
+                const targetDate = dateStr; // Use provided date
                 
-                if (!gameData.dailyLogs[today]) {
-                    gameData.dailyLogs[today] = { habits: [] };
+                // Prevent editing future dates
+                if (isFuture) {
+                    showNotification('⛔ No puedes modificar hábitos de fechas futuras', 'error');
+                    return;
                 }
                 
-                const habits = gameData.dailyLogs[today].habits || [];
+                if (!gameData.dailyLogs[targetDate]) {
+                    gameData.dailyLogs[targetDate] = { habits: [] };
+                }
+                
+                const habits = gameData.dailyLogs[targetDate].habits || [];
                 const index = habits.indexOf(habitId);
                 const wasCompleted = index > -1;
                 
@@ -1383,15 +1616,21 @@
                 const checkbox = document.getElementById(`habit-${habitId}`);
                 const checkboxState = checkbox ? checkbox.checked : false;
                 
-                console.log(`🔍 Toggling habit ${habitId}: wasCompleted=${wasCompleted}, checkboxState=${checkboxState}`);
+                console.log(`🔍 Toggling habit ${habitId} for ${targetDate}: wasCompleted=${wasCompleted}, checkboxState=${checkboxState}`);
                 
                 if (wasCompleted && !checkboxState) {
                     // UNCOMPLETE: Remove completion and subtract rewards
                     habits.splice(index, 1);
                     
-                    // Subtract rewards when uncompleting (if positive)
-                    if (gameData.player.xp >= 10) gameData.player.xp -= 10;
-                    if (gameData.player.coins >= 1) gameData.player.coins -= 1;
+                    // Only give/subtract rewards if it's today's date
+                    if (targetDate === today) {
+                        // Subtract rewards when uncompleting (if positive)
+                        if (gameData.player.xp >= 10) gameData.player.xp -= 10;
+                        if (gameData.player.coins >= 1) gameData.player.coins -= 1;
+                        showNotification(`↩️ Hábito desmarcado. -10 XP, -1 🪙`, 'habit-uncomplete');
+                    } else {
+                        showNotification(`↩️ Hábito desmarcado para ${targetDate}`, 'habit-uncomplete');
+                    }
                     
                     // Decrement habit total completion
                     const habit = gameData.habits.find(h => h.id === habitId);
@@ -1399,17 +1638,11 @@
                         habit.totalCompleted -= 1;
                     }
                     
-                    showNotification(`↩️ Hábito desmarcado. -10 XP, -1 🪙`, 'habit-uncomplete');
-                    
                 } else if (!wasCompleted && checkboxState) {
                     // COMPLETE: Add completion and give rewards ONLY if not previously completed today
                     habits.push(habitId);
                     
-                    // Give rewards on first completion of the day
-                    gameData.player.xp += 10;
-                    gameData.player.coins += 1;
-                    
-                    // Find habit and update Fibonacci level ONLY on first completion
+                    // Find habit and update Fibonacci level
                     const habit = gameData.habits.find(h => h.id === habitId);
                     if (habit) {
                         habit.totalCompleted += 1;
@@ -1419,10 +1652,19 @@
                         
                         // Show celebration notification
                         const category = gameData.categories[habit.category];
-                        showNotification(`🎉 ¡${category.emoji} ${habit.name} completado! +10 XP, +1 🪙`, 'habit-complete');
+                        
+                        // Only give/subtract rewards if it's today's date
+                        if (targetDate === today) {
+                            // Give rewards on first completion of the day
+                            gameData.player.xp += 10;
+                            gameData.player.coins += 1;
+                            showNotification(`🎉 ¡${category.emoji} ${habit.name} completado! +10 XP, +1 🪙`, 'habit-complete');
+                        } else {
+                            showNotification(`✅ ¡${category.emoji} ${habit.name} completado para ${targetDate}!`, 'habit-complete');
+                        }
                     }
                     
-                    console.log(`✅ Rewards awarded for ${habitId}: +10 XP, +1 coin`);
+                    console.log(`✅ Habit ${habitId} completed for ${targetDate}`);
                     
                 } else {
                     // Invalid state - checkbox and data don't match, just sync without rewards
@@ -1435,11 +1677,11 @@
                 }
                 
                 // Update the habits array
-                gameData.dailyLogs[today].habits = [...new Set(habits)]; // Remove duplicates just in case
+                gameData.dailyLogs[targetDate].habits = [...new Set(habits)]; // Remove duplicates just in case
                 
                 // Force immediate save for critical data
                 saveGameData();
-                loadDailyHabits();
+                loadDailyHabitsForDate(targetDate);
                 updateWolfEvolution();
                 updateStreaks();
                 checkBadges();
@@ -1485,56 +1727,67 @@
 
         // Save daily log with proper form clearing
         function saveDailyLog() {
+            const targetDate = currentDailyDate;
             const today = new Date().toISOString().split('T')[0];
+            const isFuture = targetDate > today;
             
-            if (!gameData.dailyLogs[today]) {
-                gameData.dailyLogs[today] = { habits: [] };
+            if (isFuture) {
+                showNotification('⛔ No puedes guardar registros de fechas futuras', 'error');
+                return;
+            }
+            
+            if (!gameData.dailyLogs[targetDate]) {
+                gameData.dailyLogs[targetDate] = { habits: [] };
             }
             
             // Get energy level
             const selectedEnergy = document.querySelector('.energy-emoji.selected');
             if (selectedEnergy) {
-                gameData.dailyLogs[today].energyLevel = parseInt(selectedEnergy.dataset.level);
+                gameData.dailyLogs[targetDate].energyLevel = parseInt(selectedEnergy.dataset.level);
             }
             
             // Get reflection and intention
-            gameData.dailyLogs[today].reflection = document.getElementById('daily-reflection').value;
-            gameData.dailyLogs[today].intention = document.getElementById('tomorrow-intention').value;
-            gameData.dailyLogs[today].requestAdvice = document.getElementById('request-advice').checked;
+            gameData.dailyLogs[targetDate].reflection = document.getElementById('daily-reflection').value;
+            gameData.dailyLogs[targetDate].intention = document.getElementById('tomorrow-intention').value;
+            gameData.dailyLogs[targetDate].requestAdvice = document.getElementById('request-advice').checked;
             
             // Handle evidence image
             const evidenceFile = document.getElementById('evidence-upload').files[0];
             if (evidenceFile) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    gameData.dailyLogs[today].evidenceImage = e.target.result;
+                    gameData.dailyLogs[targetDate].evidenceImage = e.target.result;
                     saveGameData();
                 };
                 reader.readAsDataURL(evidenceFile);
             }
             
-            gameData.dailyLogs[today].timestamp = Date.now();
+            gameData.dailyLogs[targetDate].timestamp = Date.now();
             
             saveGameData();
             
             // SUCCESS MESSAGE
-            const completedHabits = gameData.dailyLogs[today].habits?.length || 0;
+            const completedHabits = gameData.dailyLogs[targetDate].habits?.length || 0;
             const totalHabits = gameData.habits.length;
             
-            if (completedHabits === totalHabits && totalHabits > 0) {
-                showNotification('🎉 ¡Día perfecto completado! Vuelve mañana para seguir evolucionando tu lobo.', 'success');
+            if (targetDate === today) {
+                if (completedHabits === totalHabits && totalHabits > 0) {
+                    showNotification('🎉 ¡Día perfecto completado! Vuelve mañana para seguir evolucionando tu lobo.', 'success');
+                } else {
+                    showNotification('✅ ¡Registro guardado! Vuelve mañana para un nuevo día de conquistas.', 'success');
+                }
+                
+                // Award completion bonus only for today
+                gameData.player.xp += 5;
+                gameData.player.coins += 2;
+                updateWolfEvolution();
+                updatePlayerStats();
+                
+                // UPDATE STATUS MESSAGE
+                document.getElementById('day-status').innerHTML = '✅ ¡Registro completado! Vuelve mañana para continuar tu evolución.';
             } else {
-                showNotification('✅ ¡Registro guardado! Vuelve mañana para un nuevo día de conquistas.', 'success');
+                showNotification(`✅ ¡Registro guardado para ${targetDate}!`, 'success');
             }
-            
-            // Award completion bonus
-            gameData.player.xp += 5;
-            gameData.player.coins += 2;
-            updateWolfEvolution();
-            updatePlayerStats();
-            
-            // UPDATE STATUS MESSAGE
-            document.getElementById('day-status').innerHTML = '✅ ¡Registro completado! Vuelve mañana para continuar tu evolución.';
             
             // Clear the daily form after successful submission
             clearDailyForm();
@@ -2920,14 +3173,18 @@
 
         // NEW: Morning Routine Functions - Brian Tracy Method
         function saveMorningRoutine() {
-            // Fix timezone issue - use local date
-            const today = new Date();
-            const localDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000));
-            const todayStr = localDate.toISOString().split('T')[0];
+            const targetDate = currentMorningDate;
+            const today = new Date().toISOString().split('T')[0];
+            const isFuture = targetDate > today;
+            
+            if (isFuture) {
+                showNotification('⛔ No puedes guardar rituales de fechas futuras', 'error');
+                return;
+            }
             
             // Collect all form data
             const morningData = {
-                date: todayStr,
+                date: targetDate,
                 timestamp: Date.now(),
                 feeling: document.getElementById('morning-feeling').value.trim(),
                 priorities: [
@@ -2961,63 +3218,92 @@
                 gameData.morningRoutines = [];
             }
             
-            // Remove any existing routine for today (overwrite)
-            gameData.morningRoutines = gameData.morningRoutines.filter(routine => routine.date !== todayStr);
+            // Remove any existing routine for target date (overwrite)
+            gameData.morningRoutines = gameData.morningRoutines.filter(routine => routine.date !== targetDate);
             
             // Add new routine
             gameData.morningRoutines.unshift(morningData);
             
-            // Reward completion
-            gameData.player.xp += 25; // Higher reward for morning routine
-            gameData.player.coins += 3;
+            // Only reward if it's today's date
+            if (targetDate === today) {
+                // Reward completion
+                gameData.player.xp += 25; // Higher reward for morning routine
+                gameData.player.coins += 3;
+                showNotification('🌅 ¡Ritual matutino completado! +25 XP, +3 🪙 - ¡Excelente comienzo de día!', 'habit-complete');
+            } else {
+                showNotification(`🌅 ¡Ritual matutino guardado para ${targetDate}!`, 'habit-complete');
+            }
             
             saveGameData();
             updatePlayerStats();
             updateMorningRoutineStats();
             updateMorningRoutineHistory();
             
-            showNotification('🌅 ¡Ritual matutino completado! +25 XP, +3 🪙 - ¡Excelente comienzo de día!', 'habit-complete');
-            
             // Clear form after successful save
             clearMorningRoutine();
         }
         
         function loadMorningRoutine() {
+            // Load routine for current morning date
+            loadMorningRoutineForDate(currentMorningDate);
+        }
+        
+        function loadMorningRoutineForDate(dateStr) {
             const today = new Date().toISOString().split('T')[0];
+            const isFuture = dateStr > today;
             
             if (!gameData.morningRoutines) {
-                showNotification('ℹ️ No hay rituales matutinos previos para cargar', 'error');
-                return;
+                gameData.morningRoutines = [];
             }
             
-            // Find today's routine first, then latest routine
-            let routine = gameData.morningRoutines.find(r => r.date === today);
-            if (!routine && gameData.morningRoutines.length > 0) {
-                routine = gameData.morningRoutines[0]; // Most recent
+            // Find routine for the specific date
+            let routine = gameData.morningRoutines.find(r => r.date === dateStr);
+            
+            // Clear form first
+            clearMorningRoutine();
+            
+            if (routine && !isFuture) {
+                // Populate form fields
+                document.getElementById('morning-feeling').value = routine.feeling || '';
+                document.getElementById('morning-priority1').value = routine.priorities[0] || '';
+                document.getElementById('morning-priority2').value = routine.priorities[1] || '';
+                document.getElementById('morning-priority3').value = routine.priorities[2] || '';
+                document.getElementById('morning-identity').value = routine.identity || '';
+                document.getElementById('morning-gratitude1').value = routine.gratitudes[0] || '';
+                document.getElementById('morning-gratitude2').value = routine.gratitudes[1] || '';
+                document.getElementById('morning-gratitude3').value = routine.gratitudes[2] || '';
+                document.getElementById('morning-visualization').value = routine.visualization || '';
+                document.getElementById('morning-action-work').value = routine.actions?.work || '';
+                document.getElementById('morning-action-health').value = routine.actions?.health || '';
+                document.getElementById('morning-action-relationship').value = routine.actions?.relationship || '';
+                document.getElementById('morning-declaration').value = routine.declaration || '';
+                
+                if (dateStr === today) {
+                    showNotification('📋 Ritual matutino de hoy cargado', 'success');
+                } else {
+                    showNotification(`📋 Ritual del ${dateStr} cargado`, 'success');
+                }
+            } else if (!routine && !isFuture) {
+                showNotification(`ℹ️ No hay ritual guardado para ${dateStr}`, 'error');
             }
             
-            if (!routine) {
-                showNotification('ℹ️ No hay rituales matutinos para cargar', 'error');
-                return;
-            }
+            // Disable form fields for future dates
+            const formElements = [
+                'morning-feeling', 'morning-priority1', 'morning-priority2', 'morning-priority3',
+                'morning-identity', 'morning-gratitude1', 'morning-gratitude2', 'morning-gratitude3',
+                'morning-visualization', 'morning-action-work', 'morning-action-health', 
+                'morning-action-relationship', 'morning-declaration'
+            ];
             
-            // Populate form fields
-            document.getElementById('morning-feeling').value = routine.feeling || '';
-            document.getElementById('morning-priority1').value = routine.priorities[0] || '';
-            document.getElementById('morning-priority2').value = routine.priorities[1] || '';
-            document.getElementById('morning-priority3').value = routine.priorities[2] || '';
-            document.getElementById('morning-identity').value = routine.identity || '';
-            document.getElementById('morning-gratitude1').value = routine.gratitudes[0] || '';
-            document.getElementById('morning-gratitude2').value = routine.gratitudes[1] || '';
-            document.getElementById('morning-gratitude3').value = routine.gratitudes[2] || '';
-            document.getElementById('morning-visualization').value = routine.visualization || '';
-            document.getElementById('morning-action-work').value = routine.actions?.work || '';
-            document.getElementById('morning-action-health').value = routine.actions?.health || '';
-            document.getElementById('morning-action-relationship').value = routine.actions?.relationship || '';
-            document.getElementById('morning-declaration').value = routine.declaration || '';
-            
-            const dateStr = routine.date === today ? 'de hoy' : `del ${routine.date}`;
-            showNotification(`📋 Ritual matutino ${dateStr} cargado`, 'success');
+            formElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.disabled = isFuture;
+                    if (isFuture) {
+                        element.placeholder = '🔒 Fecha futura';
+                    }
+                }
+            });
         }
         
         function clearMorningRoutine() {
