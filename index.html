@@ -1037,15 +1037,58 @@
                             <strong>改善 (Kaizen)</strong> - Mejora continua mediante cambios MICROSCÓPICOS. No intentes escalar la montaña de una vez. Da un paso, luego otro.
                         </p>
                         <div class="bg-white bg-opacity-10 rounded p-4 mb-4">
-                            <p class="text-blue-200 mb-3"><strong>Tu cambio microscópico (debe ser ridículamente pequeño):</strong></p>
+                            <p class="text-blue-200 mb-3"><strong>Selecciona una categoría para recibir sugerencias microscópicas:</strong></p>
+                            
+                            <!-- Category Selector -->
+                            <select id="kaizen-category" onchange="showKaizenSuggestions()" 
+                                    class="w-full p-3 rounded bg-white bg-opacity-90 text-gray-800 mb-3 font-semibold">
+                                <option value="">-- Selecciona una categoría --</option>
+                                <option value="fitness">💪 Fitness & Ejercicio</option>
+                                <option value="nutrition">🥗 Nutrición & Alimentación</option>
+                                <option value="water">💧 Hidratación</option>
+                                <option value="sleep">😴 Sueño & Descanso</option>
+                                <option value="nofap">🔥 Control Sexual / NoFap</option>
+                                <option value="meditation">🧘 Meditación & Mindfulness</option>
+                                <option value="reading">📚 Lectura & Aprendizaje</option>
+                                <option value="productivity">⚡ Productividad & Trabajo</option>
+                                <option value="creativity">🎨 Creatividad</option>
+                                <option value="social">👥 Relaciones Sociales</option>
+                                <option value="money">💰 Finanzas</option>
+                                <option value="cleaning">🧹 Orden & Limpieza</option>
+                                <option value="morning">🌅 Rutina Matutina</option>
+                            </select>
+                            
+                            <!-- Suggestions Box -->
+                            <div id="kaizen-suggestions" class="hidden mb-3 bg-blue-900 bg-opacity-40 rounded-lg p-4 border border-blue-400">
+                                <p class="text-yellow-300 font-semibold mb-2">💡 Recomendaciones Microscópicas:</p>
+                                <div id="kaizen-recommendations" class="space-y-2">
+                                    <!-- Suggestions will be inserted here -->
+                                </div>
+                            </div>
+                            
+                            <!-- Manual Input -->
+                            <p class="text-blue-200 mb-2"><strong>O escribe tu propio cambio microscópico:</strong></p>
                             <input type="text" id="kaizen-habit" 
-                                   placeholder="Ejemplo: 'Un vaso de agua al despertar' o '5 flexiones antes de dormir'"
-                                   class="w-full p-3 rounded bg-white bg-opacity-90 text-gray-800 mb-2">
+                                   placeholder="Ejemplo: 'Un vaso de agua al despertar'"
+                                   class="w-full p-3 rounded bg-white bg-opacity-90 text-gray-800 mb-3">
+                            
+                            <!-- Duration Selector -->
+                            <div class="mb-3">
+                                <p class="text-blue-200 mb-2"><strong>¿Por cuánto tiempo? (Recomendado: 2 semanas mínimo)</strong></p>
+                                <select id="kaizen-duration" class="w-full p-2 rounded bg-white bg-opacity-90 text-gray-800">
+                                    <option value="14">2 semanas (14 días) - Mínimo recomendado</option>
+                                    <option value="21" selected>3 semanas (21 días) - Formación de hábito</option>
+                                    <option value="30">1 mes (30 días) - Consolidación</option>
+                                    <option value="66">66 días - Automatización completa</option>
+                                </select>
+                            </div>
+                            
                             <div class="flex justify-between items-center">
                                 <div class="text-white text-sm">
                                     <span id="kaizen-streak">0</span> días consecutivos
+                                    <span id="kaizen-goal" class="text-blue-200"></span>
                                 </div>
-                                <button onclick="saveKaizen()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">
+                                <button onclick="saveKaizen()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors font-semibold">
                                     🚀 Comenzar Mi 1%
                                 </button>
                             </div>
@@ -1455,7 +1498,7 @@
                     if (!gameData.philosophies) {
                         gameData.philosophies = {
                             ikigai: { purpose: '', discovered: false },
-                            kaizen: { microHabit: '', streak: 0, startDate: null },
+                            kaizen: { microHabit: '', streak: 0, startDate: null, duration: 21, goalDate: null },
                             haraHachiBu: { daysApplied: 0, lastDate: null },
                             wabiSabi: { logs: [], timesRisen: 0 },
                             ganbaru: { totalDays: 0, currentStreak: 0, timesReturned: 0 }
@@ -1493,7 +1536,7 @@
             if (!migratedData.philosophies) {
                 migratedData.philosophies = {
                     ikigai: { purpose: '', discovered: false },
-                    kaizen: { microHabit: '', streak: 0, startDate: null },
+                    kaizen: { microHabit: '', streak: 0, startDate: null, duration: 21, goalDate: null },
                     haraHachiBu: { daysApplied: 0, lastDate: null },
                     wabiSabi: { logs: [], timesRisen: 0 },
                     ganbaru: { totalDays: 0, currentStreak: 0, timesReturned: 0 }
@@ -2333,7 +2376,7 @@
             });
         }
 
-        // NEW: Fibonacci Golden Ratio Chart - Enhanced
+        // NEW: Fibonacci Golden Ratio Chart - TRUE SPIRAL with Golden Rectangles
         function updateFibonacciChart() {
             const container = document.getElementById('fibonacci-chart');
             if (!container) return;
@@ -2342,10 +2385,8 @@
             
             const width = container.offsetWidth;
             const height = container.offsetHeight;
-            const centerX = width / 2;
-            const centerY = height / 2;
             
-            // Golden ratio
+            // Golden ratio (φ = 1.618033988749...)
             const phi = (1 + Math.sqrt(5)) / 2;
             
             // Get perfect days (days when ALL habits were completed)
@@ -2357,94 +2398,204 @@
                 const message = document.createElement('div');
                 message.className = 'flex flex-col items-center justify-center h-full text-center';
                 message.innerHTML = `
-                    <div class="text-6xl mb-4">🌟</div>
-                    <div class="text-white text-lg font-semibold mb-2">Proporción Áurea Esperando</div>
+                    <div class="text-6xl mb-4">🐚</div>
+                    <div class="text-white text-lg font-semibold mb-2">Espiral Áurea Esperando</div>
                     <div class="text-blue-200 text-sm max-w-xs">
                         Completa TODOS los hábitos en un día para comenzar a formar la espiral dorada de la perfección.
                     </div>
-                    <div class="text-yellow-300 text-xs mt-2">✨ Cada día perfecto agrega un punto a la espiral ✨</div>
+                    <div class="text-yellow-300 text-xs mt-2">✨ Cada día perfecto agrega un cuadrado a la espiral ✨</div>
                 `;
                 container.appendChild(message);
                 return;
             }
             
-            // Create golden spiral based on perfect days
-            for (let i = 0; i < Math.min(totalPerfectDays, 50); i++) {
-                // Calculate spiral position using golden ratio
-                const angle = i * (2 * Math.PI / phi);
-                const radius = (i + 1) * 8; // Spiral grows outward
+            // Fibonacci sequence for square sizes
+            const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610];
+            const numSquares = Math.min(totalPerfectDays, fibonacci.length);
+            
+            // Calculate scaling to fit container
+            const totalSize = fibonacci.slice(0, numSquares).reduce((a, b) => Math.max(a, b), 0);
+            const scale = Math.min(width, height) / (totalSize * 1.5);
+            
+            // Create SVG for the entire visualization
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("width", width);
+            svg.setAttribute("height", height);
+            svg.style.cssText = "position: absolute; top: 0; left: 0;";
+            
+            // Starting position (bottom-right corner for first square)
+            let positions = [
+                { x: width/2, y: height/2, size: fibonacci[0] * scale, dir: 0 } // dir: 0=left, 1=up, 2=right, 3=down
+            ];
+            
+            // Calculate positions for all squares using Fibonacci tiling
+            for (let i = 1; i < numSquares; i++) {
+                const prev = positions[i - 1];
+                const prevPrev = i >= 2 ? positions[i - 2] : null;
+                const size = fibonacci[i] * scale;
+                const prevSize = prev.size;
                 
-                const x = centerX + Math.cos(angle) * radius;
-                const y = centerY + Math.sin(angle) * radius;
+                let x, y, dir;
                 
-                // Create spiral point
-                const point = document.createElement('div');
-                point.className = 'fibonacci-point active';
-                point.style.cssText = `
-                    position: absolute;
-                    left: ${x}px;
-                    top: ${y}px;
-                    width: ${6 + (i * 0.5)}px;
-                    height: ${6 + (i * 0.5)}px;
-                    background: linear-gradient(45deg, #ffd700, #ffed4e);
-                    border-radius: 50%;
-                    transform: translate(-50%, -50%);
-                    box-shadow: 0 0 ${8 + i}px rgba(255, 215, 0, 0.6);
-                    animation: goldenPulse 2s ease-in-out infinite;
-                    animation-delay: ${i * 0.1}s;
-                `;
-                point.title = `Día Perfecto #${i + 1} - ${perfectDays[i]}`;
-                
-                container.appendChild(point);
-                
-                // Draw connection line to previous point
-                if (i > 0) {
-                    const prevAngle = (i - 1) * (2 * Math.PI / phi);
-                    const prevRadius = i * 8;
-                    const prevX = centerX + Math.cos(prevAngle) * prevRadius;
-                    const prevY = centerY + Math.sin(prevAngle) * prevRadius;
-                    
-                    const line = document.createElement('div');
-                    const lineLength = Math.sqrt(Math.pow(x - prevX, 2) + Math.pow(y - prevY, 2));
-                    const lineAngle = Math.atan2(y - prevY, x - prevX) * (180 / Math.PI);
-                    
-                    line.style.cssText = `
-                        position: absolute;
-                        left: ${prevX}px;
-                        top: ${prevY}px;
-                        width: ${lineLength}px;
-                        height: 1px;
-                        background: linear-gradient(90deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.6));
-                        transform: rotate(${lineAngle}deg);
-                        transform-origin: 0 50%;
-                    `;
-                    
-                    container.appendChild(line);
+                // Positioning logic based on spiral pattern
+                if (i === 1) {
+                    x = prev.x - prevSize;
+                    y = prev.y;
+                    dir = 1;
+                } else {
+                    const cycle = (i - 1) % 4;
+                    switch(cycle) {
+                        case 0: // Add to left
+                            x = prev.x - size;
+                            y = prev.y;
+                            dir = 1;
+                            break;
+                        case 1: // Add to top
+                            x = prev.x;
+                            y = prev.y - size;
+                            dir = 2;
+                            break;
+                        case 2: // Add to right
+                            x = prev.x;
+                            y = prev.y;
+                            dir = 3;
+                            break;
+                        case 3: // Add to bottom
+                            x = prev.x;
+                            y = prev.y + prevSize;
+                            dir = 0;
+                            break;
+                    }
                 }
+                
+                positions.push({ x, y, size, dir });
             }
             
-            // Add center point
-            const centerPoint = document.createElement('div');
-            centerPoint.style.cssText = `
-                position: absolute;
-                left: ${centerX}px;
-                top: ${centerY}px;
-                width: 16px;
-                height: 16px;
-                background: radial-gradient(circle, #8b5cf6, #6d28d9);
-                border-radius: 50%;
-                transform: translate(-50%, -50%);
-                box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
-                border: 2px solid #ffd700;
-            `;
-            centerPoint.title = `Centro Áureo - ${totalPerfectDays} días perfectos`;
-            container.appendChild(centerPoint);
+            // Center the whole pattern
+            const minX = Math.min(...positions.map(p => p.x));
+            const minY = Math.min(...positions.map(p => p.y));
+            const maxX = Math.max(...positions.map(p => p.x + p.size));
+            const maxY = Math.max(...positions.map(p => p.y + p.size));
+            const offsetX = (width - (maxX - minX)) / 2 - minX;
+            const offsetY = (height - (maxY - minY)) / 2 - minY;
+            
+            // Draw golden rectangles
+            positions.forEach((pos, i) => {
+                const rect = document.createElementNS(svgNS, "rect");
+                rect.setAttribute("x", pos.x + offsetX);
+                rect.setAttribute("y", pos.y + offsetY);
+                rect.setAttribute("width", pos.size);
+                rect.setAttribute("height", pos.size);
+                rect.setAttribute("fill", "none");
+                rect.setAttribute("stroke", `rgba(59, 130, 246, ${0.3 + (i * 0.05)})`);
+                rect.setAttribute("stroke-width", "2");
+                svg.appendChild(rect);
+                
+                // Add Fibonacci number label
+                const text = document.createElementNS(svgNS, "text");
+                text.setAttribute("x", pos.x + offsetX + pos.size/2);
+                text.setAttribute("y", pos.y + offsetY + pos.size/2);
+                text.setAttribute("fill", "rgba(255, 215, 0, 0.6)");
+                text.setAttribute("font-size", Math.max(10, pos.size * 0.2));
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("dominant-baseline", "middle");
+                text.setAttribute("font-weight", "bold");
+                text.textContent = fibonacci[i];
+                svg.appendChild(text);
+            });
+            
+            // Draw the golden spiral (quarter circles connecting squares)
+            let spiralPath = "";
+            positions.forEach((pos, i) => {
+                if (i === 0) return;
+                
+                const size = pos.size;
+                let cx, cy, startAngle, endAngle;
+                
+                // Determine arc parameters based on direction
+                const cycle = (i - 1) % 4;
+                switch(cycle) {
+                    case 0: // Left square, arc from bottom-left
+                        cx = pos.x + offsetX + size;
+                        cy = pos.y + offsetY + size;
+                        startAngle = Math.PI;
+                        endAngle = Math.PI * 1.5;
+                        break;
+                    case 1: // Top square, arc from bottom-right
+                        cx = pos.x + offsetX + size;
+                        cy = pos.y + offsetY + size;
+                        startAngle = Math.PI * 1.5;
+                        endAngle = Math.PI * 2;
+                        break;
+                    case 2: // Right square, arc from top-right
+                        cx = pos.x + offsetX;
+                        cy = pos.y + offsetY + size;
+                        startAngle = 0;
+                        endAngle = Math.PI * 0.5;
+                        break;
+                    case 3: // Bottom square, arc from top-left
+                        cx = pos.x + offsetX;
+                        cy = pos.y + offsetY;
+                        startAngle = Math.PI * 0.5;
+                        endAngle = Math.PI;
+                        break;
+                }
+                
+                // Create arc path
+                const startX = cx + size * Math.cos(startAngle);
+                const startY = cy + size * Math.sin(startAngle);
+                const endX = cx + size * Math.cos(endAngle);
+                const endY = cy + size * Math.sin(endAngle);
+                
+                if (i === 1) {
+                    spiralPath += `M ${startX} ${startY}`;
+                }
+                spiralPath += ` A ${size} ${size} 0 0 1 ${endX} ${endY}`;
+            });
+            
+            // Draw the golden spiral curve
+            const spiral = document.createElementNS(svgNS, "path");
+            spiral.setAttribute("d", spiralPath);
+            spiral.setAttribute("stroke", "#ffd700");
+            spiral.setAttribute("stroke-width", "3");
+            spiral.setAttribute("fill", "none");
+            spiral.setAttribute("stroke-linecap", "round");
+            svg.appendChild(spiral);
+            
+            container.appendChild(svg);
             
             // Add progress indicator
             const progressIndicator = document.createElement('div');
-            progressIndicator.className = 'absolute top-2 right-2 text-xs text-yellow-300 font-semibold';
-            progressIndicator.textContent = `${totalPerfectDays} días perfectos`;
+            progressIndicator.className = 'absolute top-2 right-2 text-xs text-yellow-300 font-semibold bg-black bg-opacity-50 px-3 py-1 rounded';
+            progressIndicator.innerHTML = `🐚 ${totalPerfectDays} días perfectos`;
             container.appendChild(progressIndicator);
+            
+            // Add date tooltip for each square
+            positions.forEach((pos, i) => {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'absolute text-xs bg-black bg-opacity-70 text-white px-2 py-1 rounded pointer-events-none opacity-0 hover:opacity-100 transition-opacity';
+                tooltip.style.cssText = `
+                    left: ${pos.x + offsetX}px;
+                    top: ${pos.y + offsetY}px;
+                    width: ${pos.size}px;
+                    height: ${pos.size}px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                `;
+                tooltip.innerHTML = `Día ${i + 1}<br>${perfectDays[i] || 'N/A'}`;
+                container.appendChild(tooltip);
+                
+                tooltip.onmouseenter = () => tooltip.style.opacity = '1';
+                tooltip.onmouseleave = () => tooltip.style.opacity = '0';
+            });
+            
+            // Add mathematical info
+            const infoTooltip = document.createElement('div');
+            infoTooltip.className = 'absolute bottom-2 left-2 text-xs text-blue-200 bg-black bg-opacity-50 px-2 py-1 rounded';
+            infoTooltip.innerHTML = `φ = ${phi.toFixed(6)} | Rectángulos Áureos`;
+            container.appendChild(infoTooltip);
         }
         
         // Helper function to get days when ALL habits were completed
@@ -4030,8 +4181,186 @@
         }
         
         // 2. KAIZEN - Micro Habit Tracker
+        // Kaizen Micro-Habit Recommendations Database
+        const kaizenRecommendations = {
+            fitness: {
+                icon: '💪',
+                suggestions: [
+                    { habit: '1 flexión al despertar', weeks: 2, why: 'Solo una. Cualquiera puede hacer una.' },
+                    { habit: '5 sentadillas mientras hierve el café', weeks: 2, why: 'Aprovecha tiempos muertos.' },
+                    { habit: 'Subir escaleras en vez del ascensor (1 piso)', weeks: 3, why: 'Cambio invisible pero acumulativo.' },
+                    { habit: '10 segundos de plancha antes de la ducha', weeks: 2, why: 'Tan corto que no hay excusa.' },
+                    { habit: 'Estirar los brazos 30 segundos al levantarse', weeks: 2, why: 'Despertar el cuerpo suavemente.' }
+                ]
+            },
+            nutrition: {
+                icon: '🥗',
+                suggestions: [
+                    { habit: 'Agregar 1 fruta a cualquier comida', weeks: 2, why: 'No quitas nada, solo agregas.' },
+                    { habit: 'Reemplazar 1 refresco por agua esta semana', weeks: 2, why: 'Solo uno. No todos.' },
+                    { habit: 'Comer 1 verdura al día (la que sea)', weeks: 3, why: 'Empezar a crear el hábito.' },
+                    { habit: 'Masticar cada bocado 20 veces', weeks: 2, why: 'Comer consciente sin cambiar qué comes.' },
+                    { habit: 'Agregar 1 puñado de nueces a tu día', weeks: 2, why: 'Grasas saludables sin esfuerzo.' }
+                ]
+            },
+            water: {
+                icon: '💧',
+                suggestions: [
+                    { habit: '1 vaso de agua al despertar (antes del café)', weeks: 2, why: 'Hidratación después de 8h de ayuno.' },
+                    { habit: '1 vaso de agua antes de cada comida', weeks: 3, why: 'Anclaje automático: comida = agua.' },
+                    { habit: 'Llenar una botella de 500ml y terminarla antes del almuerzo', weeks: 2, why: 'Meta visible y alcanzable.' },
+                    { habit: '1 sorbo de agua cada vez que revisas el celular', weeks: 2, why: 'Convertir vicio en virtud.' }
+                ]
+            },
+            sleep: {
+                icon: '😴',
+                suggestions: [
+                    { habit: 'Acostarme 5 minutos más temprano cada noche', weeks: 2, why: '5 min es imperceptible pero suma 35 min/semana.' },
+                    { habit: 'Apagar todas las pantallas 10 minutos antes de dormir', weeks: 3, why: 'La luz azul destruye melatonina. Solo 10 min de transición.' },
+                    { habit: 'Poner el celular fuera del alcance de la cama (otra habitación)', weeks: 3, why: 'Cambio de entorno, no de voluntad. Imposible scrollear.' },
+                    { habit: 'Leer 1 página física antes de dormir (no kindle)', weeks: 2, why: 'Ritual de transición sin pantallas.' },
+                    { habit: 'Oscuridad total: tapar 1 luz LED que molesta', weeks: 2, why: 'Melatonina necesita oscuridad absoluta.' },
+                    { habit: 'Escribir 1 tarea pendiente en papel antes de dormir', weeks: 2, why: 'Vaciar la mente de loops mentales.' },
+                    { habit: 'Temperatura: bajar termostato 2°C en la habitación', weeks: 2, why: 'Sueño profundo necesita temperatura baja (18-20°C).' },
+                    { habit: 'Misma hora de dormir 6 días/semana (±15 min)', weeks: 3, why: 'Ritmo circadiano = reloj biológico. Consistencia > cantidad.' }
+                ]
+            },
+            nofap: {
+                icon: '🔥',
+                suggestions: [
+                    { habit: 'Dejar celular fuera de la habitación al dormir', weeks: 3, why: 'Eliminar acceso fácil en momentos vulnerables (noche/mañana).' },
+                    { habit: 'Hacer 10 flexiones cada vez que siento el impulso', weeks: 3, why: 'Redirigir energía. Romper el patrón automático.' },
+                    { habit: 'Ducha fría de 30 segundos cuando siento tentación', weeks: 2, why: 'Reset dopamina. Incomodidad > impulso.' },
+                    { habit: 'Salir de la habitación inmediatamente al despertar', weeks: 3, why: 'Mayoría de recaídas: primeros 30 min despierto. Romper rutina.' },
+                    { habit: 'Bloquear 1 red social o sitio problemático esta semana', weeks: 2, why: 'Eliminar triggers. Un sitio a la vez.' },
+                    { habit: 'Escribir "¿Por qué quiero parar?" antes de dormir', weeks: 2, why: 'Reforzar propósito cuando la voluntad es más débil.' },
+                    { habit: 'Llamar a 1 amigo cuando siento el impulso fuerte', weeks: 3, why: 'Conexión humana > dopamina artificial.' },
+                    { habit: 'Hacer 1 cosa productiva antes de las 9am', weeks: 3, why: 'Momentum positivo previene caída en patrones viejos.' },
+                    { habit: 'Trackear solo HOY (no cuentes días de racha)', weeks: 4, why: 'Enfoque: ganar hoy. No presión de "romper racha de X días".' }
+                ]
+            },
+            meditation: {
+                icon: '🧘',
+                suggestions: [
+                    { habit: '3 respiraciones profundas al despertar', weeks: 2, why: 'Solo 30 segundos de presencia.' },
+                    { habit: '1 minuto de ojos cerrados en silencio', weeks: 2, why: '60 segundos. Ni siquiera "meditar".' },
+                    { habit: 'Observar mi respiración mientras espero (fila, semáforo)', weeks: 3, why: 'Tiempos muertos = oportunidades.' },
+                    { habit: 'Agradecer 1 cosa antes de levantarme de la cama', weeks: 2, why: 'Reprogramar el primer pensamiento del día.' }
+                ]
+            },
+            reading: {
+                icon: '📚',
+                suggestions: [
+                    { habit: 'Leer 1 página de cualquier libro al día', weeks: 2, why: '1 página son 2 minutos. 365 páginas al año.' },
+                    { habit: 'Leer durante 5 minutos en el transporte', weeks: 2, why: 'Convertir tiempo perdido en crecimiento.' },
+                    { habit: 'Reemplazar 10 min de redes sociales por lectura', weeks: 3, why: 'Solo 10 minutos. No eliminamos, redistribuimos.' },
+                    { habit: 'Leer 1 artículo educativo durante el desayuno', weeks: 2, why: 'Alimentar mente y cuerpo simultáneamente.' }
+                ]
+            },
+            productivity: {
+                icon: '⚡',
+                suggestions: [
+                    { habit: 'Escribir las 3 tareas más importantes del día', weeks: 2, why: 'Claridad antes de acción.' },
+                    { habit: 'Trabajar 5 minutos en la tarea más difícil', weeks: 2, why: 'Solo 5 minutos rompe la resistencia.' },
+                    { habit: 'Limpiar mi escritorio antes de empezar a trabajar', weeks: 2, why: 'Entorno limpio = mente clara.' },
+                    { habit: 'Desactivar notificaciones durante 1 hora', weeks: 3, why: 'Una hora de trabajo profundo.' }
+                ]
+            },
+            creativity: {
+                icon: '🎨',
+                suggestions: [
+                    { habit: 'Dibujar 1 línea o garabato en una libreta', weeks: 2, why: 'No arte, solo movimiento creativo.' },
+                    { habit: 'Escribir 1 idea random al día (en cualquier lado)', weeks: 2, why: 'Entrenar el músculo de las ideas.' },
+                    { habit: 'Escuchar 1 canción nueva cada día', weeks: 2, why: 'Exponer el cerebro a lo desconocido.' },
+                    { habit: 'Tomar 1 foto de algo que me llame la atención', weeks: 2, why: 'Entrenar la observación consciente.' }
+                ]
+            },
+            social: {
+                icon: '👥',
+                suggestions: [
+                    { habit: 'Enviar 1 mensaje a un amigo/familiar que no he hablado', weeks: 2, why: 'Reconectar sin presión.' },
+                    { habit: 'Hacer 1 pregunta genuina a alguien hoy', weeks: 2, why: 'Interés real > small talk.' },
+                    { habit: 'Dar 1 cumplido sincero al día', weeks: 2, why: 'Elevar a otros te eleva a ti.' },
+                    { habit: 'Dejar el celular guardado durante 1 comida con otros', weeks: 3, why: 'Presencia real = conexión real.' }
+                ]
+            },
+            money: {
+                icon: '💰',
+                suggestions: [
+                    { habit: 'Anotar cada gasto del día (solo anotar)', weeks: 3, why: 'Consciencia antes de cambio.' },
+                    { habit: 'Ahorrar $1 o $5 cada día (la cantidad más pequeña)', weeks: 3, why: 'El hábito importa más que la cantidad.' },
+                    { habit: 'Revisar saldo bancario cada mañana (2 minutos)', weeks: 2, why: 'Consciencia financiera diaria.' },
+                    { habit: 'Preguntar "¿Realmente necesito esto?" antes de comprar', weeks: 2, why: 'Pausa consciente entre impulso y acción.' }
+                ]
+            },
+            cleaning: {
+                icon: '🧹',
+                suggestions: [
+                    { habit: 'Lavar 1 plato inmediatamente después de usarlo', weeks: 2, why: 'Uno solo. Prevenir acumulación.' },
+                    { habit: 'Hacer mi cama en cuanto me levanto (30 segundos)', weeks: 2, why: 'Primera victoria del día.' },
+                    { habit: 'Guardar 1 objeto fuera de lugar antes de dormir', weeks: 2, why: 'Uno solo. Orden incremental.' },
+                    { habit: 'Limpiar 1 superficie mientras espero que algo se caliente', weeks: 2, why: 'Tiempos muertos = oportunidades.' }
+                ]
+            },
+            morning: {
+                icon: '🌅',
+                suggestions: [
+                    { habit: 'Levantarme 5 minutos más temprano', weeks: 2, why: '5 minutos no duelen pero crean espacio.' },
+                    { habit: 'No revisar el celular por 10 minutos al despertar', weeks: 3, why: 'Empezar el día sin dopamina externa.' },
+                    { habit: 'Tomar sol en la cara por 2 minutos al despertar', weeks: 2, why: 'Resetear reloj biológico naturalmente.' },
+                    { habit: 'Hacer 3 respiraciones profundas antes de levantarme', weeks: 2, why: 'Despertar consciente, no en automático.' }
+                ]
+            }
+        };
+        
+        function showKaizenSuggestions() {
+            const category = document.getElementById('kaizen-category').value;
+            const suggestionsBox = document.getElementById('kaizen-suggestions');
+            const recommendationsDiv = document.getElementById('kaizen-recommendations');
+            
+            if (!category) {
+                suggestionsBox.classList.add('hidden');
+                return;
+            }
+            
+            const data = kaizenRecommendations[category];
+            suggestionsBox.classList.remove('hidden');
+            
+            recommendationsDiv.innerHTML = data.suggestions.map((item, index) => `
+                <div class="bg-white bg-opacity-10 rounded p-3 hover:bg-opacity-20 transition-all cursor-pointer border border-transparent hover:border-yellow-400"
+                     onclick="selectKaizenSuggestion('${item.habit.replace(/'/g, "\\'")}', ${item.weeks})">
+                    <div class="flex items-start gap-2">
+                        <div class="text-2xl">${data.icon}</div>
+                        <div class="flex-1">
+                            <p class="text-white font-semibold">${item.habit}</p>
+                            <p class="text-blue-200 text-xs mt-1">⏱️ ${item.weeks} semanas | 💡 ${item.why}</p>
+                        </div>
+                        <div class="text-yellow-300 text-xl">→</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function selectKaizenSuggestion(habit, weeks) {
+            document.getElementById('kaizen-habit').value = habit;
+            const durationSelect = document.getElementById('kaizen-duration');
+            const days = weeks * 7;
+            
+            // Set duration based on recommendation
+            if (days === 14) durationSelect.value = '14';
+            else if (days === 21) durationSelect.value = '21';
+            else if (days === 30) durationSelect.value = '30';
+            
+            showNotification(`✅ Seleccionado: "${habit}" por ${weeks} semanas`, 'success');
+            
+            // Scroll to input
+            document.getElementById('kaizen-habit').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
         function saveKaizen() {
             const microHabit = document.getElementById('kaizen-habit').value.trim();
+            const duration = parseInt(document.getElementById('kaizen-duration').value);
+            
             if (!microHabit) {
                 showNotification('⚠️ Define tu cambio microscópico primero', 'error');
                 return;
@@ -4043,20 +4372,47 @@
             }
             
             gameData.philosophies.kaizen.microHabit = microHabit;
+            gameData.philosophies.kaizen.duration = duration;
+            gameData.philosophies.kaizen.goalDate = calculateGoalDate(duration);
             
             saveGameData();
             loadKaizen();
-            showNotification('📈 Tu mejora del 1% ha comenzado. Hazlo mañana otra vez.', 'success');
+            showNotification(`📈 Tu mejora del 1% ha comenzado: "${microHabit}" por ${duration} días. ¡Hazlo mañana otra vez!`, 'success');
+        }
+        
+        function calculateGoalDate(days) {
+            const today = new Date();
+            const goal = new Date(today);
+            goal.setDate(goal.getDate() + days);
+            return goal.toISOString().split('T')[0];
         }
         
         function loadKaizen() {
             const microHabit = gameData.philosophies.kaizen.microHabit;
             const streak = gameData.philosophies.kaizen.streak || 0;
+            const duration = gameData.philosophies.kaizen.duration || 21;
+            const startDate = gameData.philosophies.kaizen.startDate;
             
             if (microHabit) {
                 document.getElementById('kaizen-habit').value = microHabit;
             }
+            
             document.getElementById('kaizen-streak').textContent = streak;
+            
+            // Show progress towards goal
+            if (startDate && duration) {
+                const progress = Math.min(100, Math.round((streak / duration) * 100));
+                const remaining = Math.max(0, duration - streak);
+                const goalSpan = document.getElementById('kaizen-goal');
+                
+                if (remaining > 0) {
+                    goalSpan.textContent = ` / ${duration} días (${progress}% completo, faltan ${remaining})`;
+                    goalSpan.className = 'text-blue-200';
+                } else {
+                    goalSpan.textContent = ` 🎉 ¡META ALCANZADA! ¿Listo para el siguiente nivel?`;
+                    goalSpan.className = 'text-green-300 font-bold';
+                }
+            }
         }
         
         // 3. HARA HACHI BU - Moderacion Tracker
