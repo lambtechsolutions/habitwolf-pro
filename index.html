@@ -7,7 +7,7 @@
     
     <!-- PWA Meta Tags -->
     <meta name="description" content="Aplicación gamificada de seguimiento de hábitos con sistema de evolución de lobo">
-    <meta name="theme-color" content="#4299e1">
+    <meta name="theme-color" content="#1e293b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="HabitWolf Pro">
@@ -28,14 +28,14 @@
     <style>
         body { 
             font-family: 'Inter', sans-serif; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             min-height: 100vh;
         }
         
         .wolf-card {
-            background: linear-gradient(145deg, #2d3748, #4a5568);
-            border: 3px solid #4299e1;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            background: linear-gradient(145deg, #1e293b, #334155);
+            border: 3px solid #3b82f6;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
         }
         
         /* FIXED: Individual wolf evolution images without background */
@@ -221,10 +221,10 @@
         }
         
         .tab-button.active {
-            background: linear-gradient(135deg, #4299e1, #3182ce);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(66, 153, 225, 0.3);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
         }
         
         /* Enhanced Notification styles */
@@ -295,9 +295,26 @@
         
         /* Enhanced styling */
         .glassmorphism {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.8);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Character Selection Styles */
+        .character-option {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .character-option:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        
+        .character-option.selected {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: #4299e1;
         }
         
         /* Shop item styling */
@@ -415,6 +432,9 @@
             </button>
             <button onclick="switchTab('profile')" id="tab-profile" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
                 🐺 Perfil
+            </button>
+            <button onclick="switchTab('filosofias')" id="tab-filosofias" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
+                🎌 Filosofías
             </button>
             <button onclick="switchTab('guardar')" id="tab-guardar" class="tab-button flex-1 py-3 px-4 text-white font-semibold whitespace-nowrap">
                 💾 Datos
@@ -882,6 +902,70 @@
                     </div>
                 </div>
                 
+                <!-- NEW: Character Selection -->
+                <div class="mb-8 bg-white bg-opacity-10 rounded-lg p-6">
+                    <h4 class="text-xl font-bold text-white mb-4">🎭 Selección de Personaje</h4>
+                    <p class="text-blue-200 text-sm mb-4">Elige el guerrero que te representará en tu camino de autodisciplina</p>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Male Wolf -->
+                        <div onclick="selectCharacter('wolf-male')" class="character-option cursor-pointer bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition-all border-2 border-transparent hover:border-blue-400" id="char-wolf-male">
+                            <div class="text-4xl mb-2">🐺</div>
+                            <div class="text-white font-semibold text-sm">Lobo Guerrero</div>
+                            <div class="text-blue-200 text-xs">Masculino</div>
+                        </div>
+                        
+                        <!-- Female Wolf -->
+                        <div onclick="selectCharacter('wolf-female')" class="character-option cursor-pointer bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition-all border-2 border-transparent hover:border-pink-400" id="char-wolf-female">
+                            <div class="text-4xl mb-2">🐺💖</div>
+                            <div class="text-white font-semibold text-sm">Loba Guerrera</div>
+                            <div class="text-pink-200 text-xs">Femenino</div>
+                        </div>
+                        
+                        <!-- Phoenix -->
+                        <div onclick="selectCharacter('phoenix')" class="character-option cursor-pointer bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition-all border-2 border-transparent hover:border-orange-400" id="char-phoenix">
+                            <div class="text-4xl mb-2">🔥🦅</div>
+                            <div class="text-white font-semibold text-sm">Fénix</div>
+                            <div class="text-orange-200 text-xs">Neutral</div>
+                        </div>
+                        
+                        <!-- Dragon -->
+                        <div onclick="selectCharacter('dragon')" class="character-option cursor-pointer bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition-all border-2 border-transparent hover:border-purple-400" id="char-dragon">
+                            <div class="text-4xl mb-2">🐉</div>
+                            <div class="text-white font-semibold text-sm">Dragón</div>
+                            <div class="text-purple-200 text-xs">Neutral</div>
+                        </div>
+                        
+                        <!-- Lion -->
+                        <div onclick="selectCharacter('lion-male')" class="character-option cursor-pointer bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition-all border-2 border-transparent hover:border-yellow-400" id="char-lion-male">
+                            <div class="text-4xl mb-2">🦁</div>
+                            <div class="text-white font-semibold text-sm">León Valiente</div>
+                            <div class="text-yellow-200 text-xs">Masculino</div>
+                        </div>
+                        
+                        <!-- Lioness -->
+                        <div onclick="selectCharacter('lion-female')" class="character-option cursor-pointer bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition-all border-2 border-transparent hover:border-yellow-400" id="char-lion-female">
+                            <div class="text-4xl mb-2">🦁💫</div>
+                            <div class="text-white font-semibold text-sm">Leona Feroz</div>
+                            <div class="text-yellow-200 text-xs">Femenino</div>
+                        </div>
+                        
+                        <!-- Tiger -->
+                        <div onclick="selectCharacter('tiger')" class="character-option cursor-pointer bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition-all border-2 border-transparent hover:border-orange-400" id="char-tiger">
+                            <div class="text-4xl mb-2">🐯</div>
+                            <div class="text-white font-semibold text-sm">Tigre Imparable</div>
+                            <div class="text-orange-200 text-xs">Neutral</div>
+                        </div>
+                        
+                        <!-- Bear -->
+                        <div onclick="selectCharacter('bear')" class="character-option cursor-pointer bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg p-4 text-center transition-all border-2 border-transparent hover:border-brown-400" id="char-bear">
+                            <div class="text-4xl mb-2">🐻</div>
+                            <div class="text-white font-semibold text-sm">Oso Poderoso</div>
+                            <div class="text-amber-200 text-xs">Neutral</div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Evolution Path -->
                 <div class="mb-8">
                     <h4 class="text-xl font-bold text-white mb-4">🌟 Camino de Evolución</h4>
@@ -897,6 +981,253 @@
                         <!-- Dynamic badges will be loaded here -->
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Filosofías Tab - NEW: 5 Japanese Philosophies -->
+        <div id="filosofias-tab" class="tab-content hidden">
+            <div class="glassmorphism rounded-xl p-6">
+                <h3 class="text-2xl font-bold text-white mb-4">🎌 Las 5 Filosofías del Cambio Permanente</h3>
+                <p class="text-blue-200 mb-6">Basado en antiguas filosofías japonesas que transforman vidas. No se trata de cambios rápidos, sino de transformación permanente.</p>
+                
+                <!-- Philosophy Cards -->
+                <div class="space-y-6">
+                    
+                    <!-- 1. IKIGAI - Tu Propósito -->
+                    <div class="bg-gradient-to-r from-purple-900 to-indigo-900 bg-opacity-50 rounded-lg p-6 border-l-4 border-purple-400">
+                        <div class="flex items-center mb-4">
+                            <div class="text-5xl mr-4">🎯</div>
+                            <div>
+                                <h4 class="text-2xl font-bold text-white">1. IKIGAI</h4>
+                                <p class="text-purple-200 text-sm">Tu Razón de Ser</p>
+                            </div>
+                        </div>
+                        <p class="text-white mb-4">
+                            <strong>生き甲斐 (Ikigai)</strong> - No se trata de perder peso o dejar adicciones. Se trata de descubrir tu PROPÓSITO PROFUNDO.
+                        </p>
+                        <div class="bg-white bg-opacity-10 rounded p-4 mb-4">
+                            <p class="text-blue-200 text-sm mb-2"><strong>Tu Ikigai:</strong></p>
+                            <textarea id="ikigai-purpose" 
+                                      placeholder="¿Por qué REALMENTE quieres cambiar? No 'perder peso', sino '¿Estar presente para mis hijos? ¿Recuperar mi dignidad? ¿Ver crecer a mi familia?'" 
+                                      class="w-full p-3 rounded bg-white bg-opacity-90 text-gray-800" 
+                                      rows="3"></textarea>
+                            <button onclick="saveIkigai()" class="mt-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded transition-colors">
+                                💾 Guardar Mi Propósito
+                            </button>
+                        </div>
+                        <div id="ikigai-display" class="hidden bg-purple-800 bg-opacity-50 rounded p-4">
+                            <p class="text-white font-semibold mb-2">🎯 Tu Ikigai:</p>
+                            <p id="ikigai-text" class="text-purple-100 italic"></p>
+                        </div>
+                        <p class="text-purple-100 text-sm mt-4">
+                            💡 <strong>Lección:</strong> Cuando quieras rendirte, no pienses en la dieta. Piensa en tu propósito. El propósito no desaparece como la motivación.
+                        </p>
+                    </div>
+                    
+                    <!-- 2. KAIZEN - Mejora Continua -->
+                    <div class="bg-gradient-to-r from-blue-900 to-cyan-900 bg-opacity-50 rounded-lg p-6 border-l-4 border-blue-400">
+                        <div class="flex items-center mb-4">
+                            <div class="text-5xl mr-4">📈</div>
+                            <div>
+                                <h4 class="text-2xl font-bold text-white">2. KAIZEN</h4>
+                                <p class="text-blue-200 text-sm">Mejora del 1% Diaria</p>
+                            </div>
+                        </div>
+                        <p class="text-white mb-4">
+                            <strong>改善 (Kaizen)</strong> - Mejora continua mediante cambios MICROSCÓPICOS. No intentes escalar la montaña de una vez. Da un paso, luego otro.
+                        </p>
+                        <div class="bg-white bg-opacity-10 rounded p-4 mb-4">
+                            <p class="text-blue-200 mb-3"><strong>Tu cambio microscópico (debe ser ridículamente pequeño):</strong></p>
+                            <input type="text" id="kaizen-habit" 
+                                   placeholder="Ejemplo: 'Un vaso de agua al despertar' o '5 flexiones antes de dormir'"
+                                   class="w-full p-3 rounded bg-white bg-opacity-90 text-gray-800 mb-2">
+                            <div class="flex justify-between items-center">
+                                <div class="text-white text-sm">
+                                    <span id="kaizen-streak">0</span> días consecutivos
+                                </div>
+                                <button onclick="saveKaizen()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition-colors">
+                                    🚀 Comenzar Mi 1%
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <div class="bg-blue-800 bg-opacity-30 rounded p-3 text-center">
+                                <div class="text-2xl font-bold text-blue-300">1%</div>
+                                <div class="text-blue-200 text-xs">Hoy</div>
+                            </div>
+                            <div class="bg-blue-800 bg-opacity-30 rounded p-3 text-center">
+                                <div class="text-2xl font-bold text-blue-300">365%</div>
+                                <div class="text-blue-200 text-xs">En 1 año</div>
+                            </div>
+                            <div class="bg-blue-800 bg-opacity-30 rounded p-3 text-center">
+                                <div class="text-2xl font-bold text-green-300">3705%</div>
+                                <div class="text-blue-200 text-xs">Crecimiento</div>
+                            </div>
+                        </div>
+                        <p class="text-blue-100 text-sm">
+                            💡 <strong>Lección:</strong> Si mejoras 1% cada día durante un año, no mejoras 365%, mejoras 3705%. Es matemática exponencial.
+                        </p>
+                    </div>
+                    
+                    <!-- 3. HARA HACHI BU - Moderación -->
+                    <div class="bg-gradient-to-r from-green-900 to-emerald-900 bg-opacity-50 rounded-lg p-6 border-l-4 border-green-400">
+                        <div class="flex items-center mb-4">
+                            <div class="text-5xl mr-4">🍽️</div>
+                            <div>
+                                <h4 class="text-2xl font-bold text-white">3. HARA HACHI BU</h4>
+                                <p class="text-green-200 text-sm">Come Hasta el 80%</p>
+                            </div>
+                        </div>
+                        <p class="text-white mb-4">
+                            <strong>腹八分 (Hara Hachi Bu)</strong> - Principio de Okinawa: "Detente al 80% en TODO". Deja siempre un 20% de espacio. Ahí reside la sostenibilidad.
+                        </p>
+                        <div class="bg-white bg-opacity-10 rounded p-4 mb-4">
+                            <p class="text-green-200 mb-3"><strong>Aplica el 80% en:</strong></p>
+                            <div class="space-y-2 text-white text-sm">
+                                <div class="flex items-center">
+                                    <span class="text-2xl mr-3">🍽️</span>
+                                    <span><strong>Comida:</strong> Come hasta 80% de saciedad (espera 20 min)</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-2xl mr-3">💼</span>
+                                    <span><strong>Trabajo:</strong> Trabaja al 80% de capacidad (evita burnout)</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-2xl mr-3">🏋️</span>
+                                    <span><strong>Ejercicio:</strong> Entrena al 80% (previene lesiones)</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-2xl mr-3">💰</span>
+                                    <span><strong>Finanzas:</strong> Gasta 80%, ahorra 20%</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-2xl mr-3">🗣️</span>
+                                    <span><strong>Conversación:</strong> Habla 80%, escucha 20%</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <span class="text-2xl mr-3">📱</span>
+                                    <span><strong>Tiempo:</strong> Usa 80%, deja 20% libre</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center justify-between">
+                                <span class="text-green-200">¿Aplicaste Hara Hachi Bu hoy?</span>
+                                <button onclick="toggleHaraHachiBu()" id="hara-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors">
+                                    ✅ Sí, lo hice
+                                </button>
+                            </div>
+                            <div class="mt-2 text-green-200 text-sm">
+                                Días aplicados: <span id="hara-count" class="font-bold">0</span>
+                            </div>
+                        </div>
+                        <p class="text-green-100 text-sm mt-4">
+                            💡 <strong>Lección:</strong> El 20% que no usas es el espacio que permite la sostenibilidad. Los centenarios de Okinawa viven hasta 100+ años por este principio. La moderación no es debilidad, es sabiduría.
+                        </p>
+                    </div>
+                    
+                    <!-- 4. WABI-SABI - Imperfección -->
+                    <div class="bg-gradient-to-r from-pink-900 to-rose-900 bg-opacity-50 rounded-lg p-6 border-l-4 border-pink-400">
+                        <div class="flex items-center mb-4">
+                            <div class="text-5xl mr-4">🌸</div>
+                            <div>
+                                <h4 class="text-2xl font-bold text-white">4. WABI-SABI</h4>
+                                <p class="text-pink-200 text-sm">La Belleza de la Imperfección</p>
+                            </div>
+                        </div>
+                        <p class="text-white mb-4">
+                            <strong>侘寂 (Wabi-Sabi)</strong> - Nada es permanente, nada es perfecto, nada está completo. Y en esa imperfección reside la verdadera belleza.
+                        </p>
+                        <div class="bg-white bg-opacity-10 rounded p-4 mb-4">
+                            <p class="text-pink-200 mb-3"><strong>Registro de Imperfecciones (Cuando tropieces):</strong></p>
+                            <textarea id="wabisabi-log" 
+                                      placeholder="Ejemplo: 'Comí demasiado en Navidad, pero hoy bebí mi vaso de agua y caminé. No he caído, solo tropecé.'"
+                                      class="w-full p-3 rounded bg-white bg-opacity-90 text-gray-800 mb-2" 
+                                      rows="3"></textarea>
+                            <button onclick="logWabiSabi()" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded transition-colors">
+                                🌸 Registrar y Perdonar
+                            </button>
+                            <div class="mt-3 text-pink-200 text-sm">
+                                Veces que te has levantado: <span id="wabisabi-count" class="font-bold">0</span> 🌸
+                            </div>
+                        </div>
+                        <div id="wabisabi-logs" class="space-y-2 max-h-60 overflow-y-auto">
+                            <!-- Logs will appear here -->
+                        </div>
+                        <p class="text-pink-100 text-sm mt-4">
+                            💡 <strong>Lección:</strong> Tropezar no es caer. Cuando tropiezas, pierdes el equilibrio por un segundo. Cuando caes, dejas de moverte. Levántate siempre.
+                        </p>
+                    </div>
+                    
+                    <!-- 5. GANBARU - Perseverancia -->
+                    <div class="bg-gradient-to-r from-orange-900 to-red-900 bg-opacity-50 rounded-lg p-6 border-l-4 border-orange-400">
+                        <div class="flex items-center mb-4">
+                            <div class="text-5xl mr-4">💪</div>
+                            <div>
+                                <h4 class="text-2xl font-bold text-white">5. GANBARU</h4>
+                                <p class="text-orange-200 text-sm">Persevera Siempre</p>
+                            </div>
+                        </div>
+                        <p class="text-white mb-4">
+                            <strong>頑張る (Ganbaru)</strong> - La capacidad de resistir incluso cuando es difícil. No se trata de nunca caer, se trata de levantarse siempre.
+                        </p>
+                        <div class="bg-white bg-opacity-10 rounded p-4 mb-4">
+                            <p class="text-orange-200 mb-3"><strong>Tu Medidor de Perseverancia:</strong></p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-orange-800 bg-opacity-30 rounded p-4 text-center">
+                                    <div class="text-3xl font-bold text-orange-300" id="ganbaru-days">0</div>
+                                    <div class="text-orange-200 text-sm">Días activo</div>
+                                </div>
+                                <div class="bg-orange-800 bg-opacity-30 rounded p-4 text-center">
+                                    <div class="text-3xl font-bold text-orange-300" id="ganbaru-streak">0</div>
+                                    <div class="text-orange-200 text-sm">Racha actual</div>
+                                </div>
+                                <div class="bg-orange-800 bg-opacity-30 rounded p-4 text-center">
+                                    <div class="text-3xl font-bold text-yellow-300" id="ganbaru-returns">0</div>
+                                    <div class="text-orange-200 text-sm">Veces que regresaste</div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-orange-100 text-sm">
+                            💡 <strong>Lección:</strong> En los días difíciles, no te rindas. Solo haz lo mínimo indispensable para mantener el impulso. Ganbaru.
+                        </p>
+                    </div>
+                    
+                </div>
+                
+                <!-- Summary Section -->
+                <div class="mt-8 bg-gradient-to-r from-purple-800 to-pink-800 bg-opacity-50 rounded-lg p-6 border-2 border-yellow-400">
+                    <h4 class="text-2xl font-bold text-white mb-4">🌟 El Sistema Completo</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4 text-center">
+                        <div class="bg-white bg-opacity-20 rounded p-3">
+                            <div class="text-3xl mb-2">🎯</div>
+                            <div class="text-white font-semibold text-sm">IKIGAI</div>
+                            <div class="text-blue-200 text-xs">Tu propósito</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded p-3">
+                            <div class="text-3xl mb-2">📈</div>
+                            <div class="text-white font-semibold text-sm">KAIZEN</div>
+                            <div class="text-blue-200 text-xs">1% diario</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded p-3">
+                            <div class="text-3xl mb-2">🍽️</div>
+                            <div class="text-white font-semibold text-sm">HARA HACHI BU</div>
+                            <div class="text-blue-200 text-xs">Moderación</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded p-3">
+                            <div class="text-3xl mb-2">🌸</div>
+                            <div class="text-white font-semibold text-sm">WABI-SABI</div>
+                            <div class="text-blue-200 text-xs">Imperfección</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded p-3">
+                            <div class="text-3xl mb-2">💪</div>
+                            <div class="text-white font-semibold text-sm">GANBARU</div>
+                            <div class="text-blue-200 text-xs">Perseverancia</div>
+                        </div>
+                    </div>
+                    <p class="text-white mt-6 text-center italic">
+                        "No necesitas las cinco juntas. Solo necesitas empezar con una cosa hoy. Y cuando tropieces, porque lo harás, no te rindas. Solo levántate."
+                    </p>
+                </div>
+                
             </div>
         </div>
 
@@ -971,7 +1302,7 @@
         
         // Enhanced Game Data with version compatibility
         let gameData = {
-            version: '2.0', // Version tracking for compatibility
+            version: '2.3', // Version tracking for compatibility - Professional Blue Theme
             player: {
                 name: 'Cachorro Guerrero',
                 level: 1,
@@ -979,7 +1310,34 @@
                 maxXp: 100,
                 coins: 0,
                 lives: 3,
-                avatar: 'level-1'
+                avatar: 'level-1',
+                character: 'wolf-male', // NEW: Character selection
+                characterName: 'Lobo Guerrero' // NEW: Character display name
+            },
+            // NEW: 5 Japanese Philosophies System
+            philosophies: {
+                ikigai: {
+                    purpose: '',
+                    discovered: false
+                },
+                kaizen: {
+                    microHabit: '',
+                    streak: 0,
+                    startDate: null
+                },
+                haraHachiBu: {
+                    daysApplied: 0,
+                    lastDate: null
+                },
+                wabiSabi: {
+                    logs: [],
+                    timesRisen: 0
+                },
+                ganbaru: {
+                    totalDays: 0,
+                    currentStreak: 0,
+                    timesReturned: 0
+                }
             },
             habits: [],
             categories: {
@@ -1090,6 +1448,19 @@
                     if (!gameData.journal) gameData.journal = [];
                     if (!gameData.shopItems) gameData.shopItems = gameData.shopItems || getDefaultShopItems();
                     if (!gameData.purchasedItems) gameData.purchasedItems = [];
+                    if (!gameData.player.character) {
+                        gameData.player.character = 'wolf-male';
+                        gameData.player.characterName = 'Lobo Guerrero';
+                    }
+                    if (!gameData.philosophies) {
+                        gameData.philosophies = {
+                            ikigai: { purpose: '', discovered: false },
+                            kaizen: { microHabit: '', streak: 0, startDate: null },
+                            haraHachiBu: { daysApplied: 0, lastDate: null },
+                            wabiSabi: { logs: [], timesRisen: 0 },
+                            ganbaru: { totalDays: 0, currentStreak: 0, timesReturned: 0 }
+                        };
+                    }
                     
                 } catch (e) {
                     console.warn('Error loading saved data:', e);
@@ -1105,12 +1476,29 @@
             };
             
             // Ensure version is updated
-            migratedData.version = '2.0';
+            migratedData.version = '2.1';
             
             // Add new fields if missing
             if (!migratedData.journal) migratedData.journal = [];
             if (!migratedData.shopItems) migratedData.shopItems = getDefaultShopItems();
             if (!migratedData.purchasedItems) migratedData.purchasedItems = [];
+            
+            // NEW: Initialize character selection for old saves
+            if (!migratedData.player.character) {
+                migratedData.player.character = 'wolf-male';
+                migratedData.player.characterName = 'Lobo Guerrero';
+            }
+            
+            // NEW: Initialize philosophies for old saves
+            if (!migratedData.philosophies) {
+                migratedData.philosophies = {
+                    ikigai: { purpose: '', discovered: false },
+                    kaizen: { microHabit: '', streak: 0, startDate: null },
+                    haraHachiBu: { daysApplied: 0, lastDate: null },
+                    wabiSabi: { logs: [], timesRisen: 0 },
+                    ganbaru: { totalDays: 0, currentStreak: 0, timesReturned: 0 }
+                };
+            }
             
             return migratedData;
         }
@@ -1317,6 +1705,8 @@
                 updateShopItems();
             } else if (tabName === 'journal') {
                 updateJournalEntries();
+            } else if (tabName === 'filosofias') {
+                loadAllPhilosophies();
             } else if (tabName === 'analysis') {
                 // Analysis tab is ready to use
             }
@@ -2748,6 +3138,143 @@
             showNotification(`🎉 ¡Compraste ${item.icon} ${item.name}! ¡Disfrútalo sin culpa!`, 'success');
         }
 
+        // NEW: Character Selection System
+        const characterData = {
+            'wolf-male': {
+                name: 'Lobo Guerrero',
+                emoji: '🐺',
+                color: '#4299e1',
+                levels: [
+                    { level: 1, name: 'Cachorro Guerrero' },
+                    { level: 2, name: 'Lobo Explorador' },
+                    { level: 3, name: 'Guerrero Feroz' },
+                    { level: 4, name: 'Comandante Alpha' },
+                    { level: 5, name: 'General Místico' }
+                ]
+            },
+            'wolf-female': {
+                name: 'Loba Guerrera',
+                emoji: '🐺💖',
+                color: '#ec4899',
+                levels: [
+                    { level: 1, name: 'Cachorra Valiente' },
+                    { level: 2, name: 'Loba Exploradora' },
+                    { level: 3, name: 'Guerrera Feroz' },
+                    { level: 4, name: 'Comandante Alpha' },
+                    { level: 5, name: 'Matriarca Mística' }
+                ]
+            },
+            'phoenix': {
+                name: 'Fénix Renacido',
+                emoji: '🔥🦅',
+                color: '#f97316',
+                levels: [
+                    { level: 1, name: 'Chispa Inicial' },
+                    { level: 2, name: 'Llama Creciente' },
+                    { level: 3, name: 'Ave de Fuego' },
+                    { level: 4, name: 'Fénix Resplandeciente' },
+                    { level: 5, name: 'Inmortal de las Cenizas' }
+                ]
+            },
+            'dragon': {
+                name: 'Dragón Ancestral',
+                emoji: '🐉',
+                color: '#8b5cf6',
+                levels: [
+                    { level: 1, name: 'Dragoncillo Curioso' },
+                    { level: 2, name: 'Dragón Joven' },
+                    { level: 3, name: 'Dragón Guerrero' },
+                    { level: 4, name: 'Dragón Ancestral' },
+                    { level: 5, name: 'Señor de los Cielos' }
+                ]
+            },
+            'lion-male': {
+                name: 'León Valiente',
+                emoji: '🦁',
+                color: '#f59e0b',
+                levels: [
+                    { level: 1, name: 'Cachorro Valiente' },
+                    { level: 2, name: 'León Joven' },
+                    { level: 3, name: 'Guerrero de la Sabana' },
+                    { level: 4, name: 'Rey de la Manada' },
+                    { level: 5, name: 'Soberano Indomable' }
+                ]
+            },
+            'lion-female': {
+                name: 'Leona Feroz',
+                emoji: '🦁💫',
+                color: '#f59e0b',
+                levels: [
+                    { level: 1, name: 'Cachorra Audaz' },
+                    { level: 2, name: 'Leona Joven' },
+                    { level: 3, name: 'Cazadora Suprema' },
+                    { level: 4, name: 'Reina de la Manada' },
+                    { level: 5, name: 'Matriarca Legendaria' }
+                ]
+            },
+            'tiger': {
+                name: 'Tigre Imparable',
+                emoji: '🐯',
+                color: '#ea580c',
+                levels: [
+                    { level: 1, name: 'Tigrecillo Audaz' },
+                    { level: 2, name: 'Tigre Ágil' },
+                    { level: 3, name: 'Cazador Solitario' },
+                    { level: 4, name: 'Depredador Supremo' },
+                    { level: 5, name: 'Leyenda de la Jungla' }
+                ]
+            },
+            'bear': {
+                name: 'Oso Poderoso',
+                emoji: '🐻',
+                color: '#92400e',
+                levels: [
+                    { level: 1, name: 'Osezno Fuerte' },
+                    { level: 2, name: 'Oso Explorador' },
+                    { level: 3, name: 'Guerrero del Bosque' },
+                    { level: 4, name: 'Guardián Ancestral' },
+                    { level: 5, name: 'Titán de las Montañas' }
+                ]
+            }
+        };
+        
+        function selectCharacter(characterType) {
+            const character = characterData[characterType];
+            if (!character) return;
+            
+            // Update player data
+            gameData.player.character = characterType;
+            gameData.player.characterName = character.name;
+            
+            // Update name based on current level
+            const levelData = character.levels.find(l => l.level === gameData.player.level);
+            if (levelData) {
+                gameData.player.name = levelData.name;
+            }
+            
+            // Save and update UI
+            saveGameData();
+            updateWolfProfile();
+            updatePlayerStats();
+            
+            // Visual feedback - highlight selected character
+            document.querySelectorAll('.character-option').forEach(option => {
+                option.classList.remove('ring-4', 'ring-blue-400', 'ring-pink-400', 'ring-orange-400', 'ring-purple-400', 'ring-yellow-400');
+            });
+            
+            const selectedElement = document.getElementById(`char-${characterType}`);
+            if (selectedElement) {
+                selectedElement.classList.add('ring-4', 'ring-offset-2');
+                if (characterType.includes('female')) {
+                    selectedElement.classList.add('ring-pink-400');
+                } else {
+                    selectedElement.classList.add('ring-blue-400');
+                }
+            }
+            
+            showNotification(`🎭 Personaje cambiado a ${character.emoji} ${character.name}`, 'success');
+        }
+        
         // Wolf Profile Functions
         function updateWolfProfile() {
             document.getElementById('wolf-profile-name').textContent = gameData.player.name;
@@ -2759,19 +3286,46 @@
             const avatar = document.getElementById('wolf-profile-avatar');
             avatar.className = `wolf-evolution-image ${gameData.player.avatar} mx-auto mb-4`;
             
+            // Highlight selected character
+            const characterType = gameData.player.character || 'wolf-male';
+            document.querySelectorAll('.character-option').forEach(option => {
+                option.classList.remove('selected', 'ring-4', 'ring-blue-400', 'ring-pink-400');
+            });
+            
+            const selectedElement = document.getElementById(`char-${characterType}`);
+            if (selectedElement) {
+                selectedElement.classList.add('selected', 'ring-4', 'ring-offset-2');
+                if (characterType.includes('female')) {
+                    selectedElement.classList.add('ring-pink-400');
+                } else {
+                    selectedElement.classList.add('ring-blue-400');
+                }
+            }
+            
             updateEvolutionPath();
             updateBadgesGallery();
         }
 
         function updateEvolutionPath() {
             const container = document.getElementById('evolution-path');
+            
+            // Get character-specific evolution names
+            const characterType = gameData.player.character || 'wolf-male';
+            const character = characterData[characterType];
+            
             const levels = [
-                { level: 1, name: 'Cachorro Guerrero', xp: 0, avatar: 'level-1' },
-                { level: 2, name: 'Lobo Explorador', xp: 210, avatar: 'level-2' },
-                { level: 3, name: 'Guerrero Feroz', xp: 660, avatar: 'level-3' },
-                { level: 4, name: 'Comandante Alpha', xp: 1320, avatar: 'level-4' },
-                { level: 5, name: 'General Místico', xp: 2640, avatar: 'level-5' }
-            ];
+                { level: 1, xp: 0, avatar: 'level-1' },
+                { level: 2, xp: 210, avatar: 'level-2' },
+                { level: 3, xp: 660, avatar: 'level-3' },
+                { level: 4, xp: 1320, avatar: 'level-4' },
+                { level: 5, xp: 2640, avatar: 'level-5' }
+            ].map(l => {
+                const levelData = character ? character.levels.find(cl => cl.level === l.level) : null;
+                return {
+                    ...l,
+                    name: levelData ? levelData.name : `Nivel ${l.level}`
+                };
+            });
             
             container.innerHTML = '';
             
@@ -2838,14 +3392,14 @@
             });
         }
 
-        // Wolf Evolution System
+        // Wolf Evolution System - Updated for multiple characters
         function updateWolfEvolution() {
             const levels = [
-                { level: 1, name: 'Cachorro Guerrero', xp: 0, maxXp: 210, avatar: 'level-1' },        // ~21 días
-                { level: 2, name: 'Lobo Explorador', xp: 210, maxXp: 660, avatar: 'level-2' },       // ~66 días total
-                { level: 3, name: 'Guerrero Feroz', xp: 660, maxXp: 1320, avatar: 'level-3' },      // ~132 días total
-                { level: 4, name: 'Comandante Alpha', xp: 1320, maxXp: 2640, avatar: 'level-4' },   // ~264 días total
-                { level: 5, name: 'General Místico', xp: 2640, maxXp: 3650, avatar: 'level-5' }     // ~365 días total (1 año)
+                { level: 1, xp: 0, maxXp: 210, avatar: 'level-1' },        // ~21 días
+                { level: 2, xp: 210, maxXp: 660, avatar: 'level-2' },       // ~66 días total
+                { level: 3, xp: 660, maxXp: 1320, avatar: 'level-3' },      // ~132 días total
+                { level: 4, xp: 1320, maxXp: 2640, avatar: 'level-4' },   // ~264 días total
+                { level: 5, xp: 2640, maxXp: 3650, avatar: 'level-5' }     // ~365 días total (1 año)
             ];
             
             const currentLevel = levels.find(l => gameData.player.xp >= l.xp && (gameData.player.xp < l.maxXp || l.level === 5));
@@ -2853,10 +3407,19 @@
             if (currentLevel && currentLevel.level > gameData.player.level) {
                 // Level up!
                 gameData.player.level = currentLevel.level;
-                gameData.player.name = currentLevel.name;
                 gameData.player.avatar = currentLevel.avatar;
                 
-                showNotification(`🎉 ¡LEVEL UP! Ahora eres ${currentLevel.name}!`, 'success');
+                // Get character-specific level name
+                const characterType = gameData.player.character || 'wolf-male';
+                const character = characterData[characterType];
+                if (character) {
+                    const levelData = character.levels.find(l => l.level === currentLevel.level);
+                    if (levelData) {
+                        gameData.player.name = levelData.name;
+                    }
+                }
+                
+                showNotification(`🎉 ¡LEVEL UP! Ahora eres ${gameData.player.name}!`, 'success');
                 gameData.player.coins += 50; // Level up bonus
             }
             
@@ -3085,10 +3648,26 @@
         }
 
         function exportData() {
+            // Calculate statistics for the backup
+            const stats = {
+                totalHabits: gameData.habits.length,
+                totalCompletions: gameData.habits.reduce((sum, h) => sum + (h.totalCompleted || 0), 0),
+                totalDaysLogged: Object.keys(gameData.dailyLogs).length,
+                currentLevel: gameData.player.level,
+                totalXP: gameData.player.xp,
+                totalCoins: gameData.player.coins,
+                badgesEarned: gameData.badges.length,
+                journalEntries: gameData.journal?.length || 0,
+                morningRoutines: gameData.morningRoutines?.length || 0,
+                longestStreak: Math.max(...Object.values(gameData.streaks).filter(s => typeof s === 'number' && !isNaN(s)), 0)
+            };
+            
             const dataToExport = {
-                gameData: gameData,
+                appName: 'HabitWolf Pro',
+                version: '2.0',
                 exportDate: new Date().toISOString(),
-                version: '2.0'
+                stats: stats,
+                gameData: gameData
             };
             
             const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {type: 'application/json'});
@@ -3102,7 +3681,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showNotification('💾 Respaldo v2.0 descargado exitosamente', 'success');
+            showNotification(`💾 Respaldo creado: ${stats.totalHabits} hábitos, ${stats.totalCompletions} completaciones, Nivel ${stats.currentLevel}`, 'success');
         }
 
         function importData() {
@@ -3421,6 +4000,183 @@
                 updateMorningRoutineHistory();
                 showNotification('🗑️ Ritual matutino eliminado', 'success');
             }
+        }
+
+        // NEW: 5 Japanese Philosophies Functions
+        
+        // 1. IKIGAI - Save Purpose
+        function saveIkigai() {
+            const purpose = document.getElementById('ikigai-purpose').value.trim();
+            if (!purpose) {
+                showNotification('⚠️ Escribe tu propósito profundo primero', 'error');
+                return;
+            }
+            
+            gameData.philosophies.ikigai.purpose = purpose;
+            gameData.philosophies.ikigai.discovered = true;
+            
+            saveGameData();
+            loadIkigai();
+            showNotification('🎯 Tu Ikigai ha sido guardado. Este es tu Norte.', 'success');
+        }
+        
+        function loadIkigai() {
+            const purpose = gameData.philosophies.ikigai.purpose;
+            if (purpose) {
+                document.getElementById('ikigai-display').classList.remove('hidden');
+                document.getElementById('ikigai-text').textContent = purpose;
+                document.getElementById('ikigai-purpose').value = purpose;
+            }
+        }
+        
+        // 2. KAIZEN - Micro Habit Tracker
+        function saveKaizen() {
+            const microHabit = document.getElementById('kaizen-habit').value.trim();
+            if (!microHabit) {
+                showNotification('⚠️ Define tu cambio microscópico primero', 'error');
+                return;
+            }
+            
+            if (!gameData.philosophies.kaizen.startDate) {
+                gameData.philosophies.kaizen.startDate = new Date().toISOString().split('T')[0];
+                gameData.philosophies.kaizen.streak = 1;
+            }
+            
+            gameData.philosophies.kaizen.microHabit = microHabit;
+            
+            saveGameData();
+            loadKaizen();
+            showNotification('📈 Tu mejora del 1% ha comenzado. Hazlo mañana otra vez.', 'success');
+        }
+        
+        function loadKaizen() {
+            const microHabit = gameData.philosophies.kaizen.microHabit;
+            const streak = gameData.philosophies.kaizen.streak || 0;
+            
+            if (microHabit) {
+                document.getElementById('kaizen-habit').value = microHabit;
+            }
+            document.getElementById('kaizen-streak').textContent = streak;
+        }
+        
+        // 3. HARA HACHI BU - Moderacion Tracker
+        function toggleHaraHachiBu() {
+            const today = new Date().toISOString().split('T')[0];
+            const lastDate = gameData.philosophies.haraHachiBu.lastDate;
+            
+            if (lastDate === today) {
+                showNotification('✅ Ya registraste Hara Hachi Bu hoy', 'success');
+                return;
+            }
+            
+            gameData.philosophies.haraHachiBu.daysApplied += 1;
+            gameData.philosophies.haraHachiBu.lastDate = today;
+            
+            saveGameData();
+            loadHaraHachiBu();
+            showNotification('🍽️ Hara Hachi Bu aplicado. Comiste con moderación.', 'success');
+        }
+        
+        function loadHaraHachiBu() {
+            const count = gameData.philosophies.haraHachiBu.daysApplied || 0;
+            document.getElementById('hara-count').textContent = count;
+        }
+        
+        // 4. WABI-SABI - Imperfection Log
+        function logWabiSabi() {
+            const logText = document.getElementById('wabisabi-log').value.trim();
+            if (!logText) {
+                showNotification('⚠️ Escribe qué sucedió y cómo te levantaste', 'error');
+                return;
+            }
+            
+            const log = {
+                date: new Date().toISOString(),
+                text: logText
+            };
+            
+            gameData.philosophies.wabiSabi.logs.unshift(log);
+            gameData.philosophies.wabiSabi.timesRisen += 1;
+            
+            // Keep only last 10 logs
+            if (gameData.philosophies.wabiSabi.logs.length > 10) {
+                gameData.philosophies.wabiSabi.logs = gameData.philosophies.wabiSabi.logs.slice(0, 10);
+            }
+            
+            saveGameData();
+            document.getElementById('wabisabi-log').value = '';
+            loadWabiSabi();
+            showNotification('🌸 Te levantaste. Eso es lo único que importa.', 'success');
+        }
+        
+        function loadWabiSabi() {
+            const count = gameData.philosophies.wabiSabi.timesRisen || 0;
+            const logs = gameData.philosophies.wabiSabi.logs || [];
+            
+            document.getElementById('wabisabi-count').textContent = count;
+            
+            const container = document.getElementById('wabisabi-logs');
+            if (logs.length === 0) {
+                container.innerHTML = '<p class="text-pink-200 text-sm text-center py-4">Aún no has registrado imperfecciones. Cuando tropieces, regístralo aquí.</p>';
+            } else {
+                container.innerHTML = logs.map(log => {
+                    const date = new Date(log.date).toLocaleDateString('es-ES', { 
+                        day: 'numeric', 
+                        month: 'short' 
+                    });
+                    return `
+                        <div class="bg-pink-800 bg-opacity-30 rounded p-3">
+                            <div class="text-pink-200 text-xs mb-1">${date}</div>
+                            <div class="text-white text-sm">${log.text}</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+        
+        // 5. GANBARU - Perseverance Meter
+        function updateGanbaru() {
+            const totalDays = Object.keys(gameData.dailyLogs).length;
+            const today = new Date().toISOString().split('T')[0];
+            const hasDataToday = gameData.dailyLogs[today]?.habits?.length > 0;
+            
+            // Calculate current streak
+            let currentStreak = 0;
+            for (let i = 0; i < 365; i++) {
+                const checkDate = new Date();
+                checkDate.setDate(checkDate.getDate() - i);
+                const dateStr = checkDate.toISOString().split('T')[0];
+                
+                if (gameData.dailyLogs[dateStr]?.habits?.length > 0) {
+                    currentStreak++;
+                } else {
+                    break;
+                }
+            }
+            
+            gameData.philosophies.ganbaru.totalDays = totalDays;
+            gameData.philosophies.ganbaru.currentStreak = currentStreak;
+            
+            loadGanbaru();
+        }
+        
+        function loadGanbaru() {
+            const totalDays = gameData.philosophies.ganbaru.totalDays || 0;
+            const currentStreak = gameData.philosophies.ganbaru.currentStreak || 0;
+            const timesReturned = gameData.philosophies.wabiSabi.timesRisen || 0;
+            
+            document.getElementById('ganbaru-days').textContent = totalDays;
+            document.getElementById('ganbaru-streak').textContent = currentStreak;
+            document.getElementById('ganbaru-returns').textContent = timesReturned;
+        }
+        
+        // Load all philosophies when tab is opened
+        function loadAllPhilosophies() {
+            loadIkigai();
+            loadKaizen();
+            loadHaraHachiBu();
+            loadWabiSabi();
+            updateGanbaru();
         }
 
         // ENHANCED: Utility Functions with better notifications
