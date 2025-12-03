@@ -182,3 +182,21 @@ self.addEventListener('notificationclick', event => {
 
 // Sincronización en segundo plano
 self.addEventListener('sync', event => {
+  if (event.tag === 'habitwolf-sync') {
+    event.waitUntil(
+      // Aquí se implementaría la lógica de sincronización
+      // Por ejemplo, enviar datos pendientes cuando haya conexión
+      console.log('🔄 Sincronización de datos en segundo plano')
+    );
+  }
+});
+
+// Manejo de errores
+self.addEventListener('error', event => {
+  console.error('❌ Error en Service Worker:', event.error);
+});
+
+// Logging de información útil
+console.log('🐺 HabitWolf Pro Service Worker cargado');
+console.log(`📦 Versión de caché: ${CACHE_NAME}`);
+console.log(`📁 Archivos estáticos: ${STATIC_FILES.length} archivos`);
