@@ -1538,14 +1538,65 @@
                         gameData = { ...gameData, ...loadedData };
                     }
                     
-                    // Ensure all new fields exist
+                    // CRITICAL: Ensure ALL v2.4 fields exist
                     if (!gameData.journal) gameData.journal = [];
-                    if (!gameData.shopItems) gameData.shopItems = gameData.shopItems || getDefaultShopItems();
+                    if (!gameData.morningRoutines) gameData.morningRoutines = [];
+                    if (!gameData.shopItems || gameData.shopItems.length === 0) {
+                        gameData.shopItems = getDefaultShopItems();
+                    }
                     if (!gameData.purchasedItems) gameData.purchasedItems = [];
+                    if (!gameData.habits) gameData.habits = [];
+                    if (!gameData.dailyLogs) gameData.dailyLogs = {};
+                    if (!gameData.streaks) gameData.streaks = {};
+                    if (!gameData.badges) gameData.badges = [];
+                    if (!gameData.categories) gameData.categories = {
+                        fitness: { name: 'Fitness & Salud', emoji: '💪', color: '#ef4444' },
+                        learning: { name: 'Aprendizaje', emoji: '📚', color: '#3b82f6' },
+                        productivity: { name: 'Productividad', emoji: '⚡', color: '#f59e0b' },
+                        mindfulness: { name: 'Mindfulness', emoji: '🧘', color: '#10b981' },
+                        creativity: { name: 'Creatividad', emoji: '🎨', color: '#8b5cf6' },
+                        social: { name: 'Social', emoji: '👥', color: '#ec4899' },
+                        nutrition: { name: 'Nutrición', emoji: '🥗', color: '#84cc16' },
+                        finance: { name: 'Finanzas', emoji: '💰', color: '#06b6d4' },
+                        morning: { name: 'Rutina Matutina', emoji: '🌅', color: '#fb923c' },
+                        sleep: { name: 'Sueño', emoji: '😴', color: '#6366f1' },
+                        water: { name: 'Hidratación', emoji: '💧', color: '#0ea5e9' },
+                        meditation: { name: 'Meditación', emoji: '🕉️', color: '#059669' },
+                        reading: { name: 'Lectura', emoji: '📖', color: '#7c3aed' },
+                        exercise: { name: 'Ejercicio', emoji: '🏃', color: '#dc2626' },
+                        family: { name: 'Familia', emoji: '👨‍👩‍👧‍👦', color: '#f59e0b' },
+                        work: { name: 'Trabajo', emoji: '💼', color: '#475569' },
+                        travel: { name: 'Viajes', emoji: '✈️', color: '#0284c7' },
+                        hobby: { name: 'Hobbies', emoji: '🎯', color: '#7c2d12' },
+                        music: { name: 'Música', emoji: '🎵', color: '#be185d' },
+                        cooking: { name: 'Cocinar', emoji: '👨‍🍳', color: '#ea580c' },
+                        cleaning: { name: 'Limpieza', emoji: '🧹', color: '#65a30d' },
+                        technology: { name: 'Tecnología', emoji: '💻', color: '#1e40af' },
+                        nature: { name: 'Naturaleza', emoji: '🌳', color: '#166534' },
+                        pets: { name: 'Mascotas', emoji: '🐕', color: '#92400e' },
+                        selfcare: { name: 'Cuidado Personal', emoji: '💆‍♂️', color: '#be123c' },
+                        spiritual: { name: 'Espiritual', emoji: '🙏', color: '#581c87' }
+                    };
+                    
+                    if (!gameData.player) {
+                        gameData.player = {
+                            name: 'Cachorro Guerrero',
+                            level: 1,
+                            xp: 0,
+                            maxXp: 100,
+                            coins: 0,
+                            lives: 3,
+                            avatar: 'level-1',
+                            character: 'wolf-male',
+                            characterName: 'Lobo Guerrero'
+                        };
+                    }
+                    
                     if (!gameData.player.character) {
                         gameData.player.character = 'wolf-male';
                         gameData.player.characterName = 'Lobo Guerrero';
                     }
+                    
                     if (!gameData.philosophies) {
                         gameData.philosophies = {
                             ikigai: { purpose: '', discovered: false },
@@ -1555,6 +1606,9 @@
                             ganbaru: { totalDays: 0, currentStreak: 0, timesReturned: 0 }
                         };
                     }
+                    
+                    // Auto-update version to 2.4
+                    gameData.version = '2.4';
                     
                 } catch (e) {
                     console.warn('Error loading saved data:', e);
@@ -1569,21 +1623,43 @@
                 ...oldData    // Overlay old data
             };
             
-            // Ensure version is updated
-            migratedData.version = '2.1';
+            // Ensure version is updated to v2.4
+            migratedData.version = '2.4';
             
-            // Add new fields if missing
+            // Add new fields if missing (v2.4 compatibility)
             if (!migratedData.journal) migratedData.journal = [];
+            if (!migratedData.morningRoutines) migratedData.morningRoutines = [];
             if (!migratedData.shopItems) migratedData.shopItems = getDefaultShopItems();
             if (!migratedData.purchasedItems) migratedData.purchasedItems = [];
             
-            // NEW: Initialize character selection for old saves
+            // Ensure core data structures exist
+            if (!migratedData.habits) migratedData.habits = [];
+            if (!migratedData.dailyLogs) migratedData.dailyLogs = {};
+            if (!migratedData.streaks) migratedData.streaks = {};
+            if (!migratedData.badges) migratedData.badges = [];
+            
+            // Initialize player if missing
+            if (!migratedData.player) {
+                migratedData.player = {
+                    name: 'Cachorro Guerrero',
+                    level: 1,
+                    xp: 0,
+                    maxXp: 100,
+                    coins: 0,
+                    lives: 3,
+                    avatar: 'level-1',
+                    character: 'wolf-male',
+                    characterName: 'Lobo Guerrero'
+                };
+            }
+            
+            // Initialize character selection for old saves
             if (!migratedData.player.character) {
                 migratedData.player.character = 'wolf-male';
                 migratedData.player.characterName = 'Lobo Guerrero';
             }
             
-            // NEW: Initialize philosophies for old saves
+            // Initialize philosophies for old saves
             if (!migratedData.philosophies) {
                 migratedData.philosophies = {
                     ikigai: { purpose: '', discovered: false },
@@ -1592,6 +1668,11 @@
                     wabiSabi: { logs: [], timesRisen: 0 },
                     ganbaru: { totalDays: 0, currentStreak: 0, timesReturned: 0 }
                 };
+            }
+            
+            // Initialize categories if missing
+            if (!migratedData.categories) {
+                migratedData.categories = gameData.categories;
             }
             
             return migratedData;
@@ -4072,25 +4153,57 @@
                     
                     if (importedData.gameData) {
                         if (confirm('¿Estás seguro de restaurar estos datos? Esto sobrescribirá toda la información actual.')) {
-                            // Handle version compatibility
-                            if (!importedData.version || importedData.version < '2.0') {
-                                gameData = migrateOldData(importedData.gameData);
-                            } else {
-                                gameData = importedData.gameData;
+                            let restoredData = importedData.gameData;
+                            
+                            // CRITICAL: Ensure all required fields exist for v2.4
+                            if (!restoredData.journal) restoredData.journal = [];
+                            if (!restoredData.morningRoutines) restoredData.morningRoutines = [];
+                            if (!restoredData.shopItems) restoredData.shopItems = getDefaultShopItems();
+                            if (!restoredData.purchasedItems) restoredData.purchasedItems = [];
+                            if (!restoredData.player) restoredData.player = gameData.player;
+                            if (!restoredData.habits) restoredData.habits = [];
+                            if (!restoredData.categories) restoredData.categories = gameData.categories;
+                            if (!restoredData.dailyLogs) restoredData.dailyLogs = {};
+                            if (!restoredData.streaks) restoredData.streaks = {};
+                            if (!restoredData.badges) restoredData.badges = [];
+                            
+                            // Ensure player character data exists
+                            if (!restoredData.player.character) {
+                                restoredData.player.character = 'wolf-male';
+                                restoredData.player.characterName = 'Lobo Guerrero';
                             }
+                            
+                            // Ensure philosophies exist
+                            if (!restoredData.philosophies) {
+                                restoredData.philosophies = {
+                                    ikigai: { purpose: '', discovered: false },
+                                    kaizen: { microHabit: '', streak: 0, startDate: null, duration: 21, goalDate: null },
+                                    haraHachiBu: { daysApplied: 0, lastDate: null },
+                                    wabiSabi: { logs: [], timesRisen: 0 },
+                                    ganbaru: { totalDays: 0, currentStreak: 0, timesReturned: 0 }
+                                };
+                            }
+                            
+                            // Update version to current
+                            restoredData.version = '2.4';
+                            
+                            // Apply restored data
+                            gameData = restoredData;
                             
                             saveGameData();
                             
                             // Refresh interface
                             initializeApp();
                             
-                            showNotification('📤 Datos restaurados exitosamente', 'success');
+                            const stats = importedData.stats || {};
+                            showNotification(`📤 Datos restaurados: ${stats.totalHabits || gameData.habits.length} hábitos, Nivel ${stats.currentLevel || gameData.player.level}`, 'success');
                         }
                     } else {
-                        showNotification('❌ Archivo de respaldo inválido', 'error');
+                        showNotification('❌ Archivo de respaldo inválido - falta campo "gameData"', 'error');
                     }
                 } catch (error) {
-                    showNotification('❌ Error al leer el archivo de respaldo', 'error');
+                    console.error('Import error:', error);
+                    showNotification(`❌ Error al leer el archivo: ${error.message}`, 'error');
                 }
             };
             
