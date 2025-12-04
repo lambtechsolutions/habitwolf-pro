@@ -1415,9 +1415,12 @@
                     discovered: false
                 },
                 kaizen: {
-                    microHabit: '',
-                    streak: 0,
-                    startDate: null
+                    habits: [], // Array to support 3-5 simultaneous micro-habits
+                    microHabit: '', // Legacy field (keep for backwards compatibility)
+                    streak: 0, // Legacy field
+                    startDate: null, // Legacy field
+                    duration: 21,
+                    goalDate: null
                 },
                 haraHachiBu: {
                     daysApplied: 0,
@@ -2546,9 +2549,16 @@
             const fib = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
             const n = Math.min(totalPerfectDays, fib.length);
             
-            // Calculate total size needed
+            // Calculate total size needed with dynamic scaling
             const maxSize = Math.max(...fib.slice(0, n));
-            const scale = Math.min(width, height) * 0.7 / maxSize;
+            
+            // Dynamic scale factor that decreases as more squares are added
+            let scaleFactor = 0.7;
+            if (n > 8) scaleFactor = 0.5;
+            if (n > 10) scaleFactor = 0.4;
+            if (n > 12) scaleFactor = 0.35;
+            
+            const scale = Math.min(width, height) * scaleFactor / maxSize;
             
             // SVG
             const svgNS = "http://www.w3.org/2000/svg";
@@ -4518,7 +4528,7 @@
             }
         }
         
-        // 2. KAIZEN - Micro Habit Tracker
+        // 2. KAIZEN - Multiple Micro Habits Tracker (3-5 simultaneous)
         // Kaizen Micro-Habit Recommendations Database
         const kaizenRecommendations = {
             fitness: {
@@ -4704,18 +4714,43 @@
                 return;
             }
             
-            if (!gameData.philosophies.kaizen.startDate) {
-                gameData.philosophies.kaizen.startDate = new Date().toISOString().split('T')[0];
-                gameData.philosophies.kaizen.streak = 1;
+            // Initialize kaizen habits array if doesn't exist
+            if (!gameData.philosophies.kaizen.habits) {
+                gameData.philosophies.kaizen.habits = [];
             }
             
-            gameData.philosophies.kaizen.microHabit = microHabit;
-            gameData.philosophies.kaizen.duration = duration;
-            gameData.philosophies.kaizen.goalDate = calculateGoalDate(duration);
+            // Check if already have 5 active habits
+            const activeHabits = gameData.philosophies.kaizen.habits.filter(h => !h.completed);
+            if (activeHabits.length >= 5) {
+                showNotification('⚠️ Ya tienes 5 micro-hábitos activos. Completa uno antes de agregar más.', 'error');
+                return;
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Add new micro habit
+            const newHabit = {
+                id: Date.now().toString(),
+                habit: microHabit,
+                startDate: today,
+                duration: duration,
+                goalDate: calculateGoalDate(duration),
+                streak: 0,
+                completed: false,
+                lastCheckedDate: null
+            };
+            
+            gameData.philosophies.kaizen.habits.push(newHabit);
             
             saveGameData();
             loadKaizen();
-            showNotification(`📈 Tu mejora del 1% ha comenzado: "${microHabit}" por ${duration} días. ¡Hazlo mañana otra vez!`, 'success');
+            
+            // Clear form
+            document.getElementById('kaizen-habit').value = '';
+            document.getElementById('kaizen-category').value = '';
+            document.getElementById('kaizen-suggestions').classList.add('hidden');
+            
+            showNotification(`📈 Nuevo 1% agregado: "${microHabit}" por ${duration} días. ¡Puedes agregar hasta 5 simultáneos!`, 'success');
         }
         
         function calculateGoalDate(days) {
@@ -4726,31 +4761,150 @@
         }
         
         function loadKaizen() {
-            const microHabit = gameData.philosophies.kaizen.microHabit;
-            const streak = gameData.philosophies.kaizen.streak || 0;
-            const duration = gameData.philosophies.kaizen.duration || 21;
-            const startDate = gameData.philosophies.kaizen.startDate;
-            
-            if (microHabit) {
-                document.getElementById('kaizen-habit').value = microHabit;
+            // Initialize habits array if doesn't exist
+            if (!gameData.philosophies.kaizen.habits) {
+                gameData.philosophies.kaizen.habits = [];
             }
             
-            document.getElementById('kaizen-streak').textContent = streak;
+            const activeHabits = gameData.philosophies.kaizen.habits.filter(h => !h.completed);
+            const completedHabits = gameData.philosophies.kaizen.habits.filter(h => h.completed);
             
-            // Show progress towards goal
-            if (startDate && duration) {
-                const progress = Math.min(100, Math.round((streak / duration) * 100));
-                const remaining = Math.max(0, duration - streak);
-                const goalSpan = document.getElementById('kaizen-goal');
+            // Update display with list of habits
+            const streakDisplay = document.getElementById('kaizen-streak');
+            const goalDisplay = document.getElementById('kaizen-goal');
+            
+            if (activeHabits.length === 0) {
+                streakDisplay.textContent = '0';
+                goalDisplay.textContent = '';
+                goalDisplay.className = 'text-blue-200';
+                return;
+            }
+            
+            // Show total active habits
+            streakDisplay.textContent = activeHabits.length;
+            goalDisplay.textContent = ` micro-hábito(s) activo(s) (máx: 5)`;
+            goalDisplay.className = 'text-blue-200';
+            
+            // Display habits below the form
+            displayKaizenHabits();
+        }
+        
+        function displayKaizenHabits() {
+            if (!gameData.philosophies.kaizen.habits) return;
+            
+            const activeHabits = gameData.philosophies.kaizen.habits.filter(h => !h.completed);
+            const completedHabits = gameData.philosophies.kaizen.habits.filter(h => h.completed);
+            
+            // Find or create container
+            let container = document.getElementById('kaizen-habits-list');
+            if (!container) {
+                // Insert container after the kaizen form
+                const kaizenSection = document.querySelector('.bg-gradient-to-r.from-blue-900');
+                container = document.createElement('div');
+                container.id = 'kaizen-habits-list';
+                container.className = 'mt-4 space-y-2';
+                kaizenSection.querySelector('.bg-white.bg-opacity-10').appendChild(container);
+            }
+            
+            if (activeHabits.length === 0 && completedHabits.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            container.innerHTML = `
+                ${activeHabits.length > 0 ? '<div class="text-blue-200 font-semibold mb-2">📋 Micro-hábitos activos:</div>' : ''}
+                ${activeHabits.map(habit => {
+                    const progress = Math.min(100, Math.round((habit.streak / habit.duration) * 100));
+                    const remaining = Math.max(0, habit.duration - habit.streak);
+                    const isCheckedToday = habit.lastCheckedDate === today;
+                    
+                    return `
+                        <div class="bg-blue-800 bg-opacity-30 rounded-lg p-3 border border-blue-400">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <p class="text-white font-semibold">${habit.habit}</p>
+                                    <div class="text-blue-200 text-xs mt-1">
+                                        Racha: ${habit.streak}/${habit.duration} días (${progress}%)
+                                        ${remaining > 0 ? `• Faltan ${remaining} días` : '• 🎉 ¡Completado!'}
+                                    </div>
+                                    <div class="w-full bg-blue-900 rounded-full h-2 mt-2">
+                                        <div class="bg-blue-400 h-2 rounded-full transition-all" style="width: ${progress}%"></div>
+                                    </div>
+                                </div>
+                                <div class="ml-3 flex flex-col gap-1">
+                                    <button onclick="checkKaizenHabit('${habit.id}')" 
+                                            class="${isCheckedToday ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-700'} text-white px-3 py-1 rounded text-xs transition-colors"
+                                            ${isCheckedToday ? 'disabled' : ''}>
+                                        ${isCheckedToday ? '✅' : '☑️'}
+                                    </button>
+                                    <button onclick="deleteKaizenHabit('${habit.id}')" 
+                                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs transition-colors">
+                                        🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
                 
-                if (remaining > 0) {
-                    goalSpan.textContent = ` / ${duration} días (${progress}% completo, faltan ${remaining})`;
-                    goalSpan.className = 'text-blue-200';
-                } else {
-                    goalSpan.textContent = ` 🎉 ¡META ALCANZADA! ¿Listo para el siguiente nivel?`;
-                    goalSpan.className = 'text-green-300 font-bold';
-                }
+                ${completedHabits.length > 0 ? `
+                    <details class="mt-4">
+                        <summary class="text-green-300 font-semibold cursor-pointer">✅ Completados (${completedHabits.length})</summary>
+                        <div class="mt-2 space-y-2">
+                            ${completedHabits.map(habit => `
+                                <div class="bg-green-800 bg-opacity-20 rounded-lg p-2 text-sm">
+                                    <p class="text-green-200">✅ ${habit.habit}</p>
+                                    <p class="text-green-300 text-xs">Completado: ${habit.duration} días</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </details>
+                ` : ''}
+            `;
+        }
+        
+        function checkKaizenHabit(habitId) {
+            const habit = gameData.philosophies.kaizen.habits.find(h => h.id === habitId);
+            if (!habit) return;
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (habit.lastCheckedDate === today) {
+                showNotification('✅ Ya marcaste este hábito hoy', 'success');
+                return;
             }
+            
+            habit.streak += 1;
+            habit.lastCheckedDate = today;
+            
+            // Check if completed
+            if (habit.streak >= habit.duration) {
+                habit.completed = true;
+                showNotification(`🎉 ¡Micro-hábito "${habit.habit}" completado! ${habit.duration} días consecutivos.`, 'success');
+                
+                // Award XP and coins
+                gameData.player.xp += 50;
+                gameData.player.coins += 10;
+                updatePlayerStats();
+            } else {
+                showNotification(`📈 +1 día en "${habit.habit}" (${habit.streak}/${habit.duration})`, 'success');
+                gameData.player.xp += 5;
+                updatePlayerStats();
+            }
+            
+            saveGameData();
+            loadKaizen();
+        }
+        
+        function deleteKaizenHabit(habitId) {
+            if (!confirm('¿Eliminar este micro-hábito?')) return;
+            
+            gameData.philosophies.kaizen.habits = gameData.philosophies.kaizen.habits.filter(h => h.id !== habitId);
+            saveGameData();
+            loadKaizen();
+            showNotification('🗑️ Micro-hábito eliminado', 'success');
         }
         
         // 3. HARA HACHI BU - Moderacion Tracker
@@ -4763,12 +4917,21 @@
                 return;
             }
             
+            if (!gameData.philosophies.haraHachiBu.daysApplied) {
+                gameData.philosophies.haraHachiBu.daysApplied = 0;
+            }
+            
             gameData.philosophies.haraHachiBu.daysApplied += 1;
             gameData.philosophies.haraHachiBu.lastDate = today;
             
+            // Award XP
+            gameData.player.xp += 5;
+            gameData.player.coins += 1;
+            updatePlayerStats();
+            
             saveGameData();
             loadHaraHachiBu();
-            showNotification('🍽️ Hara Hachi Bu aplicado. Comiste con moderación.', 'success');
+            showNotification('🍽️ Hara Hachi Bu aplicado. Comiste con moderación. +5 XP', 'success');
         }
         
         function loadHaraHachiBu() {
@@ -4784,6 +4947,14 @@
                 return;
             }
             
+            if (!gameData.philosophies.wabiSabi.logs) {
+                gameData.philosophies.wabiSabi.logs = [];
+            }
+            
+            if (!gameData.philosophies.wabiSabi.timesRisen) {
+                gameData.philosophies.wabiSabi.timesRisen = 0;
+            }
+            
             const log = {
                 date: new Date().toISOString(),
                 text: logText
@@ -4797,10 +4968,15 @@
                 gameData.philosophies.wabiSabi.logs = gameData.philosophies.wabiSabi.logs.slice(0, 10);
             }
             
+            // Award XP for resilience
+            gameData.player.xp += 10;
+            gameData.player.coins += 2;
+            updatePlayerStats();
+            
             saveGameData();
             document.getElementById('wabisabi-log').value = '';
             loadWabiSabi();
-            showNotification('🌸 Te levantaste. Eso es lo único que importa.', 'success');
+            showNotification('🌸 Te levantaste. Eso es lo único que importa. +10 XP', 'success');
         }
         
         function loadWabiSabi() {
