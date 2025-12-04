@@ -1502,10 +1502,8 @@
         });
 
         function initializeApp() {
-            updateCurrentDate();
             updatePlayerStats();
             updateWolfProfile();
-            initializeDatePickers(); // NEW: Initialize date navigation
             loadDailyHabits();
             updateHabitsList();
             updateDashboard();
@@ -1706,7 +1704,10 @@
             
             setTimeout(() => {
                 // Reset daily status and update interface
-                document.getElementById('day-status').innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 Lupus';
+                const dayStatus = document.getElementById('day-status');
+                if (dayStatus) {
+                    dayStatus.innerHTML = '⏰ Completa tus hábitos diarios para ganar ⭐ XP y 🪙 Lupus';
+                }
                 updateCurrentDate();
                 loadDailyHabits();
                 clearDailyForm();
@@ -1725,7 +1726,10 @@
                 month: 'long', 
                 day: 'numeric' 
             };
-            document.getElementById('current-date').textContent = today.toLocaleDateString('es-ES', options);
+            const dateElement = document.getElementById('current-date');
+            if (dateElement) {
+                dateElement.textContent = today.toLocaleDateString('es-ES', options);
+            }
         }
 
         // NEW: Date Navigation Functions
