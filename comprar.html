@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprar HabitWolf Pro - Pago Seguro</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Stripe JS -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <a href="landing-page.html" class="flex items-center gap-2 text-2xl font-bold">
+                <span>🐺</span>
+                <span class="gradient-bg bg-clip-text text-transparent">HabitWolf Pro</span>
+            </a>
+            <div class="flex items-center gap-2 text-sm text-gray-600">
+                <i class="fas fa-lock text-green-600"></i>
+                <span>Pago seguro con Stripe</span>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <div class="grid md:grid-cols-2 gap-12">
+            
+            <!-- Left Column: Plan Details -->
+            <div>
+                <h1 class="text-4xl font-black text-gray-800 mb-6">
+                    Completa tu compra 🚀
+                </h1>
+                
+                <!-- Plan Selected -->
+                <div id="plan-details" class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Plan Seleccionado</h2>
+                        <a href="landing-page.html#pricing" class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                            Cambiar plan
+                        </a>
+                    </div>
+                    
+                    <!-- PRO Plan -->
+                    <div id="pro-plan" class="hidden">
+                        <div class="flex items-start gap-4 mb-6">
+                            <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-crown text-3xl text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800 mb-1">HabitWolf Pro</h3>
+                                <p class="text-gray-600">Suscripción mensual</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-purple-50 rounded-xl p-6 mb-6">
+                            <div class="flex items-baseline gap-2 mb-2">
+                                <span class="text-5xl font-black text-gray-800">$9.99</span>
+                                <span class="text-gray-600">/mes</span>
+                            </div>
+                            <p class="text-sm text-gray-600">
+                                Se cobra $9.99 USD cada mes. Cancela cuando quieras.
+                            </p>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span class="text-gray-700">Hábitos ilimitados</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span class="text-gray-700">8 personajes + evoluciones</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span class="text-gray-700">Espiral de Fibonacci</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span class="text-gray-700">5 filosofías japonesas</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span class="text-gray-700">Análisis IA + Journal + PDF</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- LIFETIME Plan -->
+                    <div id="lifetime-plan" class="hidden">
+                        <div class="flex items-start gap-4 mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-gem text-3xl text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-800 mb-1">HabitWolf Lifetime</h3>
+                                <p class="text-gray-600">Acceso de por vida</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-6 mb-6 border-2 border-yellow-200">
+                            <div class="flex items-baseline gap-2 mb-2">
+                                <span class="text-5xl font-black text-gray-800">$199</span>
+                                <span class="text-gray-600">pago único</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">
+                                Un solo pago. Acceso de por vida.
+                            </p>
+                            <div class="bg-yellow-100 rounded-lg p-3 text-sm">
+                                <strong class="text-yellow-800">💰 Ahorras $920</strong>
+                                <span class="text-yellow-700"> vs. 10 años de Pro</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-check-circle text-green-500"></i>
+                                <span class="text-gray-700 font-bold">Todo de PRO incluido</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-infinity text-purple-500"></i>
+                                <span class="text-gray-700">Acceso de por vida</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-gift text-purple-500"></i>
+                                <span class="text-gray-700">Todas las futuras actualizaciones</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-palette text-purple-500"></i>
+                                <span class="text-gray-700">Temas premium exclusivos</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-medal text-yellow-500"></i>
+                                <span class="text-gray-700">Badge especial "Founder"</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Garantía -->
+                <div class="bg-green-50 border-2 border-green-200 rounded-xl p-6">
+                    <div class="flex items-start gap-4">
+                        <div class="text-4xl">🛡️</div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">Garantía de 30 días</h3>
+                            <p class="text-sm text-gray-600">
+                                Si no estás satisfecho, te devolvemos tu dinero. Sin preguntas.
+                                Solo envía un email a soporte@habitwolf.com
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Payment Form -->
+            <div>
+                <div class="bg-white rounded-2xl p-8 shadow-lg sticky top-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Información de pago</h2>
+                    
+                    <form id="payment-form">
+                        <!-- Email -->
+                        <div class="mb-6">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                                Email <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                required
+                                placeholder="tu@email.com"
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
+                            >
+                            <p class="text-xs text-gray-500 mt-2">
+                                Recibirás el acceso a esta dirección de email
+                            </p>
+                        </div>
+                        
+                        <!-- Nombre -->
+                        <div class="mb-6">
+                            <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                                Nombre completo <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                required
+                                placeholder="Juan Pérez"
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-purple-500 focus:outline-none transition-colors"
+                            >
+                        </div>
+                        
+                        <!-- Términos -->
+                        <div class="mb-6">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    id="terms" 
+                                    required
+                                    class="mt-1 w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                                >
+                                <span class="text-sm text-gray-600">
+                                    Acepto los <a href="#" class="text-purple-600 hover:underline">términos de servicio</a> 
+                                    y la <a href="#" class="text-purple-600 hover:underline">política de privacidad</a>
+                                </span>
+                            </label>
+                        </div>
+                        
+                        <!-- Total -->
+                        <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                            <div class="flex items-center justify-between text-lg">
+                                <span class="font-medium text-gray-700">Total a pagar</span>
+                                <span id="total-amount" class="text-3xl font-black text-gray-800">$9.99</span>
+                            </div>
+                            <p id="billing-frequency" class="text-sm text-gray-500 mt-2 text-right">
+                                Se cobra mensualmente
+                            </p>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button 
+                            type="submit" 
+                            id="submit-button"
+                            class="w-full gradient-bg text-white py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all shadow-lg flex items-center justify-center gap-3"
+                        >
+                            <i class="fas fa-lock"></i>
+                            <span>Proceder al pago</span>
+                        </button>
+                        
+                        <!-- Loading State -->
+                        <div id="loading-state" class="hidden w-full bg-gray-300 text-gray-600 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3">
+                            <div class="loading-spinner"></div>
+                            <span>Procesando...</span>
+                        </div>
+                        
+                        <!-- Error Message -->
+                        <div id="error-message" class="hidden mt-4 bg-red-50 border-2 border-red-200 rounded-lg p-4 text-red-700 text-sm"></div>
+                        
+                        <!-- Security Badges -->
+                        <div class="mt-6 flex items-center justify-center gap-6 text-gray-400 text-xs">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-shield-alt text-green-500"></i>
+                                <span>Pago seguro</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fab fa-cc-stripe text-purple-500 text-xl"></i>
+                                <span>Stripe</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-lock text-blue-500"></i>
+                                <span>SSL</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Info -->
+                        <p class="text-center text-sm text-gray-500 mt-4">
+                            Serás redirigido a una página segura de pago de Stripe
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-20">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-gray-400 text-sm">
+                © 2025 HabitWolf Pro. Todos los derechos reservados.
+            </p>
+            <div class="flex justify-center gap-6 mt-4 text-sm">
+                <a href="#" class="text-gray-400 hover:text-white">Términos</a>
+                <a href="#" class="text-gray-400 hover:text-white">Privacidad</a>
+                <a href="#" class="text-gray-400 hover:text-white">Contacto</a>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // ============================================
+        // CONFIGURACIÓN - TUS CLAVES REALES
+        // ============================================
+        
+        const STRIPE_PUBLISHABLE_KEY = 'pk_test_51SiNdK3sGGtSmxXXgQ2uPJ5XckqgA1NCnLWbBYtUovYHhZNlgjN836ojOrUhfLyJLxpGnM5Gy6aNV0r3vAUiyk4Y00WcAi02dR';
+        
+        const STRIPE_PRICE_IDS = {
+            pro: 'price_1SiNoG3sGGtSmxXXFytFudfi',
+            lifetime: 'price_1SiNuB3sGGtSmxXXDNhrwj9j'
+        };
+        
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        
+        // Get plan from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedPlan = urlParams.get('plan') || 'pro';
+        
+        // Show selected plan
+        document.getElementById(`${selectedPlan}-plan`).classList.remove('hidden');
+        
+        // Update total amount
+        if (selectedPlan === 'lifetime') {
+            document.getElementById('total-amount').textContent = '$199';
+            document.getElementById('billing-frequency').textContent = 'Pago único';
+        }
+        
+        // ============================================
+        // MANEJO DEL FORMULARIO
+        // ============================================
+        
+        const form = document.getElementById('payment-form');
+        const submitButton = document.getElementById('submit-button');
+        const loadingState = document.getElementById('loading-state');
+        const errorMessage = document.getElementById('error-message');
+        
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const name = document.getElementById('name').value;
+            const termsAccepted = document.getElementById('terms').checked;
+            
+            // Validaciones
+            if (!email || !email.includes('@')) {
+                showError('Por favor ingresa un email válido');
+                return;
+            }
+            
+            if (!name || name.trim().length < 2) {
+                showError('Por favor ingresa tu nombre completo');
+                return;
+            }
+            
+            if (!termsAccepted) {
+                showError('Debes aceptar los términos de servicio');
+                return;
+            }
+            
+            // Show loading
+            submitButton.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            
+            try {
+                console.log('Creating checkout session...');
+                
+                // Llamar al backend (Netlify Function)
+                const response = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        priceId: STRIPE_PRICE_IDS[selectedPlan],
+                        email: email,
+                        name: name,
+                        plan: selectedPlan
+                    }),
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Error al crear la sesión de pago');
+                }
+                
+                const { sessionId, url } = await response.json();
+                
+                console.log('Checkout session created:', sessionId);
+                
+                // Redirigir a Stripe Checkout
+                window.location.href = url;
+                
+            } catch (err) {
+                console.error('Error:', err);
+                showError(err.message || 'Ocurrió un error. Por favor intenta de nuevo.');
+                submitButton.classList.remove('hidden');
+                loadingState.classList.add('hidden');
+            }
+        });
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            
+            // Scroll to error
+            errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HabitWolf Pro - Transforma tu vida con gamificación</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="HabitWolf Pro: Sistema de autodisciplina gamificado basado en filosofías japonesas. Convierte tus hábitos en una aventura épica.">
+    <meta name="keywords" content="hábitos, gamificación, autodisciplina, ikigai, kaizen, productividad">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="HabitWolf Pro - Transforma tu vida con gamificación">
+    <meta property="og:description" content="Sistema de autodisciplina gamificado. Evoluciona de cachorro a lobo legendario.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .hero-pattern {
+            background-color: #1e293b;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23667eea' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v6h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .8;
+            }
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .feature-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    
+    <!-- Hero Section -->
+    <section class="hero-pattern min-h-screen flex items-center justify-center px-4 py-20">
+        <div class="max-w-6xl mx-auto text-center">
+            <!-- Logo/Icon -->
+            <div class="mb-8 animate-bounce">
+                <span class="text-8xl">🐺</span>
+            </div>
+            
+            <!-- Main Title -->
+            <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">
+                Transforma tu vida con<br>
+                <span class="gradient-text">HabitWolf Pro</span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                El primer sistema de autodisciplina gamificado basado en 5 filosofías japonesas milenarias.
+                <br>
+                <strong class="text-white">Evoluciona de cachorro a lobo legendario.</strong>
+            </p>
+            
+            <!-- Social Proof -->
+            <div class="flex items-center justify-center gap-6 mb-10 text-white">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <i class="fas fa-star text-yellow-400"></i>
+                    <span class="ml-2">5.0</span>
+                </div>
+                <div class="text-gray-400">|</div>
+                <div>🔥 <strong>100+</strong> usuarios activos</div>
+                <div class="text-gray-400">|</div>
+                <div>📱 Disponible como PWA</div>
+            </div>
+            
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                <a href="#pricing" class="btn-primary text-white px-10 py-5 rounded-full text-xl font-bold shadow-2xl inline-block">
+                    🚀 Comenzar Ahora - $9.99/mes
+                </a>
+                <a href="#demo" class="bg-white text-gray-800 px-10 py-5 rounded-full text-xl font-bold shadow-lg hover:shadow-xl transition-all inline-block">
+                    👀 Ver Demo Gratis
+                </a>
+            </div>
+            
+            <!-- Trust Badge -->
+            <div class="text-gray-400 text-sm">
+                ✅ Sin permanencia | ⚡ Acceso inmediato | 🔒 Pago seguro con Stripe
+            </div>
+        </div>
+    </section>
+    
+    <!-- Problem Section -->
+    <section class="py-20 px-4 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-black text-center mb-16 text-gray-800">
+                ¿Te identificas con esto? 🤔
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <div class="bg-red-50 p-8 rounded-2xl border-l-4 border-red-500">
+                    <div class="text-4xl mb-4">❌</div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">El Problema</h3>
+                    <ul class="space-y-3 text-gray-700">
+                        <li>😞 Empiezas hábitos nuevos con motivación... que desaparece en 3 días</li>
+                        <li>📱 Apps de hábitos aburridas que nunca abres</li>
+                        <li>📊 Gráficas vacías que solo te recuerdan tu fracaso</li>
+                        <li>😔 Sientes que no tienes fuerza de voluntad</li>
+                        <li>🔄 Repites el ciclo: entusiasmo → abandono → culpa</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-green-50 p-8 rounded-2xl border-l-4 border-green-500">
+                    <div class="text-4xl mb-4">✅</div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">La Solución: HabitWolf</h3>
+                    <ul class="space-y-3 text-gray-700">
+                        <li>🎮 Gamificación adictiva: cada hábito es una batalla épica</li>
+                        <li>🐺 Tu lobo evoluciona contigo (8 personajes, 5 niveles)</li>
+                        <li>🎯 Sistema de recompensas inmediatas (XP, monedas, vidas)</li>
+                        <li>📈 Espiral de Fibonacci: visualiza tu crecimiento exponencial</li>
+                        <li>🇯🇵 Filosofías japonesas: Ikigai, Kaizen, Wabi-Sabi...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="py-20 px-4 bg-gray-100">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-black text-center mb-16 text-gray-800">
+                Características que amarás 💜
+            </h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                    <div class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-gamepad text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">Gamificación Real</h3>
+                    <p class="text-gray-600 mb-4">
+                        Sistema completo de niveles, XP, monedas (Lupus), vidas, badges y evoluciones. 
+                        No es una app de hábitos... es un RPG de tu vida.
+                    </p>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>🎯 8 personajes únicos</li>
+                        <li>⭐ 5 niveles de evolución</li>
+                        <li>🏆 25+ badges desbloqueables</li>
+                        <li>💰 Tienda de recompensas</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 2 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                    <div class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-chart-line text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">Análisis Inteligente</h3>
+                    <p class="text-gray-600 mb-4">
+                        Gráficos interactivos, radar de categorías, análisis IA semanal y la legendaria 
+                        Espiral de Fibonacci que visualiza tu progreso exponencial.
+                    </p>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>📊 Charts con Chart.js</li>
+                        <li>🧠 Análisis IA contextual</li>
+                        <li>🌀 Espiral áurea matemática</li>
+                        <li>📈 Radar de balance vida-trabajo</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 3 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                    <div class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-torii-gate text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">5 Filosofías Japonesas</h3>
+                    <p class="text-gray-600 mb-4">
+                        No solo trackeas hábitos. Integras sabiduría milenaria: 
+                        Ikigai (propósito), Kaizen (mejora continua), Wabi-Sabi, Harā Hachi Bu, Ganbaru.
+                    </p>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>🎯 Ikigai: Tu propósito de vida</li>
+                        <li>🌱 Kaizen: 3-5 micro-hábitos simultáneos</li>
+                        <li>🍃 Wabi-Sabi: Perfección en lo imperfecto</li>
+                        <li>🥢 Harā Hachi Bu: Moderación consciente</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 4 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                    <div class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-book text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">Journal Personal</h3>
+                    <p class="text-gray-600 mb-4">
+                        Diario integrado con tracking de mood, exportación a PDF, búsqueda avanzada 
+                        y visualización histórica completa.
+                    </p>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>📖 Entradas ilimitadas</li>
+                        <li>😊 5 estados de ánimo</li>
+                        <li>📄 Exportación PDF profesional</li>
+                        <li>🔍 Búsqueda por fechas</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 5 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                    <div class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-sunrise text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">Rutina Matutina</h3>
+                    <p class="text-gray-600 mb-4">
+                        Sistema especial para construir un ritual matutino poderoso. 
+                        Gana el día desde las 6 AM.
+                    </p>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>🌅 Rituales personalizados</li>
+                        <li>⏰ Tracking temporal</li>
+                        <li>📊 Historial de rituales</li>
+                        <li>🎯 Recompensas especiales</li>
+                    </ul>
+                </div>
+                
+                <!-- Feature 6 -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg card-hover">
+                    <div class="feature-icon w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-mobile-alt text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-gray-800">PWA Offline</h3>
+                    <p class="text-gray-600 mb-4">
+                        Progressive Web App que funciona sin internet. 
+                        Instala en móvil, tablet o escritorio como app nativa.
+                    </p>
+                    <ul class="text-sm text-gray-600 space-y-2">
+                        <li>📱 Instalable en iOS/Android</li>
+                        <li>⚡ Funciona offline</li>
+                        <li>🔄 Service Worker integrado</li>
+                        <li>💾 Datos locales seguros</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Social Proof / Testimonials -->
+    <section class="py-20 px-4 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-black text-center mb-16 text-gray-800">
+                Lo que dicen nuestros usuarios 💬
+            </h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-8 rounded-2xl">
+                    <div class="flex items-center gap-2 mb-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-700 mb-4 italic">
+                        "Llevo 3 meses usando HabitWolf y es la ÚNICA app de hábitos que sigo abriendo. 
+                        La gamificación es adictiva y las filosofías japonesas le dan profundidad."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                            MC
+                        </div>
+                        <div>
+                            <div class="font-bold text-gray-800">María C.</div>
+                            <div class="text-sm text-gray-500">Diseñadora UX</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-8 rounded-2xl">
+                    <div class="flex items-center gap-2 mb-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-700 mb-4 italic">
+                        "La espiral de Fibonacci es pura magia visual. Ver mi progreso exponencial 
+                        me motiva a no romper la racha. ¡Ya voy en nivel 12!"
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+                            JR
+                        </div>
+                        <div>
+                            <div class="font-bold text-gray-800">Jorge R.</div>
+                            <div class="text-sm text-gray-500">Developer Full Stack</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 p-8 rounded-2xl">
+                    <div class="flex items-center gap-2 mb-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-700 mb-4 italic">
+                        "Como coach de productividad, recomiendo HabitWolf a todos mis clientes. 
+                        Combina neurociencia, gamificación y filosofía oriental perfectamente."
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                            AP
+                        </div>
+                        <div>
+                            <div class="font-bold text-gray-800">Ana P.</div>
+                            <div class="text-sm text-gray-500">Coach Certificada</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 px-4 bg-gradient-to-br from-purple-900 to-indigo-900">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-black text-center mb-8 text-white">
+                Elige tu plan 💎
+            </h2>
+            <p class="text-xl text-center text-purple-200 mb-16 max-w-2xl mx-auto">
+                Acceso completo sin limitaciones. Cancela cuando quieras.
+            </p>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Free Plan -->
+                <div class="bg-white rounded-3xl p-8 shadow-2xl">
+                    <div class="text-center mb-6">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Gratis</h3>
+                        <div class="text-5xl font-black text-gray-800 mb-2">$0</div>
+                        <p class="text-gray-500">Para probar</p>
+                    </div>
+                    
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-green-500 mt-1"></i>
+                            <span class="text-gray-700">Hasta 5 hábitos</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-green-500 mt-1"></i>
+                            <span class="text-gray-700">1 personaje básico</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-green-500 mt-1"></i>
+                            <span class="text-gray-700">Gráficos básicos</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-times text-gray-300 mt-1"></i>
+                            <span class="text-gray-400">Sin Fibonacci</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-times text-gray-300 mt-1"></i>
+                            <span class="text-gray-400">Sin filosofías</span>
+                        </li>
+                    </ul>
+                    
+                    <a href="https://lambtechsolutions.github.io/habitwolf-pro" target="_blank" class="block w-full bg-gray-200 text-gray-800 text-center py-4 rounded-full font-bold hover:bg-gray-300 transition-all">
+                        Probar Gratis
+                    </a>
+                </div>
+                
+                <!-- Pro Plan (DESTACADO) -->
+                <div class="bg-gradient-to-br from-purple-600 to-indigo-600 rounded-3xl p-8 shadow-2xl transform scale-105 border-4 border-yellow-400">
+                    <div class="text-center mb-6">
+                        <div class="bg-yellow-400 text-purple-900 px-4 py-1 rounded-full inline-block mb-4 font-bold text-sm">
+                            🔥 MÁS POPULAR
+                        </div>
+                        <h3 class="text-2xl font-bold text-white mb-2">Pro</h3>
+                        <div class="text-5xl font-black text-white mb-2">$9.99</div>
+                        <p class="text-purple-200">por mes</p>
+                    </div>
+                    
+                    <ul class="space-y-3 mb-8 text-white">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-yellow-400 mt-1"></i>
+                            <span>✅ Hábitos ILIMITADOS</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-yellow-400 mt-1"></i>
+                            <span>✅ 8 personajes + evoluciones</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-yellow-400 mt-1"></i>
+                            <span>✅ Espiral de Fibonacci</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-yellow-400 mt-1"></i>
+                            <span>✅ 5 filosofías japonesas</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-yellow-400 mt-1"></i>
+                            <span>✅ Análisis IA semanal</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-yellow-400 mt-1"></i>
+                            <span>✅ Journal + PDF export</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-yellow-400 mt-1"></i>
+                            <span>✅ Rutina matutina</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-yellow-400 mt-1"></i>
+                            <span>✅ Soporte prioritario</span>
+                        </li>
+                    </ul>
+                    
+                    <a href="comprar.html?plan=pro" class="block w-full bg-yellow-400 text-purple-900 text-center py-4 rounded-full font-bold hover:bg-yellow-300 transition-all shadow-xl pulse-animation">
+                        🚀 Comenzar Ahora
+                    </a>
+                    
+                    <p class="text-center text-purple-200 text-sm mt-4">
+                        ⚡ Acceso inmediato | ❌ Sin permanencia
+                    </p>
+                </div>
+                
+                <!-- Lifetime Plan -->
+                <div class="bg-white rounded-3xl p-8 shadow-2xl">
+                    <div class="text-center mb-6">
+                        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-1 rounded-full inline-block mb-4 font-bold text-sm">
+                            💎 MEJOR VALOR
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-800 mb-2">Lifetime</h3>
+                        <div class="text-5xl font-black text-gray-800 mb-2">$199</div>
+                        <p class="text-gray-500">pago único</p>
+                    </div>
+                    
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check text-green-500 mt-1"></i>
+                            <span class="text-gray-700 font-bold">Todo de PRO +</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-crown text-yellow-500 mt-1"></i>
+                            <span class="text-gray-700">Acceso de por vida</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-crown text-yellow-500 mt-1"></i>
+                            <span class="text-gray-700">Futuras actualizaciones</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-crown text-yellow-500 mt-1"></i>
+                            <span class="text-gray-700">Temas premium exclusivos</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-crown text-yellow-500 mt-1"></i>
+                            <span class="text-gray-700">Badge especial "Founder"</span>
+                        </li>
+                    </ul>
+                    
+                    <a href="comprar.html?plan=lifetime" class="block w-full btn-primary text-white text-center py-4 rounded-full font-bold">
+                        💎 Comprar Lifetime
+                    </a>
+                    
+                    <p class="text-center text-gray-500 text-sm mt-4">
+                        Ahorra $920 vs. 10 años de Pro
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Garantía -->
+            <div class="mt-16 text-center">
+                <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 max-w-2xl mx-auto border border-white/20">
+                    <div class="text-5xl mb-4">🛡️</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Garantía de 30 días</h3>
+                    <p class="text-purple-200">
+                        Si no ves resultados en 30 días, te devolvemos tu dinero. Sin preguntas.
+                        Tu única responsabilidad es usar la app consistentemente por 30 días.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FAQ Section -->
+    <section class="py-20 px-4 bg-gray-50">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-black text-center mb-16 text-gray-800">
+                Preguntas frecuentes 🤔
+            </h2>
+            
+            <div class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">¿Funciona offline?</h3>
+                    <p class="text-gray-600">
+                        Sí. HabitWolf es una PWA (Progressive Web App) que funciona completamente offline. 
+                        Tus datos se guardan localmente en tu dispositivo.
+                    </p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">¿Puedo cancelar cuando quiera?</h3>
+                    <p class="text-gray-600">
+                        Por supuesto. Sin contratos ni permanencia. Cancela en cualquier momento desde tu cuenta.
+                    </p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">¿Mis datos están seguros?</h3>
+                    <p class="text-gray-600">
+                        100%. Tus datos se almacenan localmente en tu navegador. No los compartimos con nadie. 
+                        Puedes exportar/importar backups cuando quieras.
+                    </p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">¿Qué dispositivos son compatibles?</h3>
+                    <p class="text-gray-600">
+                        iOS (Safari), Android (Chrome), Windows, Mac, Linux. Cualquier navegador moderno. 
+                        Puedes instalarlo como app nativa en tu móvil.
+                    </p>
+                </div>
+                
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">¿Hay actualizaciones incluidas?</h3>
+                    <p class="text-gray-600">
+                        Sí. Todos los planes incluyen actualizaciones automáticas. El plan Lifetime incluye 
+                        todas las futuras funciones sin costo adicional.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Final CTA -->
+    <section class="py-20 px-4 gradient-bg">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl md:text-6xl font-black text-white mb-6">
+                ¿Listo para evolucionar? 🐺
+            </h2>
+            <p class="text-xl md:text-2xl text-purple-100 mb-10">
+                Únete a los cientos de personas que ya transformaron su vida con HabitWolf Pro.
+                <br>
+                <strong class="text-white">Tu lobo interior te está esperando.</strong>
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+                <a href="comprar.html?plan=pro" class="bg-yellow-400 text-purple-900 px-12 py-6 rounded-full text-2xl font-bold shadow-2xl hover:bg-yellow-300 transition-all pulse-animation inline-block">
+                    🚀 Comenzar por $9.99/mes
+                </a>
+            </div>
+            
+            <p class="text-purple-200 text-sm">
+                ✅ Sin permanencia | ⚡ Acceso inmediato | 🔒 Pago seguro | 🛡️ Garantía 30 días
+            </p>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h4 class="font-bold text-xl mb-4">🐺 HabitWolf Pro</h4>
+                    <p class="text-gray-400 text-sm">
+                        Transforma tu vida con gamificación y filosofías japonesas.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Producto</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white">Características</a></li>
+                        <li><a href="#pricing" class="hover:text-white">Precios</a></li>
+                        <li><a href="#" class="hover:text-white">Demo</a></li>
+                        <li><a href="#" class="hover:text-white">Roadmap</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Soporte</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white">Documentación</a></li>
+                        <li><a href="#" class="hover:text-white">Contacto</a></li>
+                        <li><a href="#" class="hover:text-white">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white">Estado del servicio</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white">Términos de uso</a></li>
+                        <li><a href="#" class="hover:text-white">Privacidad</a></li>
+                        <li><a href="#" class="hover:text-white">Cookies</a></li>
+                        <li><a href="#" class="hover:text-white">Reembolsos</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm mb-4 md:mb-0">
+                    © 2025 HabitWolf Pro. Todos los derechos reservados.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-youtube text-xl"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-discord text-xl"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scripts adicionales -->
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+        
+        // Tracking de conversión (implementar con tu sistema)
+        const trackCTA = (plan) => {
+            console.log(`CTA clicked: ${plan}`);
+            // Aquí integrar Google Analytics, Facebook Pixel, etc.
+        };
+    </script>
+</body>
+</html>
