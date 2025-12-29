@@ -5482,42 +5482,100 @@
                     
                     let cellContent = '';
                     if (habitsInSlot.length > 0) {
-                        habitsInSlot.forEach(habit => {
+                        // Get habits that start in this hour
+                        const habitsStartingHere = habitsInSlot.filter(habit => {
                             const startHour = parseInt(habit.schedule.startTime.split(':')[0]);
+                            return currentHour === startHour;
+                        });
+                        
+                        // Sort by start minute to render in order
+                        habitsStartingHere.sort((a, b) => {
+                            const aMin = parseInt(a.schedule.startTime.split(':')[1] || 0);
+                            const bMin = parseInt(b.schedule.startTime.split(':')[1] || 0);
+                            return aMin - bMin;
+                        });
+                        
+                        // Detect overlaps and assign columns
+                        const columns = [];
+                        habitsStartingHere.forEach(habit => {
+                            const startHour = parseInt(habit.schedule.startTime.split(':')[0]);
+                            const startMinute = parseInt(habit.schedule.startTime.split(':')[1] || 0);
+                            const endHour = parseInt(habit.schedule.endTime.split(':')[0]);
+                            const endMinute = parseInt(habit.schedule.endTime.split(':')[1] || 0);
                             
-                            // Only render the block in the starting hour to avoid duplicates
-                            if (currentHour === startHour) {
-                                const category = gameData.categories[habit.category];
-                                const isCompleted = dayLog?.habits?.includes(habit.id);
-                                const bgColor = isCompleted ? 'bg-green-600' : 'bg-blue-600';
-                                const opacity = isCompleted ? 'bg-opacity-80' : 'bg-opacity-60';
+                            const startTime = startHour * 60 + startMinute;
+                            const endTime = endHour * 60 + endMinute;
+                            
+                            // Find a column where this habit doesn't overlap
+                            let columnIndex = 0;
+                            while (columnIndex < columns.length) {
+                                const column = columns[columnIndex];
+                                const hasOverlap = column.some(h => {
+                                    const hStart = parseInt(h.schedule.startTime.split(':')[0]) * 60 + 
+                                                  parseInt(h.schedule.startTime.split(':')[1] || 0);
+                                    const hEnd = parseInt(h.schedule.endTime.split(':')[0]) * 60 + 
+                                                parseInt(h.schedule.endTime.split(':')[1] || 0);
+                                    return !(endTime <= hStart || startTime >= hEnd);
+                                });
                                 
-                                // Calculate duration in hours
-                                const endHour = parseInt(habit.schedule.endTime.split(':')[0]);
-                                const endMinute = parseInt(habit.schedule.endTime.split(':')[1] || 0);
-                                const startMinute = parseInt(habit.schedule.startTime.split(':')[1] || 0);
-                                
-                                // Calculate duration more precisely
-                                let durationHours = endHour - startHour;
-                                if (endMinute > 0 || startMinute > 0) {
-                                    durationHours = (endHour * 60 + endMinute - startHour * 60 - startMinute) / 60;
-                                }
-                                
-                                // Height calculation: each hour = 60px (approximate cell height)
-                                const blockHeight = Math.max(durationHours * 60, 50); // Minimum 50px
-                                
-                                cellContent += `
-                                    <div class="${bgColor} ${opacity} text-white text-xs p-2 rounded cursor-pointer hover:opacity-100 transition-opacity absolute"
-                                         onclick="toggleHabitFromCalendar('${habit.id}', '${dateStr}')"
-                                         title="${habit.name} - ${habit.schedule.startTime} a ${habit.schedule.endTime}"
-                                         style="height: ${blockHeight}px; width: calc(100% - 8px); top: 0; left: 4px; z-index: 10;">
-                                        <div class="font-semibold">${category.emoji} ${habit.name}</div>
-                                        <div class="text-xs opacity-75 mt-1">${habit.schedule.startTime} - ${habit.schedule.endTime}</div>
-                                        <div class="text-xs opacity-75">(${durationHours.toFixed(1)}h)</div>
-                                        ${isCompleted ? '<div class="text-xs mt-1">✅ Completado</div>' : ''}
-                                    </div>
-                                `;
+                                if (!hasOverlap) break;
+                                columnIndex++;
                             }
+                            
+                            if (columnIndex >= columns.length) {
+                                columns.push([]);
+                            }
+                            columns[columnIndex].push(habit);
+                            habit._column = columnIndex;
+                            habit._totalColumns = 0; // Will be set after
+                        });
+                        
+                        // Set total columns for width calculation
+                        const totalColumns = columns.length;
+                        habitsStartingHere.forEach(h => h._totalColumns = totalColumns);
+                        
+                        // Render habits with column-based positioning
+                        habitsStartingHere.forEach(habit => {
+                            const startHour = parseInt(habit.schedule.startTime.split(':')[0]);
+                            const category = gameData.categories[habit.category];
+                            const isCompleted = dayLog?.habits?.includes(habit.id);
+                            const bgColor = isCompleted ? 'bg-green-600' : 'bg-blue-600';
+                            const opacity = isCompleted ? 'bg-opacity-80' : 'bg-opacity-60';
+                            
+                            // Calculate duration in hours
+                            const endHour = parseInt(habit.schedule.endTime.split(':')[0]);
+                            const endMinute = parseInt(habit.schedule.endTime.split(':')[1] || 0);
+                            const startMinute = parseInt(habit.schedule.startTime.split(':')[1] || 0);
+                            
+                            // Calculate duration more precisely
+                            let durationHours = endHour - startHour;
+                            if (endMinute > 0 || startMinute > 0) {
+                                durationHours = (endHour * 60 + endMinute - startHour * 60 - startMinute) / 60;
+                            }
+                            
+                            // Height calculation: each hour = 60px (approximate cell height)
+                            const blockHeight = Math.max(durationHours * 60, 50); // Minimum 50px
+                            
+                            // Calculate vertical offset based on start minutes
+                            const topOffset = startMinute; // 1 minute = 1 pixel
+                            
+                            // Calculate horizontal position for overlapping habits
+                            const columnIndex = habit._column;
+                            const totalColumns = habit._totalColumns;
+                            const widthPercent = 100 / totalColumns;
+                            const leftPercent = (columnIndex * widthPercent);
+                            
+                            cellContent += `
+                                <div class="${bgColor} ${opacity} text-white text-xs p-1 rounded cursor-pointer hover:opacity-100 transition-opacity absolute"
+                                     onclick="toggleHabitFromCalendar('${habit.id}', '${dateStr}')"
+                                     title="${habit.name} - ${habit.schedule.startTime} a ${habit.schedule.endTime}"
+                                     style="height: ${blockHeight}px; width: ${widthPercent}%; top: ${topOffset}px; left: ${leftPercent}%; z-index: 10; overflow: hidden;">
+                                    <div class="font-semibold text-xs">${category.emoji} ${habit.name}</div>
+                                    <div class="text-xs opacity-75">${habit.schedule.startTime}-${habit.schedule.endTime}</div>
+                                    ${totalColumns === 1 ? `<div class="text-xs opacity-75">(${durationHours.toFixed(1)}h)</div>` : ''}
+                                    ${isCompleted ? '<div class="text-xs">✅</div>' : ''}
+                                </div>
+                            `;
                         });
                     }
                     
