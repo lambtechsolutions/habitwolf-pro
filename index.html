@@ -544,6 +544,7 @@
                     <h4 id="habit-form-title" class="text-white font-semibold mb-4">Agregar Nuevo Hábito</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                         <input type="text" id="new-habit-name" placeholder="Nombre del hábito" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
+                        <textarea id="new-habit-description" placeholder="Descripción (opcional)" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90 col-span-1 md:col-span-2 lg:col-span-5" rows="2"></textarea>
                         <select id="new-habit-category" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
                             <option value="">Seleccionar categoría</option>
                             <option value="fitness">💪 Fitness & Salud</option>
@@ -1897,6 +1898,7 @@
         // Habit Management with meta and unit
         function addNewHabit() {
             const name = document.getElementById('new-habit-name').value.trim();
+            const description = document.getElementById('new-habit-description').value.trim();
             const category = document.getElementById('new-habit-category').value;
             const target = parseInt(document.getElementById('new-habit-target').value) || 1;
             const unit = document.getElementById('new-habit-unit').value.trim() || 'vez';
@@ -1909,6 +1911,7 @@
             const newHabit = {
                 id: Date.now().toString(),
                 name: name,
+                description: description,
                 category: category,
                 target: target,
                 unit: unit,
@@ -1926,6 +1929,7 @@
             
             // Clear form
             document.getElementById('new-habit-name').value = '';
+            document.getElementById('new-habit-description').value = '';
             document.getElementById('new-habit-category').value = '';
             document.getElementById('new-habit-target').value = '';
             document.getElementById('new-habit-unit').value = '';
@@ -1941,6 +1945,7 @@
             
             // Fill form with current habit data
             document.getElementById('new-habit-name').value = habit.name;
+            document.getElementById('new-habit-description').value = habit.description || '';
             document.getElementById('new-habit-category').value = habit.category;
             document.getElementById('new-habit-target').value = habit.target;
             document.getElementById('new-habit-unit').value = habit.unit;
@@ -1967,6 +1972,7 @@
         
         function saveHabitEdit(habitId) {
             const name = document.getElementById('new-habit-name').value.trim();
+            const description = document.getElementById('new-habit-description').value.trim();
             const category = document.getElementById('new-habit-category').value;
             const target = parseInt(document.getElementById('new-habit-target').value) || 1;
             const unit = document.getElementById('new-habit-unit').value.trim() || 'vez';
@@ -1982,6 +1988,7 @@
                 gameData.habits[habitIndex] = {
                     ...gameData.habits[habitIndex],
                     name: name,
+                    description: description,
                     category: category,
                     target: target,
                     unit: unit
@@ -2051,6 +2058,7 @@
                             <span class="text-2xl">${category.emoji}</span>
                             <div>
                                 <h4 class="text-white font-semibold">${habit.name}</h4>
+                                ${habit.description ? `<p class="text-gray-300 text-sm italic mt-1">"${habit.description}"</p>` : ''}
                                 <p class="text-blue-200 text-sm">${category.name} • Meta: ${habit.target} ${habit.unit} • Racha: ${streak} días</p>
                                 <p class="text-yellow-200 text-xs">🌀 Nivel Fibonacci: ${fibLevel}</p>
                             </div>
@@ -2099,6 +2107,7 @@
                         <span class="text-2xl">${category.emoji}</span>
                         <div class="flex-grow">
                             <h4 class="text-white font-semibold ${isCompleted ? 'line-through opacity-75' : ''}">${habit.name}</h4>
+                            ${habit.description ? `<p class="text-gray-300 text-xs italic mt-1">"${habit.description}"</p>` : ''}
                             <p class="text-blue-200 text-sm">${category.name} • Meta: ${habit.target} ${habit.unit} ${isFuture ? '• 🔒 Futuro' : ''}</p>
                         </div>
                         ${isCompleted ? '<span class="text-green-400 text-xl">✅</span>' : ''}
