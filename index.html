@@ -1487,6 +1487,22 @@
                     <div class="text-blue-200 text-sm" id="week-status"></div>
                 </div>
                 
+                <!-- 🔧 Herramientas de Mantenimiento -->
+                <div class="mb-4 flex flex-wrap gap-2 justify-center">
+                    <button onclick="verificarIntegridadDatos()" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors shadow-lg">
+                        🔍 Verificar Integridad
+                    </button>
+                    <button onclick="eliminarDuplicados()" 
+                            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors shadow-lg">
+                        🧹 Limpiar Duplicados
+                    </button>
+                    <button onclick="inyectarMisHabitos()" 
+                            class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors shadow-lg">
+                        🔥 Inyectar Hábitos
+                    </button>
+                </div>
+                
                 <!-- Calendar Grid -->
                 <div class="bg-white bg-opacity-5 rounded-lg p-4 overflow-x-auto">
                     <div id="calendar-grid" class="min-w-full">
@@ -5553,10 +5569,183 @@
             renderCalendar();
         }
         
+        // 🧹 FUNCIÓN DE LIMPIEZA DE DUPLICADOS
+        function eliminarDuplicados() {
+            console.log('🧹 INICIANDO LIMPIEZA DE DUPLICADOS...');
+            console.log(`📊 Total de hábitos ANTES: ${gameData.habits.length}`);
+            
+            const habitosAntesDeCleanup = gameData.habits.length;
+            
+            // Crear un Map para rastrear hábitos únicos por nombre y horario
+            const habitosUnicos = new Map();
+            
+            gameData.habits.forEach(habit => {
+                // Crear una clave única basada en nombre, hora de inicio y días de la semana
+                const scheduleKey = habit.schedule && habit.schedule.enabled 
+                    ? `${habit.schedule.startTime}-${habit.schedule.weekdays.sort().join(',')}`
+                    : 'no-schedule';
+                
+                const uniqueKey = `${habit.name}|${scheduleKey}`;
+                
+                // Si este hábito no existe aún, agregarlo
+                if (!habitosUnicos.has(uniqueKey)) {
+                    habitosUnicos.set(uniqueKey, habit);
+                    console.log(`✅ Agregado: ${habit.name} (${scheduleKey})`);
+                } else {
+                    // Mantener el que tenga más datos (mayor racha, totalCompleted, etc.)
+                    const existing = habitosUnicos.get(uniqueKey);
+                    if (habit.totalCompleted > existing.totalCompleted || 
+                        habit.streak > existing.streak) {
+                        habitosUnicos.set(uniqueKey, habit);
+                        console.log(`🔄 Actualizado: ${habit.name} (mejor streak/totalCompleted)`);
+                    } else {
+                        console.log(`🗑️ Eliminado duplicado: ${habit.name}`);
+                    }
+                }
+            });
+            
+            // Reemplazar hábitos con lista deduplicada
+            gameData.habits = Array.from(habitosUnicos.values());
+            
+            const duplicadosEliminados = habitosAntesDeCleanup - gameData.habits.length;
+            console.log(`✅ Total de hábitos DESPUÉS: ${gameData.habits.length}`);
+            console.log(`🗑️ Eliminados: ${duplicadosEliminados} duplicados`);
+            
+            // Guardar cambios
+            saveGameData();
+            
+            // Actualizar UI
+            try {
+                updateHabitsList();
+                loadDailyHabits();
+                renderCalendar();
+                updateDashboard();
+            } catch (e) {
+                console.error('Error actualizando UI:', e);
+            }
+            
+            showNotification(`🎉 Limpieza completada: ${gameData.habits.length} hábitos únicos (eliminados ${duplicadosEliminados} duplicados)`, 'success');
+            
+            return {
+                antes: habitosAntesDeCleanup,
+                despues: gameData.habits.length,
+                eliminados: duplicadosEliminados
+            };
+        }
+        
+        // 🔍 FUNCIÓN DE VERIFICACIÓN DE INTEGRIDAD
+        function verificarIntegridadDatos() {
+            console.log('🔍 VERIFICANDO INTEGRIDAD DE DATOS...');
+            
+            const report = {
+                totalHabits: gameData.habits.length,
+                scheduledHabits: 0,
+                unscheduledHabits: 0,
+                duplicateNames: [],
+                invalidSchedules: [],
+                habitsByCategory: {}
+            };
+            
+            const nameCount = {};
+            const scheduleCount = {};
+            
+            gameData.habits.forEach(habit => {
+                // Contar por nombre
+                nameCount[habit.name] = (nameCount[habit.name] || 0) + 1;
+                
+                // Contar por categoría
+                if (!report.habitsByCategory[habit.category]) {
+                    report.habitsByCategory[habit.category] = 0;
+                }
+                report.habitsByCategory[habit.category]++;
+                
+                // Verificar horario
+                if (habit.schedule && habit.schedule.enabled) {
+                    report.scheduledHabits++;
+                    
+                    // Crear clave de horario
+                    const scheduleKey = `${habit.name}|${habit.schedule.startTime}-${habit.schedule.weekdays.sort().join(',')}`;
+                    scheduleCount[scheduleKey] = (scheduleCount[scheduleKey] || 0) + 1;
+                    
+                    // Validar horario
+                    if (!habit.schedule.startTime || !habit.schedule.endTime || !habit.schedule.weekdays) {
+                        report.invalidSchedules.push(habit.name);
+                    }
+                } else {
+                    report.unscheduledHabits++;
+                }
+            });
+            
+            // Encontrar duplicados por nombre
+            Object.keys(nameCount).forEach(name => {
+                if (nameCount[name] > 1) {
+                    report.duplicateNames.push(`${name} (${nameCount[name]}x)`);
+                }
+            });
+            
+            // Encontrar duplicados por horario
+            const duplicateSchedules = [];
+            Object.keys(scheduleCount).forEach(key => {
+                if (scheduleCount[key] > 1) {
+                    duplicateSchedules.push(`${key.split('|')[0]} (${scheduleCount[key]}x en mismo horario)`);
+                }
+            });
+            
+            console.log('📊 REPORTE DE INTEGRIDAD:', report);
+            console.log('📋 Duplicados de horario:', duplicateSchedules);
+            
+            let message = `📊 REPORTE DE INTEGRIDAD\n\n`;
+            message += `Total de hábitos: ${report.totalHabits}\n`;
+            message += `Con horario: ${report.scheduledHabits}\n`;
+            message += `Sin horario: ${report.unscheduledHabits}\n\n`;
+            
+            message += `📂 Por categoría:\n`;
+            Object.keys(report.habitsByCategory).forEach(cat => {
+                const category = gameData.categories[cat];
+                const emoji = category ? category.emoji : '📌';
+                message += `  ${emoji} ${cat}: ${report.habitsByCategory[cat]}\n`;
+            });
+            
+            if (report.duplicateNames.length > 0) {
+                message += `\n⚠️ DUPLICADOS POR NOMBRE:\n${report.duplicateNames.join('\n')}\n`;
+            }
+            
+            if (duplicateSchedules.length > 0) {
+                message += `\n⚠️ DUPLICADOS POR HORARIO:\n${duplicateSchedules.join('\n')}\n`;
+            }
+            
+            if (report.duplicateNames.length > 0 || duplicateSchedules.length > 0) {
+                message += `\n💡 Usa el botón "🧹 Limpiar Duplicados" para corregir.`;
+            } else {
+                message += `\n✅ No se encontraron duplicados.`;
+            }
+            
+            if (report.invalidSchedules.length > 0) {
+                message += `\n\n⚠️ Horarios inválidos:\n${report.invalidSchedules.join('\n')}`;
+            }
+            
+            alert(message);
+            return report;
+        }
+        
         // 🔥 INYECTOR DE MIS 17 HÁBITOS
         function inyectarMisHabitos() {
-            if (!confirm('⚠️ ADVERTENCIA: Esto eliminará TODOS los hábitos existentes y creará 17 nuevos.\n\n¿Continuar?')) {
-                return;
+            // PREVENCIÓN DE DUPLICADOS: Verificar si ya existen hábitos
+            if (gameData.habits.length > 0) {
+                const mensaje = `⚠️ ATENCIÓN: Ya tienes ${gameData.habits.length} hábitos creados.\n\n` +
+                               `Esto eliminará TODOS los hábitos existentes y los reemplazará con 19 hábitos predefinidos.\n\n` +
+                               `Si ya inyectaste antes, presiona CANCELAR para evitar duplicados.\n\n` +
+                               `¿Deseas CONTINUAR y REEMPLAZAR todos los hábitos?`;
+                
+                if (!confirm(mensaje)) {
+                    console.log('❌ Inyección cancelada por el usuario para prevenir duplicados');
+                    showNotification('✅ Inyección cancelada. No se modificaron los hábitos.', 'info');
+                    return;
+                }
+            } else {
+                if (!confirm('🎉 Vas a inyectar 19 hábitos predefinidos.\n\n¿Continuar?')) {
+                    return;
+                }
             }
 
             console.log('🚀 Iniciando inyección de hábitos...');
