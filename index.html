@@ -5491,10 +5491,10 @@
                                 const blockHeight = Math.max(durationHours * 60, 50); // Minimum 50px
                                 
                                 cellContent += `
-                                    <div class="${bgColor} ${opacity} text-white text-xs p-2 rounded cursor-pointer hover:opacity-100 transition-opacity relative"
+                                    <div class="${bgColor} ${opacity} text-white text-xs p-2 rounded cursor-pointer hover:opacity-100 transition-opacity absolute"
                                          onclick="toggleHabitFromCalendar('${habit.id}', '${dateStr}')"
                                          title="${habit.name} - ${habit.schedule.startTime} a ${habit.schedule.endTime}"
-                                         style="height: ${blockHeight}px; min-height: ${blockHeight}px; position: relative; z-index: 10; margin-bottom: 2px;">
+                                         style="height: ${blockHeight}px; width: calc(100% - 8px); top: 0; left: 4px; z-index: 10;">
                                         <div class="font-semibold">${category.emoji} ${habit.name}</div>
                                         <div class="text-xs opacity-75 mt-1">${habit.schedule.startTime} - ${habit.schedule.endTime}</div>
                                         <div class="text-xs opacity-75">(${durationHours.toFixed(1)}h)</div>
@@ -5505,7 +5505,7 @@
                         });
                     }
                     
-                    calendarHTML += `<td class="border border-blue-400 border-opacity-20 p-1 align-top ${isToday ? 'bg-orange-500 bg-opacity-10' : ''}" style="min-height: 60px; height: 60px; vertical-align: top;">${cellContent}</td>`;
+                    calendarHTML += `<td class="border border-blue-400 border-opacity-20 p-1 align-top ${isToday ? 'bg-orange-500 bg-opacity-10' : ''}" style="min-height: 60px; height: 60px; vertical-align: top; position: relative;">${cellContent}</td>`;
                 });
                 
                 calendarHTML += '</tr>';
