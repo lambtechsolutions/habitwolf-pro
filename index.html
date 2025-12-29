@@ -2020,11 +2020,15 @@
             const hasSchedule = document.getElementById('habit-has-schedule').checked;
             let schedule = null;
             
+            console.log('🔍 DEBUG addNewHabit - hasSchedule:', hasSchedule);
+            
             if (hasSchedule) {
                 const startTime = document.getElementById('habit-start-time').value;
                 const endTime = document.getElementById('habit-end-time').value;
                 const weekdaysCheckboxes = document.querySelectorAll('.weekday-checkbox:checked');
                 const weekdays = Array.from(weekdaysCheckboxes).map(cb => parseInt(cb.value));
+                
+                console.log('🔍 startTime:', startTime, '| endTime:', endTime, '| weekdays:', weekdays);
                 
                 if (!startTime || !endTime) {
                     showNotification('⚠️ Completa los horarios de inicio y fin', 'error');
@@ -2037,6 +2041,10 @@
                     endTime: endTime,
                     weekdays: weekdays.length > 0 ? weekdays : [0,1,2,3,4,5,6]
                 };
+                
+                console.log('✅ Schedule creado:', JSON.stringify(schedule));
+            } else {
+                console.log('⚠️ Checkbox NO marcado - schedule será null');
             }
             
             if (!name || !category) {
@@ -2093,6 +2101,32 @@
             document.getElementById('new-habit-target').value = habit.target;
             document.getElementById('new-habit-unit').value = habit.unit;
             
+            // Load schedule data if exists
+            if (habit.schedule && habit.schedule.enabled) {
+                document.getElementById('habit-has-schedule').checked = true;
+                document.getElementById('habit-start-time').value = habit.schedule.startTime || '';
+                document.getElementById('habit-end-time').value = habit.schedule.endTime || '';
+                
+                // Uncheck all weekdays first
+                document.querySelectorAll('.weekday-checkbox').forEach(cb => cb.checked = false);
+                
+                // Check selected weekdays
+                if (habit.schedule.weekdays && habit.schedule.weekdays.length > 0) {
+                    habit.schedule.weekdays.forEach(day => {
+                        const checkbox = document.querySelector(`.weekday-checkbox[value="${day}"]`);
+                        if (checkbox) checkbox.checked = true;
+                    });
+                }
+                
+                toggleScheduleFields();
+            } else {
+                document.getElementById('habit-has-schedule').checked = false;
+                document.getElementById('habit-start-time').value = '';
+                document.getElementById('habit-end-time').value = '';
+                document.querySelectorAll('.weekday-checkbox').forEach(cb => cb.checked = true);
+                toggleScheduleFields();
+            }
+            
             // Change form to edit mode
             document.getElementById('habit-form-title').textContent = 'Editar Hábito';
             document.getElementById('habit-form-button').innerHTML = '💾 Guardar Cambios';
@@ -2120,6 +2154,37 @@
             const target = parseInt(document.getElementById('new-habit-target').value) || 1;
             const unit = document.getElementById('new-habit-unit').value.trim() || 'vez';
             
+            // Capture schedule data
+            const hasSchedule = document.getElementById('habit-has-schedule').checked;
+            let schedule = null;
+            
+            console.log('🔍 DEBUG saveHabitEdit - hasSchedule:', hasSchedule);
+            
+            if (hasSchedule) {
+                const startTime = document.getElementById('habit-start-time').value;
+                const endTime = document.getElementById('habit-end-time').value;
+                const weekdaysCheckboxes = document.querySelectorAll('.weekday-checkbox:checked');
+                const weekdays = Array.from(weekdaysCheckboxes).map(cb => parseInt(cb.value));
+                
+                console.log('🔍 startTime:', startTime, '| endTime:', endTime, '| weekdays:', weekdays);
+                
+                if (!startTime || !endTime) {
+                    showNotification('⚠️ Completa los horarios de inicio y fin', 'error');
+                    return;
+                }
+                
+                schedule = {
+                    enabled: true,
+                    startTime: startTime,
+                    endTime: endTime,
+                    weekdays: weekdays.length > 0 ? weekdays : [0,1,2,3,4,5,6]
+                };
+                
+                console.log('✅ Schedule creado:', JSON.stringify(schedule));
+            } else {
+                console.log('⚠️ Checkbox NO marcado - schedule será null');
+            }
+            
             if (!name || !category) {
                 showNotification('⚠️ Completa todos los campos requeridos', 'error');
                 return;
@@ -2134,13 +2199,15 @@
                     description: description,
                     category: category,
                     target: target,
-                    unit: unit
+                    unit: unit,
+                    schedule: schedule  // NEW: Update schedule data
                 };
                 
                 saveGameData();
                 cancelHabitEdit();
                 updateHabitsList();
                 loadDailyHabits();
+                renderCalendar(); // Update calendar if visible
                 showNotification('✅ Hábito actualizado exitosamente', 'success');
             }
         }
@@ -2148,9 +2215,15 @@
         function cancelHabitEdit() {
             // Reset form
             document.getElementById('new-habit-name').value = '';
+            document.getElementById('new-habit-description').value = '';
             document.getElementById('new-habit-category').value = '';
             document.getElementById('new-habit-target').value = '';
             document.getElementById('new-habit-unit').value = '';
+            document.getElementById('habit-has-schedule').checked = false;
+            document.getElementById('habit-start-time').value = '';
+            document.getElementById('habit-end-time').value = '';
+            document.querySelectorAll('.weekday-checkbox').forEach(cb => cb.checked = true);
+            toggleScheduleFields();
             
             // Reset form to add mode
             document.getElementById('habit-form-title').textContent = 'Agregar Nuevo Hábito';
@@ -5289,8 +5362,23 @@
             const container = document.getElementById('calendar-grid');
             
             // Get habits with schedule
+            // DEBUG: Log habits structure
+            console.log('📊 DEBUG - Total hábitos:', gameData.habits.length);
+            gameData.habits.forEach((h, i) => {
+                console.log(`Hábito ${i + 1}: "${h.name}"`, {
+                    hasSchedule: !!h.schedule,
+                    scheduleEnabled: h.schedule?.enabled,
+                    startTime: h.schedule?.startTime,
+                    endTime: h.schedule?.endTime,
+                    weekdays: h.schedule?.weekdays
+                });
+            });
+            
             const scheduledHabits = gameData.habits.filter(h => h.schedule && h.schedule.enabled);
             const unscheduledHabits = gameData.habits.filter(h => !h.schedule || !h.schedule.enabled);
+            
+            console.log('✅ Con horario:', scheduledHabits.length, scheduledHabits.map(h => h.name));
+            console.log('❌ Sin horario:', unscheduledHabits.length, unscheduledHabits.map(h => h.name));
             
             if (gameData.habits.length === 0) {
                 container.innerHTML = `
@@ -5302,9 +5390,9 @@
                 return;
             }
             
-            // Create hours array (5am to 11pm for better visibility)
+            // Create hours array (24 hours: 00:00 to 23:00)
             const hours = [];
-            for (let h = 5; h < 24; h++) {
+            for (let h = 0; h < 24; h++) {
                 hours.push(`${h.toString().padStart(2, '0')}:00`);
             }
             
