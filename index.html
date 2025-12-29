@@ -5555,11 +5555,12 @@
         
         // 🔥 INYECTOR DE MIS 17 HÁBITOS
         function inyectarMisHabitos() {
-            if (!confirm('¿Estás seguro de inyectar tus 17 hábitos? Se agregarán a tu lista actual.')) {
+            if (!confirm('⚠️ ADVERTENCIA: Esto eliminará TODOS los hábitos existentes y creará 17 nuevos.\n\n¿Continuar?')) {
                 return;
             }
 
             console.log('🚀 Iniciando inyección de hábitos...');
+            console.log('🧹 Limpiando datos anteriores...');
             
             // CRÍTICO: Asegurar que la categoría "writing" existe
             if (!gameData.categories.writing) {
@@ -5580,14 +5581,29 @@
             });
             console.log('✅ Todas las categorías verificadas');
 
+            // LIMPIEZA COMPLETA: Eliminar hábitos, streaks y logs
+            const habitosAnteriores = gameData.habits.length;
+            console.log(`⚠️ Limpiando ${habitosAnteriores} hábitos existentes...`);
+            
+            // Backup de datos importantes
+            const playerBackup = {...gameData.player};
+            const journalBackup = [...(gameData.journal || [])];
+            const philosophiesBackup = {...gameData.philosophies};
+            
+            // Limpiar hábitos y relacionados
+            gameData.habits = [];
+            gameData.streaks = {};
+            gameData.dailyLogs = {}; // ⚠️ ESTO LIMPIA EL HISTORIAL
+            
+            // ✅ HORARIOS CORREGIDOS - Sin duplicados
             const habitosNuevos = [
-                // 🏋️ PILAR 1: CUERPO (5 Hábitos)
+                // 🏋️ PILAR 1: CUERPO (6 Hábitos)
                 { name: "Despertar 4:30 AM", description: "Levantarme a las 4:30 AM para ritual matutino samurái", category: "morning", target: 1, unit: "vez", schedule: { enabled: true, startTime: "04:30", endTime: "05:30", weekdays: [1,2,3,4,5,6] }},
-                { name: "Gimnasio 60 min", description: "Entrenamiento de fuerza y resistencia", category: "fitness", target: 60, unit: "min", schedule: { enabled: true, startTime: "19:00", endTime: "20:00", weekdays: [2,4,5] }},
+                { name: "Gimnasio 60 min (Mar/Jue/Vie)", description: "Entrenamiento de fuerza y resistencia", category: "fitness", target: 60, unit: "min", schedule: { enabled: true, startTime: "19:00", endTime: "20:00", weekdays: [2,4,5] }},
                 { name: "Gimnasio Domingo", description: "Cuarta sesión semanal", category: "fitness", target: 60, unit: "min", schedule: { enabled: true, startTime: "10:00", endTime: "11:00", weekdays: [0] }},
                 { name: "Meal Prep Semanal", description: "Preparar 10-12 comidas para Lun-Sáb", category: "cooking", target: 1, unit: "sesión", schedule: { enabled: true, startTime: "11:00", endTime: "14:00", weekdays: [0] }},
                 { name: "Hidratación 2L diarios", description: "Beber 2 litros de agua para energía óptima", category: "water", target: 2, unit: "litros", schedule: null },
-                { name: "Dormir 9:30 PM", description: "Luces apagadas para 7 horas de sueño (NO-NEGOCIABLE)", category: "sleep", target: 1, unit: "vez", schedule: { enabled: true, startTime: "21:30", endTime: "04:30", weekdays: [0,1,2,3,4,5] }},
+                { name: "Dormir 9:30 PM", description: "Luces apagadas para 7 horas de sueño (NO-NEGOCIABLE)", category: "sleep", target: 1, unit: "vez", schedule: { enabled: true, startTime: "21:30", endTime: "23:59", weekdays: [0,1,2,3,4,5,6] }},
                 
                 // 🧠 PILAR 2: MENTE (4 Hábitos)
                 { name: "Meditación matutina 5 min", description: "Claridad mental para empezar el día", category: "meditation", target: 5, unit: "min", schedule: { enabled: true, startTime: "04:45", endTime: "04:50", weekdays: [1,2,3,4,5,6] }},
@@ -5596,7 +5612,8 @@
                 { name: "Estudiar alemán 20 min", description: "150 horas/año para fluidez conversacional", category: "learning", target: 20, unit: "min", schedule: { enabled: true, startTime: "20:00", endTime: "20:20", weekdays: [1,2,3,4,5,6] }},
                 
                 // 💼 PILAR 3: TRABAJO (3 Hábitos)
-                { name: "Trabajo Peachtree", description: "Peachtree Roofing Supply - $773/semana", category: "work", target: 12, unit: "horas", schedule: { enabled: true, startTime: "06:00", endTime: "18:00", weekdays: [1,2,3,4,5,6] }},
+                { name: "Trabajo Peachtree", description: "Peachtree Roofing Supply - $773/semana", category: "work", target: 12, unit: "horas", schedule: { enabled: true, startTime: "06:00", endTime: "18:00", weekdays: [1,2,3,4,5] }},
+                { name: "Trabajo Peachtree (Sábado)", description: "Medio día Peachtree", category: "work", target: 6, unit: "horas", schedule: { enabled: true, startTime: "06:00", endTime: "14:00", weekdays: [6] }},
                 { name: "LambTech Solutions", description: "Desarrollo + marketing (9-10h/semana)", category: "work", target: 2, unit: "horas", schedule: null },
                 { name: "Sesión financiera semanal", description: "Revisar gastos, saldo, proyectar próxima semana", category: "finance", target: 30, unit: "min", schedule: { enabled: true, startTime: "20:00", endTime: "20:30", weekdays: [5] }},
                 
@@ -5663,17 +5680,22 @@
                 console.error('❌ Error en updateDashboard:', e.message);
             }
 
+            // Restaurar datos importantes
+            gameData.player = playerBackup;
+            gameData.journal = journalBackup;
+            gameData.philosophies = philosophiesBackup;
+            
             console.log('🎉 ¡INYECCIÓN COMPLETADA!');
             console.log(`📊 Total de hábitos ahora: ${gameData.habits.length}`);
+            console.log('⚠️ Nota: Se borró el historial de dailyLogs para evitar duplicados');
 
-            showNotification(`🎉 ${contador} hábitos inyectados correctamente. Total: ${gameData.habits.length}`, 'success');
+            showNotification(`🎉 ${contador} hábitos inyectados correctamente. HISTORIAL LIMPIADO.`, 'success');
             
-            // Recargar la página para forzar actualización completa
+            // Recargar la página automáticamente
             setTimeout(() => {
-                if (confirm('¿Recargar la página para actualizar la interfaz?')) {
-                    location.reload();
-                }
-            }, 1000);
+                console.log('🔄 Recargando página...');
+                location.reload();
+            }, 2000);
         }
         
         // Service Worker Registration
