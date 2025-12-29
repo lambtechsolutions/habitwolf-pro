@@ -576,6 +576,7 @@
                             <option value="pets">🐕 Mascotas</option>
                             <option value="selfcare">💆‍♂️ Cuidado Personal</option>
                             <option value="spiritual">🙏 Espiritual</option>
+                            <option value="writing">✍️ Escritura</option>
                         </select>
                         <input type="number" id="new-habit-target" placeholder="Meta" min="1" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
                         <input type="text" id="new-habit-unit" placeholder="Unidad (ej: kg, min, páginas)" class="p-3 rounded-lg border border-gray-300 bg-white bg-opacity-90">
@@ -1688,7 +1689,8 @@
                         nature: { name: 'Naturaleza', emoji: '🌳', color: '#166534' },
                         pets: { name: 'Mascotas', emoji: '🐕', color: '#92400e' },
                         selfcare: { name: 'Cuidado Personal', emoji: '💆‍♂️', color: '#be123c' },
-                        spiritual: { name: 'Espiritual', emoji: '🙏', color: '#581c87' }
+                        spiritual: { name: 'Espiritual', emoji: '🙏', color: '#581c87' },
+                        writing: { name: 'Escritura', emoji: '✍️', color: '#4f46e5' }
                     };
                     
                     if (!gameData.player) {
@@ -5422,15 +5424,23 @@
                     const dateStr = date.toISOString().split('T')[0];
                     const isToday = dateStr === today;
                     const dayOfWeek = date.getDay();
+                    const currentHour = parseInt(hour.split(':')[0]);
                     
-                    // Find habits for this hour and day
+                    // Find habits that span this hour and day
                     const habitsInSlot = scheduledHabits.filter(habit => {
                         if (!habit.schedule.weekdays.includes(dayOfWeek)) return false;
                         
-                        const habitHour = habit.schedule.startTime.split(':')[0];
-                        const slotHour = hour.split(':')[0];
+                        const startHour = parseInt(habit.schedule.startTime.split(':')[0]);
+                        const endHour = parseInt(habit.schedule.endTime.split(':')[0]);
+                        const endMinute = parseInt(habit.schedule.endTime.split(':')[1] || 0);
                         
-                        return habitHour === slotHour;
+                        // Check if current hour is within the habit's time range
+                        // If endMinute > 0, include the end hour; otherwise, exclude it
+                        if (endMinute > 0) {
+                            return currentHour >= startHour && currentHour <= endHour;
+                        } else {
+                            return currentHour >= startHour && currentHour < endHour;
+                        }
                     });
                     
                     // Check if habits are completed
@@ -5439,24 +5449,45 @@
                     let cellContent = '';
                     if (habitsInSlot.length > 0) {
                         habitsInSlot.forEach(habit => {
-                            const category = gameData.categories[habit.category];
-                            const isCompleted = dayLog?.habits?.includes(habit.id);
-                            const bgColor = isCompleted ? 'bg-green-600' : 'bg-blue-600';
-                            const opacity = isCompleted ? 'bg-opacity-80' : 'bg-opacity-60';
+                            const startHour = parseInt(habit.schedule.startTime.split(':')[0]);
                             
-                            cellContent += `
-                                <div class="${bgColor} ${opacity} text-white text-xs p-1 mb-1 rounded cursor-pointer hover:opacity-100 transition-opacity"
-                                     onclick="toggleHabitFromCalendar('${habit.id}', '${dateStr}')"
-                                     title="${habit.name} - ${habit.schedule.startTime} a ${habit.schedule.endTime}">
-                                    <div class="font-semibold">${category.emoji} ${habit.name}</div>
-                                    <div class="text-xs opacity-75">${habit.schedule.startTime}-${habit.schedule.endTime}</div>
-                                    ${isCompleted ? '<div class="text-xs">✅ Completado</div>' : ''}
-                                </div>
-                            `;
+                            // Only render the block in the starting hour to avoid duplicates
+                            if (currentHour === startHour) {
+                                const category = gameData.categories[habit.category];
+                                const isCompleted = dayLog?.habits?.includes(habit.id);
+                                const bgColor = isCompleted ? 'bg-green-600' : 'bg-blue-600';
+                                const opacity = isCompleted ? 'bg-opacity-80' : 'bg-opacity-60';
+                                
+                                // Calculate duration in hours
+                                const endHour = parseInt(habit.schedule.endTime.split(':')[0]);
+                                const endMinute = parseInt(habit.schedule.endTime.split(':')[1] || 0);
+                                const startMinute = parseInt(habit.schedule.startTime.split(':')[1] || 0);
+                                
+                                // Calculate duration more precisely
+                                let durationHours = endHour - startHour;
+                                if (endMinute > 0 || startMinute > 0) {
+                                    durationHours = (endHour * 60 + endMinute - startHour * 60 - startMinute) / 60;
+                                }
+                                
+                                // Height calculation: each hour = 60px (approximate cell height)
+                                const blockHeight = Math.max(durationHours * 60, 50); // Minimum 50px
+                                
+                                cellContent += `
+                                    <div class="${bgColor} ${opacity} text-white text-xs p-2 rounded cursor-pointer hover:opacity-100 transition-opacity relative"
+                                         onclick="toggleHabitFromCalendar('${habit.id}', '${dateStr}')"
+                                         title="${habit.name} - ${habit.schedule.startTime} a ${habit.schedule.endTime}"
+                                         style="height: ${blockHeight}px; min-height: ${blockHeight}px; position: relative; z-index: 10; margin-bottom: 2px;">
+                                        <div class="font-semibold">${category.emoji} ${habit.name}</div>
+                                        <div class="text-xs opacity-75 mt-1">${habit.schedule.startTime} - ${habit.schedule.endTime}</div>
+                                        <div class="text-xs opacity-75">(${durationHours.toFixed(1)}h)</div>
+                                        ${isCompleted ? '<div class="text-xs mt-1">✅ Completado</div>' : ''}
+                                    </div>
+                                `;
+                            }
                         });
                     }
                     
-                    calendarHTML += `<td class="border border-blue-400 border-opacity-20 p-1 align-top ${isToday ? 'bg-orange-500 bg-opacity-10' : ''}" style="min-height: 60px;">${cellContent}</td>`;
+                    calendarHTML += `<td class="border border-blue-400 border-opacity-20 p-1 align-top ${isToday ? 'bg-orange-500 bg-opacity-10' : ''}" style="min-height: 60px; height: 60px; vertical-align: top;">${cellContent}</td>`;
                 });
                 
                 calendarHTML += '</tr>';
