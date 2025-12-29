@@ -1429,6 +1429,24 @@
                     </div>
                 </div>
                 
+                <!-- NUEVO: Inyector de Hábitos -->
+                <div class="migration-section bg-gradient-to-r from-purple-900 to-blue-900 bg-opacity-50">
+                    <h4 class="text-lg font-semibold text-white mb-4">🚀 Inyectar Mis 17 Hábitos</h4>
+                    <p class="text-blue-200 text-sm mb-4">Esta opción carga automáticamente tus 17 hábitos configurados con todos sus horarios.</p>
+                    <div class="bg-white bg-opacity-10 rounded-lg p-4 mb-4">
+                        <p class="text-yellow-300 text-sm mb-2">⚠️ IMPORTANTE:</p>
+                        <ul class="text-blue-200 text-xs space-y-1">
+                            <li>• Se agregarán 17 hábitos a tu lista actual</li>
+                            <li>• NO se borrarán hábitos existentes</li>
+                            <li>• Incluye todos los horarios y configuraciones</li>
+                            <li>• Proceso es irreversible (crea backup primero si quieres)</li>
+                        </ul>
+                    </div>
+                    <button onclick="inyectarMisHabitos()" class="btn-migration w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-lg font-bold">
+                        🔥 INYECTAR MIS 17 HÁBITOS AHORA
+                    </button>
+                </div>
+                
                 <!-- Reset Options -->
                 <div class="migration-section">
                     <h4 class="text-lg font-semibold text-white mb-4">🔄 Opciones de Reinicio</h4>
@@ -5533,6 +5551,94 @@
             
             // Re-render calendar to show updated state
             renderCalendar();
+        }
+        
+        // 🔥 INYECTOR DE MIS 17 HÁBITOS
+        function inyectarMisHabitos() {
+            if (!confirm('¿Estás seguro de inyectar tus 17 hábitos? Se agregarán a tu lista actual.')) {
+                return;
+            }
+
+            console.log('🚀 Iniciando inyección de hábitos...');
+
+            const habitosNuevos = [
+                // 🏋️ PILAR 1: CUERPO (5 Hábitos)
+                { name: "Despertar 4:30 AM", description: "Levantarme a las 4:30 AM para ritual matutino samurái", category: "morning", target: 1, unit: "vez", schedule: { enabled: true, startTime: "04:30", endTime: "05:30", weekdays: [1,2,3,4,5,6] }},
+                { name: "Gimnasio 60 min", description: "Entrenamiento de fuerza y resistencia", category: "fitness", target: 60, unit: "min", schedule: { enabled: true, startTime: "19:00", endTime: "20:00", weekdays: [2,4,5] }},
+                { name: "Gimnasio Domingo", description: "Cuarta sesión semanal", category: "fitness", target: 60, unit: "min", schedule: { enabled: true, startTime: "10:00", endTime: "11:00", weekdays: [0] }},
+                { name: "Meal Prep Semanal", description: "Preparar 10-12 comidas para Lun-Sáb", category: "cooking", target: 1, unit: "sesión", schedule: { enabled: true, startTime: "11:00", endTime: "14:00", weekdays: [0] }},
+                { name: "Hidratación 2L diarios", description: "Beber 2 litros de agua para energía óptima", category: "water", target: 2, unit: "litros", schedule: null },
+                { name: "Dormir 9:30 PM", description: "Luces apagadas para 7 horas de sueño (NO-NEGOCIABLE)", category: "sleep", target: 1, unit: "vez", schedule: { enabled: true, startTime: "21:30", endTime: "04:30", weekdays: [0,1,2,3,4,5] }},
+                
+                // 🧠 PILAR 2: MENTE (4 Hábitos)
+                { name: "Meditación matutina 5 min", description: "Claridad mental para empezar el día", category: "meditation", target: 5, unit: "min", schedule: { enabled: true, startTime: "04:45", endTime: "04:50", weekdays: [1,2,3,4,5,6] }},
+                { name: "Lectura nocturna 20 min", description: "Leer para alcanzar 1-2 libros/mes", category: "reading", target: 20, unit: "min", schedule: { enabled: true, startTime: "20:30", endTime: "20:50", weekdays: [0,1,2,3,4,5,6] }},
+                { name: "Journaling nocturno 10 min", description: "3 logros + 3 gratitudes diarias", category: "mindfulness", target: 10, unit: "min", schedule: { enabled: true, startTime: "21:00", endTime: "21:10", weekdays: [0,1,2,3,4,5,6] }},
+                { name: "Estudiar alemán 20 min", description: "150 horas/año para fluidez conversacional", category: "learning", target: 20, unit: "min", schedule: { enabled: true, startTime: "20:00", endTime: "20:20", weekdays: [1,2,3,4,5,6] }},
+                
+                // 💼 PILAR 3: TRABAJO (3 Hábitos)
+                { name: "Trabajo Peachtree", description: "Peachtree Roofing Supply - $773/semana", category: "work", target: 12, unit: "horas", schedule: { enabled: true, startTime: "06:00", endTime: "18:00", weekdays: [1,2,3,4,5,6] }},
+                { name: "LambTech Solutions", description: "Desarrollo + marketing (9-10h/semana)", category: "work", target: 2, unit: "horas", schedule: null },
+                { name: "Sesión financiera semanal", description: "Revisar gastos, saldo, proyectar próxima semana", category: "finance", target: 30, unit: "min", schedule: { enabled: true, startTime: "20:00", endTime: "20:30", weekdays: [5] }},
+                
+                // ✍️ PILAR 4: CREATIVIDAD (3 Hábitos)
+                { name: "Escritura semanal", description: "1,500-2,000 palabras (poesía, prosa, erotismo)", category: "writing", target: 1500, unit: "palabras", schedule: { enabled: true, startTime: "14:30", endTime: "16:30", weekdays: [0] }},
+                { name: "Sesión fotográfica", description: "Studio1827 - Portfolio y contenido redes", category: "creativity", target: 2, unit: "horas", schedule: { enabled: true, startTime: "15:00", endTime: "17:00", weekdays: [6] }},
+                { name: "Publicar contenido escritor", description: "Programar publicaciones para corderoescribe.com (3x semana)", category: "creativity", target: 3, unit: "posts", schedule: { enabled: true, startTime: "16:30", endTime: "17:00", weekdays: [0] }},
+                
+                // 🏡 PILAR 6: ORDEN (2 Hábitos)
+                { name: "Limpiar apartamento", description: "Espacio limpio = mente clara", category: "cleaning", target: 30, unit: "min", schedule: { enabled: true, startTime: "18:30", endTime: "19:00", weekdays: [3,6] }},
+                { name: "Preparar ropa noche anterior", description: "Mañanas sin estrés, salir eficiente", category: "morning", target: 10, unit: "min", schedule: { enabled: true, startTime: "21:10", endTime: "21:20", weekdays: [0,1,2,3,4,5] }}
+            ];
+
+            console.log(`📊 Total de hábitos a inyectar: ${habitosNuevos.length}`);
+
+            let contador = 0;
+            habitosNuevos.forEach((habitData, index) => {
+                const newHabit = {
+                    id: Date.now().toString() + '_' + index + '_' + Math.random().toString(36).substr(2, 9),
+                    name: habitData.name,
+                    description: habitData.description,
+                    category: habitData.category,
+                    target: habitData.target,
+                    unit: habitData.unit,
+                    schedule: habitData.schedule,
+                    createdAt: new Date().toISOString(),
+                    completed: {},
+                    streak: 0,
+                    totalCompleted: 0,
+                    fibonacciLevel: 1
+                };
+
+                gameData.habits.push(newHabit);
+                gameData.streaks[newHabit.id] = 0;
+                contador++;
+
+                console.log(`✅ [${contador}/${habitosNuevos.length}] ${habitData.name} - ${habitData.category}`);
+            });
+
+            saveGameData();
+            updateHabitsList();
+            loadDailyHabits();
+            renderCalendar();
+            updateDashboard();
+
+            console.log('🎉 ¡INYECCIÓN COMPLETADA!');
+            console.log(`📊 Total de hábitos ahora: ${gameData.habits.length}`);
+
+            showNotification(`🎉 ${contador} hábitos inyectados correctamente. Total: ${gameData.habits.length}`, 'success');
+            
+            // Mostrar mensaje detallado
+            alert(`🔥 INYECCIÓN COMPLETADA
+
+✅ ${contador} hábitos agregados correctamente
+
+📊 Total de hábitos en tu lista: ${gameData.habits.length}
+
+Ve a la pestaña "🎯 Hábitos" para verlos todos.
+Ve a "📅 Calendario" para ver los horarios.
+
+¡Listos para conquistar! 🐺⚔️`);
         }
         
         // Service Worker Registration
