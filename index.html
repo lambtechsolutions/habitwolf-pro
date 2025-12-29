@@ -5432,7 +5432,7 @@
                 hours.push(`${h.toString().padStart(2, '0')}:00`);
             }
             
-            let calendarHTML = '<table class="w-full border-collapse text-sm">';
+            let calendarHTML = '<div class="overflow-x-auto"><table class="border-collapse text-sm" style="table-layout: auto;">';
             
             // Header row (days of week)
             calendarHTML += '<thead><tr class="bg-blue-900 bg-opacity-30"><th class="border border-blue-400 border-opacity-30 p-2 w-20">Hora</th>';
@@ -5507,6 +5507,46 @@
                 dayColumns.set(dateStr, columns);
             });
             
+            // NUEVO: Pre-calcular número máximo de columnas por HORA y DÍA
+            const hourDayMaxColumns = new Map(); // key: "hour-dateStr" -> maxColumns
+            
+            weekDates.forEach((date) => {
+                const dateStr = date.toISOString().split('T')[0];
+                
+                hours.forEach(hour => {
+                    const currentHour = parseInt(hour.split(':')[0]);
+                    
+                    // Find habits that span this hour
+                    const habitsInHour = scheduledHabits.filter(habit => {
+                        const dayOfWeek = date.getDay();
+                        if (!habit.schedule.weekdays.includes(dayOfWeek)) return false;
+                        
+                        const startHour = parseInt(habit.schedule.startTime.split(':')[0]);
+                        const endHour = parseInt(habit.schedule.endTime.split(':')[0]);
+                        const endMinute = parseInt(habit.schedule.endTime.split(':')[1] || 0);
+                        
+                        if (endMinute > 0) {
+                            return currentHour >= startHour && currentHour <= endHour;
+                        } else {
+                            return currentHour >= startHour && currentHour < endHour;
+                        }
+                    });
+                    
+                    // Get column info for each habit
+                    const dayColumnMap = dayColumns.get(dateStr) || new Map();
+                    let maxCols = 1;
+                    
+                    habitsInHour.forEach(habit => {
+                        const columnInfo = dayColumnMap.get(habit.id);
+                        if (columnInfo && columnInfo.totalColumns > maxCols) {
+                            maxCols = columnInfo.totalColumns;
+                        }
+                    });
+                    
+                    hourDayMaxColumns.set(`${hour}-${dateStr}`, maxCols);
+                });
+            });
+            
             // Body rows (hours)
             calendarHTML += '<tbody>';
             hours.forEach(hour => {
@@ -5520,6 +5560,9 @@
                     const isToday = dateStr === today;
                     const dayOfWeek = date.getDay();
                     let cellHeight = 60; // Default height
+                    
+                    // Get max columns for this hour-day combination
+                    const maxColumns = hourDayMaxColumns.get(`${hour}-${dateStr}`) || 1;
                     
                     // Find habits that span this hour and day
                     const habitsInSlot = scheduledHabits.filter(habit => {
@@ -5598,23 +5641,29 @@
                     }
                     
                     // Store cell data
-                    cellDataArray.push({ cellContent, isToday, cellHeight });
+                    cellDataArray.push({ cellContent, isToday, cellHeight, maxColumns });
                 });
                 
                 // Calculate maximum height for the entire row
                 const rowHeight = Math.max(...cellDataArray.map(c => c.cellHeight));
+                const maxColumnsInRow = Math.max(...cellDataArray.map(c => c.maxColumns), 1);
+                
+                // Ancho mínimo: 150px base + 120px por cada columna adicional
+                const minCellWidth = 150 + (maxColumnsInRow - 1) * 120;
                 
                 // Second pass: render all cells with uniform row height
                 calendarHTML += `<tr><td class="border border-blue-400 border-opacity-20 p-1 text-blue-200 text-xs text-center bg-gray-800 bg-opacity-30" style="height: ${rowHeight}px;">${hour}</td>`;
                 
-                cellDataArray.forEach(({ cellContent, isToday }) => {
-                    calendarHTML += `<td class="border border-blue-400 border-opacity-20 p-1 align-top ${isToday ? 'bg-orange-500 bg-opacity-10' : ''}" style="min-height: ${rowHeight}px; height: ${rowHeight}px; vertical-align: top; position: relative;">${cellContent}</td>`;
+                cellDataArray.forEach(({ cellContent, isToday, maxColumns }) => {
+                    // Aplicar ancho mínimo solo si hay múltiples columnas
+                    const widthStyle = maxColumns > 1 ? `min-width: ${minCellWidth}px;` : '';
+                    calendarHTML += `<td class="border border-blue-400 border-opacity-20 p-1 align-top ${isToday ? 'bg-orange-500 bg-opacity-10' : ''}" style="min-height: ${rowHeight}px; height: ${rowHeight}px; vertical-align: top; position: relative; ${widthStyle}">${cellContent}</td>`;
                 });
                 
                 calendarHTML += '</tr>';
             });
             calendarHTML += '</tbody>';
-            calendarHTML += '</table>';
+            calendarHTML += '</table></div>';
             
             // Add section for unscheduled habits
             if (unscheduledHabits.length > 0) {
