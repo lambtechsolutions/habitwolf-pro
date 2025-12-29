@@ -5449,6 +5449,64 @@
             });
             calendarHTML += '</tr></thead>';
             
+            // NUEVO: Pre-calcular columnas para cada día COMPLETO
+            const dayColumns = new Map(); // dateStr -> Map(habitId -> column)
+            
+            weekDates.forEach((date) => {
+                const dateStr = date.toISOString().split('T')[0];
+                const dayOfWeek = date.getDay();
+                
+                // Get all habits for this day, sorted by start time
+                const dayHabits = scheduledHabits
+                    .filter(h => h.schedule.weekdays.includes(dayOfWeek))
+                    .map(habit => {
+                        const [startH, startM] = habit.schedule.startTime.split(':').map(Number);
+                        const [endH, endM] = habit.schedule.endTime.split(':').map(Number);
+                        return {
+                            habit,
+                            startMinutes: startH * 60 + startM,
+                            endMinutes: endH * 60 + endM
+                        };
+                    })
+                    .sort((a, b) => a.startMinutes - b.startMinutes);
+                
+                // Assign columns using interval scheduling algorithm
+                const columns = new Map(); // habitId -> column
+                const columnEndTimes = []; // Array of end times for each column
+                
+                dayHabits.forEach(({habit, startMinutes, endMinutes}) => {
+                    // Find first available column
+                    let assignedColumn = -1;
+                    
+                    for (let col = 0; col < columnEndTimes.length; col++) {
+                        if (startMinutes >= columnEndTimes[col]) {
+                            assignedColumn = col;
+                            columnEndTimes[col] = endMinutes;
+                            break;
+                        }
+                    }
+                    
+                    // If no column available, create new one
+                    if (assignedColumn === -1) {
+                        assignedColumn = columnEndTimes.length;
+                        columnEndTimes.push(endMinutes);
+                    }
+                    
+                    columns.set(habit.id, {
+                        column: assignedColumn,
+                        totalColumns: 0 // Will update after all habits processed
+                    });
+                });
+                
+                // Update total columns for all habits
+                const maxCols = columnEndTimes.length;
+                columns.forEach(value => {
+                    value.totalColumns = maxCols;
+                });
+                
+                dayColumns.set(dateStr, columns);
+            });
+            
             // Body rows (hours)
             calendarHTML += '<tbody>';
             hours.forEach(hour => {
@@ -5482,6 +5540,7 @@
                     
                     // Check if habits are completed
                     const dayLog = gameData.dailyLogs[dateStr];
+                    const dayColumnMap = dayColumns.get(dateStr) || new Map();
                     
                     let cellContent = '';
                     if (habitsInSlot.length > 0) {
@@ -5491,65 +5550,20 @@
                             return currentHour === startHour;
                         });
                         
-                        // Sort by start minute to render in order
-                        habitsStartingHere.sort((a, b) => {
-                            const aMin = parseInt(a.schedule.startTime.split(':')[1] || 0);
-                            const bMin = parseInt(b.schedule.startTime.split(':')[1] || 0);
-                            return aMin - bMin;
-                        });
-                        
-                        // Calculate actual positions for each habit considering overlaps
-                        const habitPositions = [];
+                        // Render each habit with pre-calculated column
                         habitsStartingHere.forEach(habit => {
                             const startHour = parseInt(habit.schedule.startTime.split(':')[0]);
                             const startMinute = parseInt(habit.schedule.startTime.split(':')[1] || 0);
                             const endHour = parseInt(habit.schedule.endTime.split(':')[0]);
                             const endMinute = parseInt(habit.schedule.endTime.split(':')[1] || 0);
                             
-                            // Calculate start and end in minutes from hour start
-                            const startMinuteInHour = startMinute;
-                            const endMinuteTotal = (endHour - startHour) * 60 + endMinute;
-                            const durationMinutes = endMinuteTotal - startMinute;
+                            const durationMinutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
+                            const durationHours = durationMinutes / 60;
                             
-                            // Find a non-overlapping column
-                            let column = 0;
-                            let positionFound = false;
+                            // Get pre-calculated column info
+                            const columnInfo = dayColumnMap.get(habit.id) || { column: 0, totalColumns: 1 };
+                            const columnWidth = 100 / columnInfo.totalColumns;
                             
-                            while (!positionFound) {
-                                // Check if this column is free for the habit's time range
-                                const overlaps = habitPositions.some(pos => {
-                                    if (pos.column !== column) return false;
-                                    
-                                    // Check if time ranges overlap
-                                    const posEnd = pos.startMinute + pos.durationMinutes;
-                                    const habitEnd = startMinuteInHour + durationMinutes;
-                                    
-                                    return !(habitEnd <= pos.startMinute || startMinuteInHour >= posEnd);
-                                });
-                                
-                                if (!overlaps) {
-                                    positionFound = true;
-                                } else {
-                                    column++;
-                                }
-                            }
-                            
-                            habitPositions.push({
-                                habit,
-                                startMinute: startMinuteInHour,
-                                durationMinutes,
-                                column,
-                                durationHours: durationMinutes / 60
-                            });
-                        });
-                        
-                        // Calculate number of columns needed
-                        const maxColumns = Math.max(...habitPositions.map(p => p.column), 0) + 1;
-                        const columnWidth = 100 / maxColumns;
-                        
-                        // Render habits with calculated positions
-                        habitPositions.forEach(pos => {
-                            const { habit, startMinute, durationMinutes, column, durationHours } = pos;
                             const category = gameData.categories[habit.category];
                             const isCompleted = dayLog?.habits?.includes(habit.id);
                             const bgColor = isCompleted ? 'bg-green-600' : 'bg-blue-600';
@@ -5560,7 +5574,7 @@
                             
                             // Position
                             const topOffset = startMinute;
-                            const leftOffset = column * columnWidth;
+                            const leftOffset = columnInfo.column * columnWidth;
                             
                             // Tooltip with full information
                             const tooltipText = `${habit.name}\\n${habit.schedule.startTime} - ${habit.schedule.endTime} (${durationHours.toFixed(1)}h)${isCompleted ? '\\n✅ Completado' : ''}`;
@@ -5576,15 +5590,11 @@
                                     </div>
                                 </div>
                             `;
+                            
+                            // Update cell height
+                            const habitBottom = startMinute + blockHeight;
+                            cellHeight = Math.max(cellHeight, habitBottom);
                         });
-                        
-                        // Calculate required cell height based on habit positions
-                        const maxHeight = habitPositions.reduce((max, pos) => {
-                            const habitBottom = pos.startMinute + Math.max(pos.durationMinutes, 35);
-                            return Math.max(max, habitBottom);
-                        }, 60); // Minimum 60px
-                        
-                        cellHeight = Math.max(cellHeight, maxHeight);
                     }
                     
                     // Store cell data
