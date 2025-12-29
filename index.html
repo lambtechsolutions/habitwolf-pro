@@ -5560,6 +5560,25 @@
             }
 
             console.log('🚀 Iniciando inyección de hábitos...');
+            
+            // CRÍTICO: Asegurar que la categoría "writing" existe
+            if (!gameData.categories.writing) {
+                console.log('⚠️ Categoría "writing" no existe, creándola...');
+                gameData.categories.writing = { 
+                    name: 'Escritura', 
+                    emoji: '✍️', 
+                    color: '#4f46e5' 
+                };
+            }
+            
+            // Verificar todas las categorías necesarias
+            const categoriasRequeridas = ['morning', 'fitness', 'cooking', 'water', 'sleep', 'meditation', 'reading', 'mindfulness', 'learning', 'work', 'finance', 'writing', 'creativity', 'cleaning'];
+            categoriasRequeridas.forEach(cat => {
+                if (!gameData.categories[cat]) {
+                    console.error(`❌ ERROR: Categoría "${cat}" no existe en gameData.categories`);
+                }
+            });
+            console.log('✅ Todas las categorías verificadas');
 
             const habitosNuevos = [
                 // 🏋️ PILAR 1: CUERPO (5 Hábitos)
@@ -5618,27 +5637,43 @@
             });
 
             saveGameData();
-            updateHabitsList();
-            loadDailyHabits();
-            renderCalendar();
-            updateDashboard();
+            
+            try {
+                updateHabitsList();
+            } catch (e) {
+                console.error('❌ Error en updateHabitsList:', e.message);
+                console.log('Intentando fix...');
+            }
+            
+            try {
+                loadDailyHabits();
+            } catch (e) {
+                console.error('❌ Error en loadDailyHabits:', e.message);
+            }
+            
+            try {
+                renderCalendar();
+            } catch (e) {
+                console.error('❌ Error en renderCalendar:', e.message);
+            }
+            
+            try {
+                updateDashboard();
+            } catch (e) {
+                console.error('❌ Error en updateDashboard:', e.message);
+            }
 
             console.log('🎉 ¡INYECCIÓN COMPLETADA!');
             console.log(`📊 Total de hábitos ahora: ${gameData.habits.length}`);
 
             showNotification(`🎉 ${contador} hábitos inyectados correctamente. Total: ${gameData.habits.length}`, 'success');
             
-            // Mostrar mensaje detallado
-            alert(`🔥 INYECCIÓN COMPLETADA
-
-✅ ${contador} hábitos agregados correctamente
-
-📊 Total de hábitos en tu lista: ${gameData.habits.length}
-
-Ve a la pestaña "🎯 Hábitos" para verlos todos.
-Ve a "📅 Calendario" para ver los horarios.
-
-¡Listos para conquistar! 🐺⚔️`);
+            // Recargar la página para forzar actualización completa
+            setTimeout(() => {
+                if (confirm('¿Recargar la página para actualizar la interfaz?')) {
+                    location.reload();
+                }
+            }, 1000);
         }
         
         // Service Worker Registration
